@@ -41,6 +41,7 @@ class UserSerializer(serializers.ModelSerializer):
             "is_active",
             "first_name",
             "last_name",
+            "groups",
         ]
 
 
@@ -224,7 +225,7 @@ class ItemSerializer(serializers.ModelSerializer):
         ]
 
 
-# %% NESTED ITEM TYPE
+# %% NESTED ITEM
 class NestedItemSerializer(serializers.ModelSerializer):
     type = ItemTypeSerializer(read_only=True)
 
@@ -370,6 +371,7 @@ class UserFullNameSerializer(serializers.ModelSerializer):
 class DocumentListSerializer(serializers.ModelSerializer):
 
     type = serializers.StringRelatedField()
+    author = serializers.StringRelatedField()
     # items = serializers.StringRelatedField(many=True)
     items = NestedItemSerializer(read_only=True, many=True)
 
@@ -383,7 +385,9 @@ class DocumentListSerializer(serializers.ModelSerializer):
             "type",
             "items",
             "created",
+            "author",
             "filename",
+            "filehash",
         ]
 
 
@@ -397,8 +401,8 @@ class DocumentTypeSerializer(serializers.ModelSerializer):
 # %% DOCUMENT
 class DocumentSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False, read_only=False)
-
     # type = serializers.PrimaryKeyRelatedField(queryset=DocumentType.objects.all())
+    items = NestedItemSerializer(read_only=True, many=True)
 
     '''
     type = DocumentTypeSerializer(read_only=True)
@@ -413,13 +417,12 @@ class DocumentSerializer(serializers.ModelSerializer):
     # template = serializers.SlugRelatedField(slug_field="name", read_only=True)
     # template_id = serializers.PrimaryKeyRelatedField(source="template", queryset=Template.objects.all(), write_only=True)
 
-    author = UserFullNameSerializer(read_only=True)
+    # author = UserFullNameSerializer(read_only=True)
+    author = UserSerializer(read_only=True)
+
     author_id = serializers.PrimaryKeyRelatedField(source="author", queryset=User.objects.all(), default=serializers.CurrentUserDefault(), write_only=True)
 
     version = serializers.IntegerField(required=False)
-
-    # item = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all())
-    #             "type_id",
 
     class Meta:
         model = Document
@@ -438,34 +441,67 @@ class DocumentSerializer(serializers.ModelSerializer):
             "author",
             "author_id",
             "file",
+            "filehash",
         ]
 
     def create(self, validated_data):
-        # version = Utils.get_next_documentVersion(Document, validated_data)
-        # validated_data["version"] = version
         version = "1"
-
-        # template = validated_data.get("template")
-
         file = validated_data.get("file", None)
-
         filename = file.name
         file_extension = filename.rsplit(".", 1)[1]
-
-        '''
-        if int(template.id) != int(settings.NESOP_TEMPLATE_AUTRE_ID):
-            template = Template.objects.filter(id=template.id).first()
-            filename = template.filename
-        '''
-
         filename = filename.rsplit(".", 1)[0] + f"_v{version}." + file_extension
-
         file.name = filename
         validated_data["file"] = file
         validated_data["filename"] = filename
-
         document = Document.objects.create(**validated_data)
         return document
+
+
+# %% New document serializer
+class NewDocumentSerializer(serializers.ModelSerializer):
+
+    id = serializers.IntegerField(required=False, read_only=False)
+
+    type = serializers.PrimaryKeyRelatedField(
+        required=True,
+        queryset=DocumentType.objects.all(),
+    )
+
+    author = serializers.PrimaryKeyRelatedField(
+        required=True,
+        queryset=User.objects.all(),
+    )
+
+    version = serializers.IntegerField(required=False)
+
+    # type = serializers.PrimaryKeyRelatedField(queryset=DocumentType.objects.all())
+    # items = NestedItemSerializer(read_only=True, many=True)
+
+    items = serializers.PrimaryKeyRelatedField(
+        required=False,
+        many=True,
+        queryset=Item.objects.all(),
+    )
+
+    class Meta:
+        model = Document
+        fields = [
+            "id",
+            "uuid",
+            "reference",
+            "title",
+            "type",
+            "created",
+            "filename",
+            "note",
+            "version",
+            "size",
+            "items",
+            "author",
+            "author_id",
+            "file",
+            "filehash",
+        ]
 
 
 # %% New item serializer
@@ -512,7 +548,6 @@ class NewItemSerializer(serializers.ModelSerializer):
             "description",
             "urgent",
             "late",
-            # "islate",
             "writtenresponse",
             "oralresponse",
             "author",
