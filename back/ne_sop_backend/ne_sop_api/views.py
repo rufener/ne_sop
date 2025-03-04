@@ -12,6 +12,7 @@ from ne_sop_api.models import (
 )
 from ne_sop_api.serializers import (
     DocumentSerializer,
+    NewDocumentSerializer,
     DocumentListSerializer,
     DocumentTypeSerializer,
     EntitySerializer,
@@ -906,8 +907,8 @@ class DocumentViewSet(viewsets.ViewSet):
     """
 
     parser_classes = (MultiPartParser, FormParser)
-    serializer_class = DocumentSerializer
-    search_fields = ["title", "reference", "filename", "items__title"]
+    serializer_class = NewDocumentSerializer
+    search_fields = ["title", "reference", "filename", "items__title", "items__number"]
     # lookup_field = "uuid"
     # lookup_url_kwarg = "uuid"
 
@@ -966,6 +967,7 @@ class DocumentViewSet(viewsets.ViewSet):
             }
         )
 
+    '''
     @extend_schema(
         responses=DocumentSerializer,
         tags=["Document"],
@@ -976,8 +978,22 @@ class DocumentViewSet(viewsets.ViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    '''
 
     @extend_schema(
+        responses=NewDocumentSerializer,
+        tags=["Document"],
+    )
+    def create(self, request):
+        serializer = NewDocumentSerializer(data=request.data, context={"request": self.request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        responses=DocumentSerializer,
         tags=["Document"],
     )
     def retrieve(self, request, pk=None):
@@ -986,14 +1002,77 @@ class DocumentViewSet(viewsets.ViewSet):
         serializer = DocumentSerializer(document)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['get'], url_path='download', url_name='download')
-    @extend_schema(tags=["Document"], description="Download the file attached to the document")
-    def download_file(self, request, pk=None):
+    @extend_schema(
+        responses=NewDocumentSerializer,
+        tags=["Document"],
+    )
+    def update(self, request, pk=None):
+        #  document = get_object_or_404(self.get_queryset(), pk=pk) # TODO: decide if we use uuid or integer PK
         document = get_object_or_404(self.get_queryset(), uuid=pk)
-        # Ensure the file is opened and returned as a response. Adjust this if you're using a custom storage.
-        file_handle = document.file.open(mode='rb')
-        response = FileResponse(file_handle, as_attachment=True, filename=document.file.name)
-        return response
+
+        # os.remove(PurePath(settings.MEDIA_ROOT, document.file.name))
+
+        # Make a mutable copy of request.data.
+        data = request.data.copy()
+
+        # Check if a new file was uploaded.
+        if 'file' in request.FILES:
+            # If a new file is provided and there's an existing file, delete the old file.
+            if document.file:
+                print("Deleting existing file:", document.file.path)
+                document.file.delete(save=False)
+        else:
+            # No new file uploaded via request.FILES.
+            # Remove the 'file' key if it exists (it might be a string or empty value)
+            data.pop('file', None)
+
+        # Use partial=True so that only provided fields are updated.
+        serializer = NewDocumentSerializer(document, data=data, partial=True)
+
+        '''
+        # Check if a file object is actually provided in request.FILES
+        file_obj = request.FILES.get('file', None)
+
+        # Check if a new file has been uploaded
+        # if 'file' in request.FILES:
+        if file_obj:
+            print("There is an existing file")
+            # If an existing file is present, delete it.
+            if document.file:
+                print("Deleting the existing file:", document.file.path)
+                document.file.delete(save=False)
+
+        else:
+            if 'file' in request.data:
+                # Make a mutable copy since request.data might be immutable.
+                data = request.data.copy()
+                data.pop("file")
+                request_data = data
+
+                # request.data.pop('file')
+
+            else:
+                request_data = request.data
+
+        # serializer = NewDocumentSerializer(document, data=request.data, partial=True)
+        serializer = NewDocumentSerializer(document, data=request_data, partial=True)
+        '''
+
+        print("Update document")
+        print("Request:")
+        print(request)
+
+        print("Request FILES:")
+        print(request.FILES)
+
+        print("Request data:")
+        print(request.data)
+        print("Document:")
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     '''
     @extend_schema(
@@ -1016,42 +1095,6 @@ class DocumentViewSet(viewsets.ViewSet):
     '''
 
     @extend_schema(
-        tags=["Document"],
-    )
-    def update(self, request, pk=None):
-        #  document = get_object_or_404(self.get_queryset(), pk=pk) # TODO: decide if we use uuid or integer PK
-        document = get_object_or_404(self.get_queryset(), uuid=pk)
-
-        # os.remove(PurePath(settings.MEDIA_ROOT, document.file.name))
-
-        # Check if a new file has been uploaded
-        if 'file' in request.FILES:
-            print("There is an existing file")
-            # If an existing file is present, delete it.
-            if document.file:
-                print("Delete file")
-                print("File path:", document.file.path)
-                document.file.delete(save=False)
-
-        serializer = DocumentSerializer(document, data=request.data)
-        print("Update document")
-        print("Request:")
-        print(request)
-
-        print("Request FILES:")
-        print(request.FILES)
-
-        print("Request data:")
-        print(request.data)
-        print("Document:")
-        # print(document)
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @extend_schema(
         responses=DocumentSerializer,
         tags=["Document"],
     )
@@ -1060,6 +1103,15 @@ class DocumentViewSet(viewsets.ViewSet):
         os.remove(PurePath(settings.MEDIA_ROOT, document.file.name))
         document.delete()
         return Response({"msg": "Document deleted"})
+
+    @action(detail=True, methods=['get'], url_path='download', url_name='download')
+    @extend_schema(tags=["Document"], description="Download the file attached to the document")
+    def download_file(self, request, pk=None):
+        document = get_object_or_404(self.get_queryset(), uuid=pk)
+        # Ensure the file is opened and returned as a response. Adjust this if you're using a custom storage.
+        file_handle = document.file.open(mode='rb')
+        response = FileResponse(file_handle, as_attachment=True, filename=document.file.name)
+        return response
 
 
 # %% UPDATE LATE ATTRIBUTE IN ITEMS
