@@ -1,4 +1,5 @@
 import uuid
+import hashlib
 from pathlib import Path, PurePath
 
 from django.contrib.auth.models import User, Group
@@ -260,6 +261,7 @@ class Document(models.Model):
     items = models.ManyToManyField(Item, blank=True, related_name="documents")
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     file = models.FileField(upload_to=Utils.get_upload_path)
+    filehash = models.CharField(max_length=64, blank=True)
 
     class Meta:
         ordering = ["created"]
@@ -270,3 +272,17 @@ class Document(models.Model):
 
     def __str__(self):
         return self.file.name
+
+    def save(self, *args, **kwargs):
+        # Only calculate the hash if it hasn't been set
+        if self.file and not self.filehash:
+            hasher = hashlib.sha256()
+            # Ensure the file pointer is at the beginning
+            self.file.open('rb')
+            for chunk in self.file.chunks():
+                hasher.update(chunk)
+            self.filehash = hasher.hexdigest()
+            # Reset the file pointer to the beginning for further operations
+            self.file.seek(0)
+            # Do not close the file; let Django handle it
+        super().save(*args, **kwargs)
