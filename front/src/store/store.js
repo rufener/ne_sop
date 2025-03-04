@@ -649,27 +649,19 @@ export const store = reactive({
     formData.append("uuid", formInput.uuid);
     formData.append("reference", formInput.reference);
     formData.append("title", formInput.title);
-    formData.append("type", "1");
-    formData.append("filename", formInput.filename);
+    formData.append("type", formInput.type);
     formData.append("note", formInput.note);
+    formInput.items.forEach((item) => {
+      formData.append("items", item.id);
+    });
+    formData.append("author", formInput.author.id);
+    formData.append("filename", formInput.filename);
     formData.append("version", formInput.version); // TODO remove
     formData.append("size", formInput.size);
-    formData.append("items", "37"); // ISSUE
-    formData.append("author_id", "6");
     formData.append("file", formInput.file);
-    // formdata.append("file", fileInput.files[0], "/C:/Users/parkanm/Downloads/sop.ics");
-    formData.append("valid", "true");
+    formData.append("valid", formInput.valid);
     formData.append("created", formInput.created);
 
-    /*
-    formData.append("title", document.title);
-    formData.append("reference", document.title);
-    formData.append("file", document.file);
-    formData.append("filename", document.filename);
-    formData.append("created", document.created);
-    formData.append("size", document.size);
-    formData.append("note", document.note);
-    */
     console.log(formData);
 
     try {
