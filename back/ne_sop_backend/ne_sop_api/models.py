@@ -275,7 +275,7 @@ class Document(models.Model):
 
     def save(self, *args, **kwargs):
         # Only calculate the hash if it hasn't been set
-        if self.file and not self.filehash:
+        if self.file:
             hasher = hashlib.sha256()
             # Ensure the file pointer is at the beginning
             self.file.open('rb')
