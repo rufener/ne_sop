@@ -355,6 +355,7 @@ export default {
 
         },
         filterFn(val, update, abort) {
+
             update(async () => {
                 this.loading.authors = true
                 const str = val.toLowerCase()
