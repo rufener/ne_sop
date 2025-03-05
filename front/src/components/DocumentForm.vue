@@ -80,36 +80,11 @@
                         </div>
                     </div>
 
-
-                    <!-- SEARCH ITEMS FIELD -->
-                    <!-- @update:model-value="query()"-->
-                    <!-- 
-                    <div class="row q-col-gutter-lg  q-py-sm">
-
-                        <div class="col">
-                            <q-input class="q-pa-none q-ma-none" bg-color="white" v-model="filter.search" outlined placeholder="Rechercher un objet (n° ou titre)"> 
-                    <template v-slot:prepend>
-                        <q-icon name="sym_o_search" />
-                    </template>
-
-                    <template v-slot:append>
-                        <q-spinner color="blue-grey" :thickness="3" v-if="loading" />
-
-                        <q-btn unelevated dense icon="close" @click="reset">
-                            <q-tooltip class="bg-black">Réinitialiser</q-tooltip>
-                        </q-btn>
-                    </template>
-                    </q-input>
-                    </div>
-
-                    </div>
-                    -->
-
                     <!-- SEARCH ITEMS FIELD -->
                     <div class="row q-col-gutter-lg  q-py-sm">
 
                         <div class="col">
-                            <!-- <q-select bg-color="white" outlined v-model="myitem" use-input hide-selected :options="itemOptions" option-label="title" option-value="id" emit-value map-options @update:model-value="selectOption" @filter="filterFn" label="Lier des objets parlementaires à ce document" :disable="!edit || !store.user.is_manager"> -->
+
                             <q-select bg-color="white" outlined v-model="myitem" use-input hide-selected :options="itemOptions" option-label="title" @update:model-value="selectOption" @filter="filterFn" label="Lier des objets parlementaires à ce document" :disable="!edit || !store.user.is_manager">
                                 <template v-slot:prepend>
                                     <q-icon name="sym_o_search" />
@@ -119,11 +94,14 @@
 
                                     <q-item v-bind="scope.itemProps">
                                         <q-item-section side>
-                                            <q-icon outline dense round color="blue" name="sym_o_add" />
+                                            <q-icon outline dense round color="blue" name="sym_o_add" v-if="!scope.opt.disable" />
+                                            <q-icon outline dense round color="red" name="sym_o_block" v-if="scope.opt.disable" />
                                         </q-item-section>
 
                                         <q-item-section>
-                                            <q-item-label>{{ scope.opt.number }} - {{ scope.opt.title }}</q-item-label>
+                                            <!-- <q-item-label>{{ scope.opt.number }} - {{ scope.opt.title }} Added: {{document.items.some(item => item.uuid === scope.opt.uuid)}}</q-item-label>
+                                            -->
+                                            <q-item-label>{{ scope.opt.number }} - {{ scope.opt.title }} Added: {{document.items.some(item => item.uuid === scope.opt.uuid)}}</q-item-label>
                                             <!-- <q-item-label caption>{{ scope.opt.type }}</q-item-label> -->
                                         </q-item-section>
                                         <!--
@@ -136,73 +114,17 @@
                                     </q-item>
                                 </template>
 
-                                <!--
-                                <template v-slot:append>
-                                    <q-spinner color="blue-grey" :thickness="3" v-if="loading.items" />
-                                </template>
-                                -->
-
-                                <!-- 
-                                <template v-slot:after>
-                                    <q-btn round unelevated color="blue-grey-8" icon="sym_o_person_add" @click="addEntity()" :disable="!edit || !store.user.is_manager">
-                                        <q-tooltip class="bg-black">Ajouter une nouvelle option</q-tooltip>
-                                    </q-btn>
-                                </template>
-                                -->
 
                             </q-select>
                         </div>
 
                     </div>
 
-
-
-                    <!-- AUTHOR SELECT/CREATE FIELD -->
-                    <!--
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-
-                        <q-select bg-color="white" outlined v-model="item.author" use-input :options="authorOptions" option-label="name" option-value="id" emit-value map-options @filter="filterFn" label="Auteur" clearable :rules="[v => checkFilled(v)]" :disable="!edit || !store.user.is_manager">
-
-                            <template v-slot:prepend>
-                                <q-icon name="sym_o_search" />
-                            </template>
-
-                            <template v-slot:option="scope">
-                                <q-item v-bind="scope.itemProps">
-                                    <q-item-section>
-                                        <q-item-label>{{ scope.opt.name }}</q-item-label>
-                                        <q-item-label caption>{{ scope.opt.type }}</q-item-label>
-                                    </q-item-section>
-                                    <q-item-section side>
-                                        <q-chip dense square :color="scope.opt.active ? 'green' : 'red'" text-color="white">
-                                            {{ scope.opt.active ? 'ACTIF' : 'INACTIF' }}
-                                        </q-chip>
-                                    </q-item-section>
-                                </q-item>
-                            </template>
-
-                            <template v-slot:append>
-                                <q-spinner color="blue-grey" :thickness="3" v-if="loading.authors" />
-                            </template>
-
-                            <template v-slot:after>
-                                <q-btn round unelevated color="blue-grey-8" icon="sym_o_person_add" @click="addEntity()" :disable="!edit || !store.user.is_manager">
-                                    <q-tooltip class="bg-black">Ajouter une nouvelle option</q-tooltip>
-                                </q-btn>
-                            </template>
-
-                        </q-select>
-
-                    </div>
-                    -->
-
-
                     <!-- LINKED ITEMS -->
                     <div class="row q-col-gutter-lg">
                         <div class="col">
                             <q-list dense class="rounded-borders">
 
-                                <!-- <q-item class="rounded-borders bg-white text-white" v-for="item in document.items"> -->
                                 <div v-for="item in document.items">
 
                                     <q-item>
@@ -302,7 +224,11 @@ export default {
     async created() {
         this.documentTypes = await this.store.getDocumentTypes()
         // getItems(filter = {}, page = 1, size = 10, sortBy = "", descending = "false") 
-        this.itemOptions = (await store.getItems({ search: "" }, 1, 5, "number", "false")).results
+
+        // this.itemOptions = (await store.getItems({ search: "" }, 1, 5, "number", "false")).results
+
+        this.getItemOptions()
+
         // this.getDocumentTypes()
     },
     methods: {
@@ -313,6 +239,14 @@ export default {
             // console.log(`${this.$options.name} | validation: ${val}`)
             this.valid = val
             // this.$emit('validationEvent', this.valid)
+        },
+        async getItemOptions(searchstring = "") {
+
+            const options = (await store.getItems({ search: searchstring.toLowerCase() }, 1, 5, "number", "false")).results
+
+            options.map(x => x.disable = this.document.items.some(item => item.uuid === x.uuid))
+            this.itemOptions = options
+
         },
         filterFn(val, update, abort) {
 
@@ -325,10 +259,17 @@ export default {
             */
 
             update(async () => {
+
+                this.getItemOptions(val)
+                //const str = val.toLowerCase()
+                // this.itemOptions = (await store.getItems({ search: str }, 1, 5, "number", "false")).results
+
+
                 // this.loading.authors = true
-                const str = val.toLowerCase()
+
+
                 // getItems(filter = {}, page = 1, size = 10, sortBy = "", descending = "false") 
-                this.itemOptions = (await store.getItems({ search: str }, 1, 5, "number", "false")).results
+
                 // this.loading.authors = false
             })
         },
@@ -339,6 +280,7 @@ export default {
             console.log("myitem")
             console.log(this.myitem)
 
+            // Check if item has already been added to list
             const exists = this.document.items.some(item => item.uuid === payload.uuid);
             if (!exists) {
                 this.document.items.push(payload)
