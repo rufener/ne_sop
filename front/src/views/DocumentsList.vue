@@ -94,7 +94,7 @@
                             <q-btn dense round flat color="grey" name="download" @click="" :href="`${store.host}/api/document/${props.row.uuid}/download/`" icon="sym_o_download">
                                 <q-tooltip class="bg-black">Télécharger {{ props.row.filename }}</q-tooltip>
                             </q-btn>
-                            <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row.id)" icon="sym_o_delete">
+                            <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row.uuid)" icon="sym_o_delete">
                                 <q-tooltip class="bg-black">Supprimer</q-tooltip>
                             </q-btn>
                         </div>
@@ -229,7 +229,7 @@ export default {
         async remove() {
 
             // console.log(`delete ${this.selected}`)
-            let message = await store.deleteEvent(this.selected)
+            let message = await store.deleteDocument(this.selected)
             if (message) {
                 this.query()
             }
