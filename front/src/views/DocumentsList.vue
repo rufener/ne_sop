@@ -51,8 +51,10 @@
                                 id: props.row.uuid
                             }
                         }">
-                            <q-chip clickable square outline color="blue-5" text-color="white" icon="sym_o_loupe">
-                                <div class="ellipsis">{{ props.row.title }} / {{ props.row.reference }}</div>
+
+                            <!-- icon="sym_o_loupe" -->
+                            <q-chip clickable square outline color="blue-5" text-color="white">
+                                <div class="ellipsis"><b>{{ props.row.title }}</b> / {{ props.row.reference }}</div>
                             </q-chip>
                         </router-link>
                     </q-td>
@@ -64,15 +66,34 @@
 
                     <!-- ITEMS COLUMN -->
                     <q-td key="type" :props="props">
-                        <div v-for="item in props.row.items" style="max-width: 250px">
+                        <div v-for="item in props.row.items" style="max-width: 280px">
                             <router-link :to="{
                                 name: 'Item',
                                 params: {
                                     id: item.id
                                 }
                             }">
-                                <q-chip clickable square outline color="blue-5" text-color="white" icon="sym_o_loupe">
-                                    <div class="ellipsis">{{ item.number }} - {{ item.title }}</div>
+                                <!-- icon="sym_o_loupe" -->
+                                <!--
+                                                                    <q-item-section avatar class="items-center q-mx-none q-px-none q-py-none q-my-none">
+                                            <q-badge :color="item.status.color" rounded />
+                                            <q-tooltip class="bg-black">{{ item.status.name }}</q-tooltip>
+                                        </q-item-section>
+                             -->
+                                <q-chip clickable square outline color="blue-5" text-color="white">
+                                    <div class="vertical-middle ellipsis"><q-badge :color="item.status.color" rounded class="q-mr-xs" /> <b>{{ item.number }}</b> - {{ item.title }}</div>
+                                    <q-tooltip class="bg-none text-body2">
+                                        <q-card class="my-card bg-black text-white">
+
+                                            <q-card-section>
+                                                <div class="text-h6">{{ item.number }} - {{ item.title }}</div>
+                                                <div class="text-subtitle2">{{ item.type.name }}</div>
+                                            </q-card-section>
+                                            <q-card-section>
+                                                {{ item.status.name }}
+                                            </q-card-section>
+                                        </q-card>
+                                    </q-tooltip>
                                 </q-chip>
                             </router-link>
                         </div>
