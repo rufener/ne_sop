@@ -57,6 +57,7 @@ from ne_sop_api.permissions import (
 )
 
 from pathlib import PurePath
+import shutil
 import os
 import datetime
 import openpyxl
@@ -967,28 +968,17 @@ class DocumentViewSet(viewsets.ViewSet):
             }
         )
 
-    '''
-    @extend_schema(
-        responses=DocumentSerializer,
-        tags=["Document"],
-    )
-    def create(self, request):
-        serializer = DocumentSerializer(data=request.data, context={"request": self.request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    '''
-
     @extend_schema(
         responses=NewDocumentSerializer,
         tags=["Document"],
     )
     def create(self, request):
-        serializer = NewDocumentSerializer(data=request.data, context={"request": self.request})
+        serializer = NewDocumentSerializer(data=request.data, context={"request": request})  # self.request
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            instance = serializer.save()  # Save and get the created instance
+            # Use a different serializer to format the output data
+            output_serializer = DocumentSerializer(instance, context={"request": request})
+            return Response(output_serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1029,7 +1019,8 @@ class DocumentViewSet(viewsets.ViewSet):
 
         # Use partial=True so that only provided fields are updated.
         serializer = NewDocumentSerializer(document, data=data, partial=True)
-        # TODO REMOVE
+
+        '''
         print("Update document")
         print("Request:")
         print(request)
@@ -1039,40 +1030,29 @@ class DocumentViewSet(viewsets.ViewSet):
 
         print("Request data:")
         print(request.data)
-        print("Document:")
+        print("Document:") 
+        '''
 
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    '''
-    @extend_schema(
-        responses=DocumentSerializer,
-        tags=["Document"],
-    )
-    def retrieve(self, request, pk):
-        document = get_object_or_404(self.get_queryset(), pk=pk)
-
-        filepath = PurePath(settings.MEDIA_ROOT, document.file.name)
-        filepath = open(filepath, "rb")
-
-        response = FileResponse(filepath, filename=document.filename, as_attachment=True)
-
-        headers = response.headers
-        headers["Content-Type"] = "application/download"
-        headers["Accept-Ranges"] = "bite"
-        response["Content-Disposition"] = f"attachment; filename={document.filename}"
-        return response
-    '''
-
     @extend_schema(
         responses=DocumentSerializer,
         tags=["Document"],
     )
     def destroy(self, request, pk=None):
         document = get_object_or_404(self.get_queryset(), uuid=pk)
-        os.remove(PurePath(settings.MEDIA_ROOT, document.file.name))
+        # os.remove(PurePath(settings.MEDIA_ROOT, document.file.name))
+
+        folder_path = os.path.join(settings.MEDIA_ROOT, str(document.uuid))
+
+        if os.path.isdir(folder_path):
+            try:
+                shutil.rmtree(folder_path)
+            except Exception as e:
+                return Response({"msg": f"Error deleting folder: {e}"}, status=500)
+
         document.delete()
         return Response({"msg": "Document deleted"})
 
