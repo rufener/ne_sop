@@ -14,9 +14,16 @@
     <q-table :rows="documents" :columns="columns" row-key="date" v-model:pagination="pagination" class="q-my-md" :loading="loading">
         <template v-slot:body="props">
             <q-tr :props="props">
-                <q-td key="filename" :props="props">
-                    <div class="text-bold overflow-ellipsis">{{ props.row.filename }} ({{ formatBytes(props.row.size) }})<q-tooltip anchor="bottom middle">{{ props.row.filename }} ({{ formatBytes(props.row.size) }})</q-tooltip></div>
-                    <div class="overflow-ellipsis">{{ props.row.template }}</div>
+                <q-td key="title" :props="props">
+
+                    <!-- <div class="text-bold overflow-ellipsis">{{ props.row.filename }} ({{ formatBytes(props.row.size) }})<q-tooltip anchor="bottom middle">{{ props.row.filename }} ({{ formatBytes(props.row.size) }})</q-tooltip></div> -->
+                    <div class="text-bold overflow-ellipsis">{{ props.row.title }} / {{ props.row.reference }}</div>
+
+                    <!-- <div class="overflow-ellipsis">{{ props.row.template }}</div> -->
+                </q-td>
+
+                <q-td key="type" :props="props">
+                    {{ props.row.type }}
                 </q-td>
                 <!--
                 <q-td key="template" :props="props">
@@ -30,27 +37,28 @@
                 -->
                 <q-td key="created" :props="props">
                     <div class="text-bold">{{ props.row.created }}</div>
-                    <div>{{ props.row.author }}</div>
+                    <div>{{ props.row.author.username }}</div>
                 </q-td>
+                <!-- 
                 <q-td key="note" :props="props">
                     {{ props.row.note }}
                 </q-td>
+                -->
                 <q-td key="actions" :props="props">
                     <div class="float-right">
-                        <q-btn dense round flat color="grey" name="download" @click="" :href="`${store.host}/api/document/${props.row.id}/`" icon="sym_o_download" :disable="!edit" v-if="props.row.id">
-                            <q-tooltip class="bg-black">Télécharger</q-tooltip>
-                        </q-btn>
-                        <!--
-                        <q-btn dense round flat color="grey" name="download" @click="store.downloadDocument(props.row.id)" icon="sym_o_download" :disable="!edit" v-if="props.row.id">
-                            <q-tooltip class="bg-black">Télécharger</q-tooltip>
-                        </q-btn>
-                        -->
-                        <!-- <q-btn dense round flat color="blue" name="edit" @click="handleEdition(props.row)" icon="sym_o_edit" :disable="!edit">
+
+                        <q-btn dense round flat color="blue" name="delete" @click="handleEdition(props.row)" icon="sym_o_edit" :disable="!edit">
                             <q-tooltip class="bg-black">Modifier</q-tooltip>
-                        </q-btn> -->
+                        </q-btn>
+
+                        <q-btn dense round flat color="grey" name="download" @click="" :href="`${store.host}/api/document/${props.row.uuid}/download/`" icon="sym_o_download">
+                            <q-tooltip class="bg-black">Télécharger {{ props.row.filename }}</q-tooltip>
+                        </q-btn>
+
                         <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row)" icon="sym_o_delete" :disable="!edit">
                             <q-tooltip class="bg-black">Supprimer</q-tooltip>
                         </q-btn>
+
                     </div>
                 </q-td>
             </q-tr>
@@ -86,11 +94,12 @@ import DeleteDialog from './DeleteDialog.vue'
 const host = import.meta.env.VITE_API_URL
 
 const columns = [
-    { name: 'filename', align: 'left', label: 'Fichier', field: 'filename', sortable: true, style: 'max-width: 250px; width: 250px' },
+    { name: 'title', align: 'left', label: 'Titre / Réf.', field: 'title', sortable: true, style: 'max-width: 250px; width: 250px' },
+    { name: 'type', align: 'left', label: 'Type', field: 'type', sortable: true, style: 'max-width: 150px; width: 150px' },
     /*{ name: 'template', align: 'left', label: 'Type', field: 'template', sortable: true }, */
     /*{ name: 'author', align: 'left', label: 'Ajouté par', field: 'author', sortable: true },*/
-    { name: 'created', align: 'left', label: 'Ajouté le', field: 'created', sortable: true, style: 'max-width: 110px; width: 110px' },
-    { name: 'note', align: 'left', label: 'Notes', field: 'note', sortable: true, style: 'max-width: 190px; width: 190px; white-space: normal;' },
+    { name: 'created', align: 'left', label: 'Modifié le', field: 'created', sortable: true }, // style: 'max-width: 110px; width: 110px' 
+    /* { name: 'note', align: 'left', label: 'Notes', field: 'note', sortable: true, style: 'max-width: 190px; width: 190px; white-space: normal;' }, */
     { name: 'actions', align: 'right', label: '', field: 'action', sortable: false, style: 'max-width: 120px; width: 80px' }
 ]
 
@@ -148,12 +157,10 @@ export default {
         showDocumentDialog() {
             this.dialog.newDocument = true
         },
-        /*
         handleEdition(val) {
-             this.selected = val
-             this.dialog.edit = true
+            this.selected = val
+            this.dialog.edit = true
         },
-        */
         handleDeletion(val) {
             this.selected = val
             this.dialog_content = `Supprimer définitivement le document '${val.filename}' ?`
@@ -172,7 +179,7 @@ export default {
 </script>
 
 <style scoped>
-.overflow-ellipsis{
+.overflow-ellipsis {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
