@@ -30,6 +30,7 @@ const routes = [
     component: Document,
     props: true,
   },
+  { path: "/documents/new", name: "NewDocument", component: Document },
   // { path: "/documents/:id(\\d+)", name: "Document", component: Document, props: true },
   { path: "/entities", name: "EntitiesList", component: EntitiesList },
   { path: "/entities/:id(\\d+)", name: "Entity", component: Entity, props: true },
