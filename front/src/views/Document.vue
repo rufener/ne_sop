@@ -66,7 +66,7 @@ export default {
         async $route(to, from) {
 
             if (to.name === "NewDocument" && from.href !== to.href) {
-                // this.initialize_document() // TODO
+                this.initialize_document()
                 this.edit = true
                 this.$router.push({ name: 'NewDocument' })
             }
@@ -81,7 +81,7 @@ export default {
         }
     },
     async created() {
-        // this.initialize_document()
+        this.initialize_document()
 
         if (this.$route.name === "NewDocument") {
             this.edit = true
@@ -104,7 +104,14 @@ export default {
                 "type": "",
                 "note": "",
                 "filename": "",
+                "version": 0,
+                "size": 0,
+                "items": [],
+                "valid": false,
+                "author": store.user,
             }
+            console.log("initialize_document()")
+            console.log(this.document)
         },
         async save(redirectTo) {
 
