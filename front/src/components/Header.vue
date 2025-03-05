@@ -31,7 +31,7 @@
                 <a href="https://www.ne.ch/autorites/DDTE/" target="_blank"><img src="img/ne_logo_white.svg" alt="Neuchâtel" /></a>
             </q-toolbar-title>
 
-            <div class="text-center text-body1 gt-sm">DDTE - Suivi des objets parlementaires</div>
+            <div class="text-center text-body1 gt-sm">Suivi des objets parlementaires</div>
 
             <q-space></q-space>
 
