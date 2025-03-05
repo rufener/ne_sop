@@ -284,5 +284,6 @@ class Document(models.Model):
             self.filehash = hasher.hexdigest()
             # Reset the file pointer to the beginning for further operations
             self.file.seek(0)
-            # Do not close the file; let Django handle it
+            # Close the file to release the lock
+            # self.file.close()
         super().save(*args, **kwargs)
