@@ -11,7 +11,7 @@
 
             <!-- SEARCH RECORDS FIELD -->
             <div class="col-xs-12 col-sm-8 col-md-6 col-lg-6">
-                <q-input bg-color="white" v-model="filter.search" outlined dense placeholder="Rechercher (réf. ou titre)"> <!-- @update:model-value="query()" -->
+                <q-input bg-color="white" v-model="filter.search" outlined dense placeholder="Rechercher (réf., titre, objet lié)"> <!-- @update:model-value="query()" -->
                     <template v-slot:prepend>
                         <q-icon name="sym_o_search" />
                     </template>
@@ -81,6 +81,11 @@
                     <!-- DATE COLUMN -->
                     <q-td key="created" :props="props">
                         {{ props.row.created }}
+                    </q-td>
+
+                    <!-- USER COLUMN -->
+                    <q-td key="author" :props="props">
+                        {{ props.row.author }}
                     </q-td>
 
                     <!-- ACTIONS COLUMN -->
@@ -165,6 +170,13 @@ export default {
                     align: "left",
                     label: "Date",
                     field: "created",
+                    sortable: true,
+                },
+                {
+                    name: "author",
+                    align: "left",
+                    label: "Utilisateur",
+                    field: "author",
                     sortable: true,
                 },
                 {
