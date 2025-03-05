@@ -610,7 +610,29 @@ export const store = reactive({
   },
 
   // ADD DOCUMENT
-  async addDocument(formData) {
+  async addDocument(formInput) {
+    console.log("addDocument");
+    console.log(formInput);
+
+    const formData = new FormData();
+
+    formData.append("reference", formInput.reference);
+    formData.append("title", formInput.title);
+    formData.append("type", formInput.type);
+    formData.append("note", formInput.note);
+    formInput.items.forEach((item) => {
+      formData.append("items", item.id);
+    });
+    formData.append("author", formInput.author.id);
+    formData.append("filename", formInput.filename);
+    formData.append("version", formInput.version); // TODO remove
+    formData.append("size", formInput.size);
+    formData.append("file", formInput.file);
+    formData.append("valid", formInput.valid);
+    formData.append("created", formInput.created);
+
+    console.log(formData);
+
     try {
       const query = new URL(`${host}/api/document/`);
       const response = await fetch(query, {
@@ -727,9 +749,11 @@ export const store = reactive({
     */
 
   // DELETE DOCUMENT BY ID
-  async deleteDocument(document_id) {
+  async deleteDocument(uuid) {
     try {
-      const query = new URL(`${host}/api/document/${document_id}/`);
+      const query = new URL(`${host}/api/document/${uuid}/`);
+      console.log("deleteDocument");
+      console.log(query);
       const response = await fetch(query, {
         method: "DELETE",
         redirect: "follow",
