@@ -1019,6 +1019,7 @@ class DocumentViewSet(viewsets.ViewSet):
         if 'file' in request.FILES:
             # If a new file is provided and there's an existing file, delete the old file.
             if document.file:
+                document.file.close()
                 print("Deleting existing file:", document.file.path)
                 document.file.delete(save=False)
         else:
@@ -1028,36 +1029,7 @@ class DocumentViewSet(viewsets.ViewSet):
 
         # Use partial=True so that only provided fields are updated.
         serializer = NewDocumentSerializer(document, data=data, partial=True)
-
-        '''
-        # Check if a file object is actually provided in request.FILES
-        file_obj = request.FILES.get('file', None)
-
-        # Check if a new file has been uploaded
-        # if 'file' in request.FILES:
-        if file_obj:
-            print("There is an existing file")
-            # If an existing file is present, delete it.
-            if document.file:
-                print("Deleting the existing file:", document.file.path)
-                document.file.delete(save=False)
-
-        else:
-            if 'file' in request.data:
-                # Make a mutable copy since request.data might be immutable.
-                data = request.data.copy()
-                data.pop("file")
-                request_data = data
-
-                # request.data.pop('file')
-
-            else:
-                request_data = request.data
-
-        # serializer = NewDocumentSerializer(document, data=request.data, partial=True)
-        serializer = NewDocumentSerializer(document, data=request_data, partial=True)
-        '''
-
+        # TODO REMOVE
         print("Update document")
         print("Request:")
         print(request)
