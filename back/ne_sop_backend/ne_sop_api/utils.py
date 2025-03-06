@@ -1,4 +1,7 @@
 from pathlib import Path, PurePath
+from django.http import HttpResponse
+from icalendar import Calendar, Event as IcsEvent
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
@@ -165,3 +168,47 @@ class Utils(object):
             adjusted_width = min(max_length + 2, 50)  # Ajouter un peu d'espace
             ws.column_dimensions[column].width = adjusted_width
         return ws
+
+    @staticmethod
+    def generate_ics_file(event):
+        """
+        Generate an ICS file for the provided Event instance
+        :param event: An instance of your Event model
+        :return: HttpResponse containing the ICS file
+        """
+        cal = Calendar()
+        cal.add('prodid', '-//Neuchâtel//NESOP//EN')
+        cal.add('version', '2.0')
+
+        ics_event = IcsEvent()
+
+        # Combine event.date and event.time (or default to midnight if time is None)
+        if event.time:
+            dtstart = datetime.combine(event.date, event.time)
+        else:
+            dtstart = datetime.combine(event.date, datetime.min.time())
+        ics_event.add('dtstart', dtstart)
+
+        # Default event duration: 1 hour
+        dtend = dtstart + timedelta(hours=1)
+        ics_event.add('dtend', dtend)
+
+        # Compose a summary from event type and item name if available
+        event_type = event.type.name if event.type and hasattr(event.type, 'name') else 'Event'
+        item_name = event.item.name if event.item and hasattr(event.item, 'name') else ''
+        summary = f"{event_type} - {item_name}" if item_name else event_type
+        ics_event.add('summary', summary)
+
+        # Add description and unique identifier
+        ics_event.add('description', event.description)
+        ics_event.add('uid', str(event.uuid))
+
+        if event.created:
+            ics_event.add('created', event.created)
+
+        cal.add_component(ics_event)
+
+        response = HttpResponse(cal.to_ical(), content_type='text/calendar; charset=utf-8')
+        filename = f"nesop_cal_{event.date.strftime('%Y%m%d')}.ics"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
