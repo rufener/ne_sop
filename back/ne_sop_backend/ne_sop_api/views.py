@@ -845,6 +845,12 @@ class EventViewSet(viewsets.ViewSet):
         event.delete()
         return Response({"msg": "Event deleted"})
 
+    @action(detail=True, methods=['get'], url_path='download', url_name='download')
+    @extend_schema(tags=["Document"], description="Download the iCalendar (.ics) file")
+    def download(self, request, pk=None):
+        event = get_object_or_404(self.get_queryset(), uuid=pk)  # pk=pk
+        return Utils.generate_ics_file(event)
+
 
 # %% TEMPLATE
 class TemplateViewSet(viewsets.ReadOnlyModelViewSet):
@@ -1037,6 +1043,7 @@ class DocumentViewSet(viewsets.ViewSet):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     @extend_schema(
         responses=DocumentSerializer,
         tags=["Document"],
