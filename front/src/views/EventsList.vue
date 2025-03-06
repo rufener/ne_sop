@@ -85,8 +85,8 @@
                     <!-- ACTIONS COLUMN -->
                     <q-td key="actions" :props="props">
                         <div class="float-right">
-                            <q-btn dense round flat color="grey" name="calendar" @click="downloadICS(props.row)" icon="sym_o_calendar_add_on">
-                                <q-tooltip class="bg-black">Ajouter au calendrier</q-tooltip>
+                            <q-btn dense round flat color="grey" name="calendar" @click="" :href="`${store.host}/api/event/${props.row.uuid}/download/`" icon="sym_o_calendar_add_on">
+                                <q-tooltip class="bg-black">Ajouter au calendrier {{ props.row.filename }}</q-tooltip>
                             </q-btn>
                             <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row.id)" icon="sym_o_delete">
                                 <q-tooltip class="bg-black">Supprimer</q-tooltip>
@@ -115,12 +115,9 @@
 <script>
 import { date as mydate } from 'quasar'
 import { store } from '../store/store.js'
-import { downloadICS } from '../store/shared.js'
+// import { downloadICS } from '../store/shared.js'
 import DeleteDialog from '../components/DeleteDialog.vue'
 
-/* const timeStamp = Date.now()
-const formattedString = mydate.formatDate(timeStamp, 'YYYY-MM-DDTHH:mm:ss.SSSZ')
-console.log(formattedString) */
 
 export default {
     name: 'EventsList',
@@ -191,7 +188,7 @@ export default {
 
     },
     methods: {
-        downloadICS,
+        // downloadICS,
         async onRequest(props) {
 
             // update pagination object
