@@ -9,7 +9,6 @@
 
                     <!-- FILE SELECTOR FIELD -->
                     <div class="col q-my-md" v-if="!document.file">
-                        <!-- counter max-files="1" -->
                         <q-file bg-color="white" outlined v-model="newFile" label="Sélectionner un fichier" :rules="[v => checkFile(v)]" clearable @update:model-value="getFileAttributes">
                             <template v-slot:prepend>
                                 <q-icon name="sym_o_attach_file" />
@@ -32,7 +31,8 @@
                             </q-item-section>
 
                             <q-item-section avatar>
-                                <q-btn dense round flat color="red" name="delete" @click="showDeleteDialog(document)" icon="sym_o_delete" :disable="!edit">
+                                <q-btn dense round flat color="red" name="delete" @click="showFilepicker()" icon="sym_o_delete" :disable="!edit">
+                                    <!-- <q-btn dense round flat color="red" name="delete" @click="showDeleteDialog(document)" icon="sym_o_delete" :disable="!edit">-->
                                     <q-tooltip class="bg-black">Supprimer</q-tooltip>
                                 </q-btn>
                             </q-item-section>
@@ -74,14 +74,14 @@
                     </div>
 
                     <!-- NOTE TEXT AREA FIELD -->
-                    <div class="row q-col-gutter-lg  q-py-md">
+                    <div class="row q-col-gutter-lg q-py-md">
                         <div class="col">
                             <q-input bg-color="white" outlined v-model="document.note" label="Notes" type="textarea" :disable="!edit" counter maxlength="500" />
                         </div>
                     </div>
 
                     <!-- SEARCH ITEMS FIELD -->
-                    <div class="row q-col-gutter-lg  q-py-sm">
+                    <div class="row q-col-gutter-lg q-py-sm" v-if="!excludeFields.includes('search-items')">
 
                         <div class="col">
 
@@ -101,7 +101,7 @@
                                         <q-item-section>
                                             <!-- <q-item-label>{{ scope.opt.number }} - {{ scope.opt.title }} Added: {{document.items.some(item => item.uuid === scope.opt.uuid)}}</q-item-label>
                                             -->
-                                            <q-item-label>{{ scope.opt.number }} - {{ scope.opt.title }} Added: {{document.items.some(item => item.uuid === scope.opt.uuid)}}</q-item-label>
+                                            <q-item-label>{{ scope.opt.number }} - {{ scope.opt.title }}</q-item-label>
                                             <!-- <q-item-label caption>{{ scope.opt.type }}</q-item-label> -->
                                         </q-item-section>
                                         <!--
@@ -121,7 +121,7 @@
                     </div>
 
                     <!-- LINKED ITEMS -->
-                    <div class="row q-col-gutter-lg">
+                    <div class="row q-col-gutter-lg" v-if="!excludeFields.includes('search-items')">
                         <div class="col">
                             <q-list dense class="rounded-borders">
 
@@ -174,7 +174,9 @@
     </Form>
 
     <!-- DELETE DIALOG -->
+    <!-- 
     <DeleteDialog v-model="dialog.deletion" @delete-event="handleDelete" :content="dialog_content" />
+    -->
 
 </template>
 
@@ -188,7 +190,7 @@ import DeleteDialog from './DeleteDialog.vue'
 export default {
     name: 'DocumentForm',
     components: { Form, FormSection, DeleteDialog },
-    props: { 'item_type': Number, 'edit': Boolean, 'modelValue': Object, 'changewatch': { type: Boolean, default: true } },
+    props: { 'item_type': Number, 'edit': Boolean, 'modelValue': Object, 'changewatch': { type: Boolean, default: true }, 'excludeFields': { type: Array, default: () => [] } },
     emits: ['update:modelValue'],
     setup() {
         return {
@@ -267,7 +269,6 @@ export default {
 
                 // this.loading.authors = true
 
-
                 // getItems(filter = {}, page = 1, size = 10, sortBy = "", descending = "false") 
 
                 // this.loading.authors = false
@@ -296,14 +297,23 @@ export default {
                 this.document.size = this.newFile.size
             }
         },
+        showFilepicker() {
+            // showDeleteDialog(document)
+            this.document.file = null
+        },
+
+        /*
         showDeleteDialog(val) {
             this.dialog_content = `Supprimer définitivement le document '${val.filename}' ?`
             this.dialog.deletion = true
         },
+        */
+        /*
         handleDelete() {
             this.document.file = null
             this.newFile = null
         },
+        */
         handleUnlink(uuid) {
 
             this.document.items = this.document.items.filter(item => item.uuid !== uuid);
