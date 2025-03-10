@@ -28,7 +28,7 @@
                 </q-td>
                 <q-td key="actions" :props="props">
                     <div class="float-right">
-                        <q-btn dense round flat color="blue" name="delete" @click="handleEdition(props.row)" icon="sym_o_edit" :disable="!edit">
+                        <q-btn dense round flat color="blue" name="edit" @click="handleEdition(props.row)" icon="sym_o_edit" :disable="!edit">
                             <q-tooltip class="bg-black">Modifier</q-tooltip>
                         </q-btn>
                         <q-btn dense round flat color="grey" name="calendar" @click="" :href="`${store.host}/api/event/${props.row.uuid}/download/`" icon="sym_o_calendar_add_on">
@@ -63,12 +63,12 @@
     </q-dialog>
 
     <!-- EDIT EVENT DIALOG -->
-    <q-dialog v-model="dialog.edit">
+    <q-dialog v-model="dialog.edition">
         <EditEventDialog v-model="selected"></EditEventDialog>
     </q-dialog>
 
     <!-- DELETE EVENT DIALOG -->
-    <DeleteDialog v-model="dialog.delete" @delete-event="remove" />
+    <DeleteDialog v-model="dialog.deletion" @delete-event="remove" />
 </template>
 
 <script>
@@ -97,7 +97,7 @@ export default {
             dateutils: dateutils,
             store,
             selected: null,
-            dialog: { add: false, delete: false, edit: false },
+            dialog: { add: false, deletion: false, edition: false },
             eventTypes: [],
             data: null,
             rows: [],
@@ -162,11 +162,11 @@ export default {
         },
         handleDeletion(val) {
             this.selected = val
-            this.dialog.delete = true
+            this.dialog.deletion = true
         },
         handleEdition(val) {
             this.selected = val
-            this.dialog.edit = true
+            this.dialog.edition = true
         },
         async remove() {
 
