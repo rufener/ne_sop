@@ -23,7 +23,7 @@
                 </q-td>
 
                 <q-td key="type" :props="props">
-                    {{ props.row.type }}
+                    {{ props.row.type.name }}
                 </q-td>
                 <!--
                 <q-td key="template" :props="props">
@@ -47,7 +47,7 @@
                 <q-td key="actions" :props="props">
                     <div class="float-right">
 
-                        <q-btn dense round flat color="blue" name="delete" @click="handleEdition(props.row)" icon="sym_o_edit" :disable="!edit">
+                        <q-btn dense round flat color="blue" name="edit" @click="handleEdition(props.row)" icon="sym_o_edit" :disable="!edit">
                             <q-tooltip class="bg-black">Modifier</q-tooltip>
                         </q-btn>
 
@@ -75,9 +75,9 @@
     </q-dialog>
 
     <!-- EDIT DOCUMENT DIALOG -->
-    <!-- <q-dialog v-model="dialog.edit">
-        <EditDocumentDialog v-model="selected" :item_type="type"></EditDocumentDialog>
-    </q-dialog> -->
+    <q-dialog v-model="dialog.edition">
+        <EditDocumentDialog v-model="selected"></EditDocumentDialog>
+    </q-dialog>
 
     <!-- DELETE DIALOG -->
     <DeleteDialog v-model="dialog.deletion" @delete-event="deleteRessource(selected)" :content="dialog_content" />
@@ -88,7 +88,7 @@ import { date } from 'quasar'
 import { store } from '../store/store.js'
 import { formatBytes } from '../store/shared.js'
 import NewDocumentDialog from "../views/NewDocumentDialog.vue"
-// import EditDocumentDialog from '../views/EditDocumentDialog.vue'
+import EditDocumentDialog from '../views/EditDocumentDialog.vue'
 import DeleteDialog from './DeleteDialog.vue'
 
 const host = import.meta.env.VITE_API_URL
@@ -105,8 +105,7 @@ const columns = [
 
 export default {
     name: 'DocumentsTable',
-    // components: { NewDocumentDialog, EditDocumentDialog, DeleteDialog },
-    components: { NewDocumentDialog, DeleteDialog },
+    components: { NewDocumentDialog, EditDocumentDialog, DeleteDialog },
     props: { 'type': Number, 'edit': Boolean, 'modelValue': Object },
     emits: ['update:modelValue'],
     setup() {
@@ -118,7 +117,7 @@ export default {
             store,
             date: date,
             selected: null,
-            dialog: { newDocument: false, deletion: false },
+            dialog: { newDocument: false, deletion: false, edition: false },
             columns: columns,
             dialog_content: undefined,
             loading: false,
@@ -158,8 +157,10 @@ export default {
             this.dialog.newDocument = true
         },
         handleEdition(val) {
+            console.log("DocumentsTable - handleEdition")
+            console.log(val)
             this.selected = val
-            this.dialog.edit = true
+            this.dialog.edition = true
         },
         handleDeletion(val) {
             this.selected = val
