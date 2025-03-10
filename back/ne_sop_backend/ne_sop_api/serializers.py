@@ -415,6 +415,8 @@ class DocumentSerializer(serializers.ModelSerializer):
     )
     '''
 
+    type = DocumentTypeSerializer(read_only=True)  # TODO
+
     # template = serializers.SlugRelatedField(slug_field="name", read_only=True)
     # template_id = serializers.PrimaryKeyRelatedField(source="template", queryset=Template.objects.all(), write_only=True)
 
