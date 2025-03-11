@@ -618,11 +618,18 @@ class ItemViewSet(viewsets.ViewSet):
     )
     def update(self, request, pk=None):
         item = get_object_or_404(self.get_queryset(), pk=pk)
+        # print("Update Item")
+        # print("request data")
+        # print(request.data)
+
         serializer = NewItemSerializer(item, data=request.data)
         if serializer.is_valid():
             item = serializer.save()
             if item.autonotify is True:
                 Utils.itemChangedNotification(item, request)
+
+            # print("serializer.data")
+            # print(serializer.data)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1011,6 +1018,14 @@ class DocumentViewSet(viewsets.ViewSet):
         # Make a mutable copy of request.data.
         data = request.data.copy()
 
+        # print("update document")
+        # print("request data")
+        # print(data)
+
+        # Clear linked items if the items attribute is not present in the update request
+        if "items" not in request.data:
+            document.items.clear()
+
         # Check if a new file was uploaded.
         if 'file' in request.FILES:
             # If a new file is provided and there's an existing file, delete the old file.
@@ -1036,11 +1051,13 @@ class DocumentViewSet(viewsets.ViewSet):
 
         print("Request data:")
         print(request.data)
-        print("Document:") 
+        print("Document:")
         '''
 
         if serializer.is_valid():
             serializer.save()
+            print("response data")
+            print(serializer.data)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
