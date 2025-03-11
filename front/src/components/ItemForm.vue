@@ -233,7 +233,7 @@
             </FormSection>
 
             <!-- DOCUMENTS SECTION -->
-            <FormSection title="Documents">
+            <FormSection title="Documents liés">
                 <template v-slot:content>
 
                     <!-- DOCUMENTS TABLE -->
