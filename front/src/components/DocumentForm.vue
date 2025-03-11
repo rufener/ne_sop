@@ -8,8 +8,8 @@
                 <template v-slot:content>
 
                     <!-- FILE SELECTOR FIELD -->
-                    <div class="col q-my-md" v-if="!document.file">
-                        <q-file bg-color="white" outlined v-model="newFile" label="Sélectionner un fichier" :rules="[v => checkFile(v)]" clearable @update:model-value="getFileAttributes">
+                    <div class="col q-my-md" v-if="!document.filename">
+                        <q-file bg-color="white" outlined v-model="newFile" label="Sélectionner un fichier" :rules="[v => checkFile(v)]" @update:model-value="getFileAttributes">
                             <template v-slot:prepend>
                                 <q-icon name="sym_o_attach_file" />
                             </template>
@@ -17,7 +17,7 @@
                     </div>
 
                     <!-- ATTACHED FILE CARD -->
-                    <q-card class="col q-my-md" flat bordered v-if="document.file">
+                    <q-card class="col q-my-md" flat bordered v-if="document.filename">
 
                         <q-item>
                             <q-item-section avatar>
@@ -60,7 +60,8 @@
                         <!-- TYPE SELECT FIELD -->
                         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
                             <!-- v-model="entity.type" :options="entityTypes" option-label="name" option-value="id" emit-value map-options label="Type"  -->
-                            <q-select bg-color="white" outlined v-model="document.type" :options="documentTypes" option-label="name" option-value="id" emit-value map-options label="Type" :rules="[v => checkFilled(v)]" clearable :disable="!edit">
+                            <!-- option-value="id" emit-value map-options -->
+                            <q-select bg-color="white" outlined v-model="document.type" :options="documentTypes" option-label="name" label="Type" :rules="[v => checkFilled(v)]" clearable :disable="!edit">
                                 <template v-slot:option="scope">
                                     <q-item v-bind="scope.itemProps">
                                         <q-item-section>
@@ -242,6 +243,9 @@ export default {
             this.valid = val
             // this.$emit('validationEvent', this.valid)
         },
+        checkFilename(val) {
+            console.log(val)
+        },
         async getItemOptions(searchstring = "") {
 
             const options = (await store.getItems({ search: searchstring.toLowerCase() }, 1, 5, "number", "false")).results
@@ -290,6 +294,7 @@ export default {
         },
         getFileAttributes() {
             console.log("getFileAttributes()")
+            console.log(this.newFile)
             if (this.newFile) {
                 console.log("this.newFile exists")
                 this.document.file = this.newFile
@@ -298,8 +303,10 @@ export default {
             }
         },
         showFilepicker() {
-            // showDeleteDialog(document)
+            this.newFile = null // new File([], "", { type: "text/plain" });
             this.document.file = null
+            this.document.filename = null
+            this.document.size = null
         },
 
         /*
@@ -315,7 +322,6 @@ export default {
         },
         */
         handleUnlink(uuid) {
-
             this.document.items = this.document.items.filter(item => item.uuid !== uuid);
         }
     }
