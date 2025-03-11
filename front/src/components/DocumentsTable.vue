@@ -63,7 +63,7 @@
     </q-dialog>
 
     <!-- DELETE DIALOG -->
-    <DeleteDialog v-model="dialog.deletion" @delete-event="deleteRessource(selected)" :content="dialog_content" />
+    <DeleteDialog v-model="dialog.deletion" @delete-event="deleteRessource(selected)" :content="dialog_content" title="Suppression définitive" />
 </template>
 
 <script>
@@ -121,15 +121,11 @@ export default {
         }
     },
     async created() {
-
         this.loading = true
-
         this.data = await this.documents
-
         this.rows = this.data.results
         this.pagination.rowsNumber = this.data.nrows
         this.loading = false
-
     },
     methods: {
         formatBytes,
@@ -144,16 +140,26 @@ export default {
         },
         handleDeletion(val) {
             this.selected = val
-            this.dialog_content = `Supprimer définitivement le document '${val.filename}' ?`
+            this.dialog_content = `Supprimer définitivement le document '${val.title}' ?`
             this.dialog.deletion = true
         },
-        async deleteRessource(ressource) {
+        async deleteRessource(document) {
+            this.documents = this.documents.filter(x => x.filename !== document.filename)
+
+            if (document.uuid !== undefined) {
+                this.loading = true
+                store.deleteDocument(document.uuid)
+                this.loading = false
+            }
+
+            /*
             this.documents = this.documents.filter(x => x.filename !== ressource.filename)
             if (ressource.id !== undefined) {
                 this.loading = true
                 store.deleteDocument(ressource.id)
                 this.loading = false
             }
+            */
         },
     }
 }
