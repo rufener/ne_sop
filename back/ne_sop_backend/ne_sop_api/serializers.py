@@ -251,6 +251,10 @@ class NestedItemSerializer(serializers.ModelSerializer):
         write_only=True,
     )
 
+    lead = EntitySerializer(read_only=True)
+
+    support = EntitySerializer(read_only=True, many=True)
+
     class Meta:
         model = Item
         fields = [
@@ -264,6 +268,8 @@ class NestedItemSerializer(serializers.ModelSerializer):
             "status_id",
             "author",
             "author_id",
+            "lead",
+            "support",
             "valid",
         ]
 
