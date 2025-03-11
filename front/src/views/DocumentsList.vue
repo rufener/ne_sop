@@ -53,7 +53,7 @@
                         }">
 
                             <!-- icon="sym_o_loupe" -->
-                            <q-chip clickable square outline color="blue-5" text-color="white">
+                            <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none">
                                 <div class="ellipsis"><b>{{ props.row.title }}</b> / {{ props.row.reference }}</div>
                             </q-chip>
                         </router-link>
@@ -80,17 +80,20 @@
                                             <q-tooltip class="bg-black">{{ item.status.name }}</q-tooltip>
                                         </q-item-section>
                              -->
-                                <q-chip clickable square outline color="blue-5" text-color="white">
+                                <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none">
                                     <div class="vertical-middle ellipsis"><q-badge :color="item.status.color" rounded class="q-mr-xs" /> <b>{{ item.number }}</b> - {{ item.title }}</div>
-                                    <q-tooltip class="bg-none text-body2">
-                                        <q-card class="my-card bg-black text-white">
+
+                                    <q-tooltip class="bg-black text-white text-body2 q-pa-none q-ma-none">
+                                        <q-card class="bg-black text-white">
 
                                             <q-card-section>
-                                                <div class="text-h6">{{ item.number }} - {{ item.title }}</div>
-                                                <div class="text-subtitle2">{{ item.type.name }}</div>
+                                                <div class="bg-white text-black text-subtitle2 text-weight-bolder q-pa-xs">{{ item.number }} - {{ item.type.name }}</div>
+                                                <div class="text-subtitle2">{{ item.title }}</div>
+                                                <div class="text-subtitle2">Auteur: {{ item.author.name }}</div>
+                                                <div class="text-subtitle2">Lead: {{ }}</div>
                                             </q-card-section>
                                             <q-card-section>
-                                                {{ item.status.name }}
+                                                <div class=""><q-badge :color="item.status.color" rounded class="q-mr-xs" /> {{ item.status.name }}</div>
                                             </q-card-section>
                                         </q-card>
                                     </q-tooltip>
@@ -134,7 +137,7 @@
         </div>
 
         <!-- DELETE DIALOG -->
-        <DeleteDialog v-model="dialog.deletion" @delete-event="remove" />
+        <DeleteDialog v-model="dialog.deletion" @delete-event="remove" content="Supprimer définitivement ce document? Les objets parlementaires liés ne seront pas supprimés." title="Suppression définitive du document" />
 
     </div>
 </template>
