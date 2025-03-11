@@ -553,8 +553,11 @@ export const store = reactive({
 
     let promises = [];
     documents.forEach((document) => {
-      // promises.push(store.addDocument(document));
-      promises.push(store.updateMyDocument(document.uuid, document));
+      if (document.uuid) {
+        promises.push(store.updateMyDocument(document.uuid, document));
+      } else {
+        promises.push(store.addDocument(document));
+      }
     });
 
     return await Promise.all(promises).catch((error) => console.log("error", error));
