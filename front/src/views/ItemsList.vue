@@ -137,7 +137,7 @@
 
 
         <!-- FILTER DIALOG -->
-        <ItemFilterDialog ref="didi" v-model:show="dialog.filter" v-model:filter="filter"></ItemFilterDialog>
+        <ItemFilterDialog ref="itemfilter" v-model:show="dialog.filter" v-model:filter="filter"></ItemFilterDialog>
 
         <!--
         <q-dialog v-model="dialog.filter">
@@ -293,7 +293,7 @@ export default {
 
         },
         reset() {
-            this.$refs.didi.resetall()
+            this.$refs.itemfilter.resetall()
         },
         getDate(events, type) {
 
