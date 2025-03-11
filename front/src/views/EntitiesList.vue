@@ -45,7 +45,7 @@
                 <q-tr :props="props" :class="{ inactive: !props.row.active }">
 
                     <!-- NAME COLUMN -->
-                    <q-td key="type" :props="props">
+                    <q-td key="name" :props="props">
 
                         <router-link :to="{
                             name: 'Entity',
@@ -53,9 +53,17 @@
                                 id: props.row.id
                             }
                         }">
+                            <!-- 
                             {{ props.row.name }}
                             <span v-if="!props.row.active"> (désactivé)</span>
+                            -->
+
+                            <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none">
+                                <div class="ellipsis"><b>{{ props.row.name }}</b></div>
+                            </q-chip>
                         </router-link>
+
+                        <q-icon name="sym_o_person_off" color="black" size="22px" class="q-mx-xs" v-if="!props.row.active" />
 
                     </q-td>
 
