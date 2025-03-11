@@ -9,20 +9,15 @@ export const store = reactive({
   host: host,
   dev: dev, // enable/disable development mode
   loading: true,
-  // warning: false,
-  // exit: false,
   navigation: { from: null, to: null },
   dialogs: { warning: false, exit: false, error: false },
   errormessage: "",
   drawer: ref(false),
-
-  // filters: { items: null, entities: null },
   entity: { old: null, new: null },
   item: { old: null, new: null },
   document: { old: null, new: null },
   event: { old: null, new: null },
   documents: [],
-  // users: users,
   user: null,
 
   // UPDATE UNSAVED CHANGES WARNING PANEL
@@ -61,6 +56,21 @@ export const store = reactive({
     }
   },
 
+  initializeDocument() {
+    return {
+      title: "",
+      reference: "",
+      type: "",
+      note: "",
+      filename: "",
+      version: 0,
+      size: 0,
+      items: [],
+      valid: false,
+      author: null,
+    };
+  },
+
   // HANDLE HTTP FETCH RESPONSE
   async handleResponse(response) {
     let payload = await response.json();
@@ -71,9 +81,7 @@ export const store = reactive({
     } else {
       this.dialogs.error = true;
       this.errormessage = payload;
-      // console.log(payload)
       return;
-      // throw new Error('Ceci est une erreur')
     }
   },
 
@@ -126,7 +134,6 @@ export const store = reactive({
         }
       }
       // const query = `${host}/api/entity?page=${page}&size=${size}&search=${filter.search}&type=${filter.type}&service=${filter.service}&sortby=${sortBy}&descending=${descending}`
-
       // console.log(`getEntities: ${query.href}`)
 
       const response = await fetch(query, {
@@ -292,10 +299,14 @@ export const store = reactive({
   // UPDATE ITEM
   async updateItem(id, data) {
     try {
-      // await sleep(1000)
+      console.log("updateItem");
+      console.log("data.documents");
+      console.log(data.documents);
+
       let documents = data.documents;
+
+      // remove linked documents (they are updated separately with the updateDocumentList method)
       let data_nodocs = Object.assign({}, data);
-      // let data_nodocs = JSON.parse(JSON.stringify(data))
       delete data_nodocs.documents;
 
       const query = new URL(`${host}/api/item/${id}/`);
@@ -307,10 +318,8 @@ export const store = reactive({
         body: JSON.stringify(data_nodocs),
         redirect: "follow",
       });
-
-      // await response.json()
       await this.handleResponse(response);
-      await this.prepareAddDocuments(documents, data_nodocs);
+      await this.updateDocumentList(documents);
 
       return await this.getItem(id);
     } catch (error) {
@@ -338,13 +347,10 @@ export const store = reactive({
         redirect: "follow",
       });
 
-      // let tmp = await response.json()
+      const item = await this.handleResponse(response);
 
-      let tmp = await this.handleResponse(response);
-
-      await this.prepareAddDocuments(documents, tmp);
-
-      return await this.getItem(tmp.id);
+      await this.prepareAddDocuments(documents, item);
+      return await this.getItem(item.id);
     } catch (error) {
       // handle network and CORS errors (fetch promise rejected)
       this.dialogs.error = true;
@@ -541,23 +547,31 @@ export const store = reactive({
     }
   },
 
+  async updateDocumentList(documents) {
+    console.log("updateDocumentList");
+    console.log(documents);
+
+    let promises = [];
+    documents.forEach((document) => {
+      // promises.push(store.addDocument(document));
+      promises.push(store.updateMyDocument(document.uuid, document));
+    });
+
+    return await Promise.all(promises).catch((error) => console.log("error", error));
+  },
+
   // PREPARE UPLOAD DOCUMENTS
   async prepareAddDocuments(documents, item) {
     documents = documents.filter((x) => x.id === undefined);
 
-    let promises = [];
-    documents.forEach((x) => {
-      let formData = new FormData();
-      formData.append("file", x.file);
-      formData.append("filename", x.filename);
-      formData.append("created", x.created);
-      formData.append("template", x.template);
-      formData.append("template_id", x.template_id);
-      formData.append("size", x.size);
-      formData.append("note", x.note);
-      formData.append("item", item.id);
+    console.log("prepareAddDocuments");
+    console.log(documents);
+    console.log(item);
 
-      promises.push(store.addDocument(formData, x.filename));
+    let promises = [];
+    documents.forEach((document) => {
+      document.items = [item];
+      promises.push(store.addDocument(document));
     });
 
     return await Promise.all(promises).catch((error) => console.log("error", error));
@@ -612,17 +626,20 @@ export const store = reactive({
   // ADD DOCUMENT
   async addDocument(formInput) {
     console.log("addDocument");
+    console.log("formInput");
     console.log(formInput);
 
     const formData = new FormData();
 
     formData.append("reference", formInput.reference);
     formData.append("title", formInput.title);
-    formData.append("type", formInput.type);
+    formData.append("type", formInput.type.id);
     formData.append("note", formInput.note);
+
     formInput.items.forEach((item) => {
       formData.append("items", item.id);
     });
+
     formData.append("author", formInput.author.id);
     formData.append("filename", formInput.filename);
     formData.append("version", formInput.version); // TODO remove
@@ -631,6 +648,7 @@ export const store = reactive({
     formData.append("valid", formInput.valid);
     formData.append("created", formInput.created);
 
+    console.log("formData");
     console.log(formData);
 
     try {
@@ -671,11 +689,13 @@ export const store = reactive({
     formData.append("uuid", formInput.uuid);
     formData.append("reference", formInput.reference);
     formData.append("title", formInput.title);
-    formData.append("type", formInput.type);
+    formData.append("type", formInput.type.id);
     formData.append("note", formInput.note);
+
     formInput.items.forEach((item) => {
       formData.append("items", item.id);
     });
+
     formData.append("author", formInput.author.id);
     formData.append("filename", formInput.filename);
     formData.append("version", formInput.version); // TODO remove
