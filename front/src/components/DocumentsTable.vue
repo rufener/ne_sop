@@ -15,35 +15,18 @@
         <template v-slot:body="props">
             <q-tr :props="props">
                 <q-td key="title" :props="props">
-
-                    <!-- <div class="text-bold overflow-ellipsis">{{ props.row.filename }} ({{ formatBytes(props.row.size) }})<q-tooltip anchor="bottom middle">{{ props.row.filename }} ({{ formatBytes(props.row.size) }})</q-tooltip></div> -->
                     <div class="text-bold overflow-ellipsis">{{ props.row.title }} / {{ props.row.reference }}</div>
-
-                    <!-- <div class="overflow-ellipsis">{{ props.row.template }}</div> -->
                 </q-td>
 
                 <q-td key="type" :props="props">
                     {{ props.row.type.name }}
                 </q-td>
-                <!--
-                <q-td key="template" :props="props">
-                    {{ props.row.template }}
-                </q-td>
-                -->
-                <!--
-                <q-td key="author" :props="props">
-                    {{ props.row.author }}
-                </q-td>
-                -->
+
                 <q-td key="created" :props="props">
                     <div class="text-bold">{{ props.row.created }}</div>
                     <div>{{ props.row.author.username }}</div>
                 </q-td>
-                <!-- 
-                <q-td key="note" :props="props">
-                    {{ props.row.note }}
-                </q-td>
-                -->
+
                 <q-td key="actions" :props="props">
                     <div class="float-right">
 
@@ -69,7 +52,7 @@
         {{ documents }}
     </div>
 
-    <!-- ADD NEW DIALOG -->
+    <!-- ADD NEW DOCUMENT DIALOG -->
     <q-dialog v-model="dialog.newDocument">
         <NewDocumentDialog v-model="documents" :item_type="type"></NewDocumentDialog>
     </q-dialog>
@@ -96,10 +79,7 @@ const host = import.meta.env.VITE_API_URL
 const columns = [
     { name: 'title', align: 'left', label: 'Titre / Réf.', field: 'title', sortable: true, style: 'max-width: 250px; width: 250px' },
     { name: 'type', align: 'left', label: 'Type', field: 'type', sortable: true, style: 'max-width: 150px; width: 150px' },
-    /*{ name: 'template', align: 'left', label: 'Type', field: 'template', sortable: true }, */
-    /*{ name: 'author', align: 'left', label: 'Ajouté par', field: 'author', sortable: true },*/
     { name: 'created', align: 'left', label: 'Modifié le', field: 'created', sortable: true }, // style: 'max-width: 110px; width: 110px' 
-    /* { name: 'note', align: 'left', label: 'Notes', field: 'note', sortable: true, style: 'max-width: 190px; width: 190px; white-space: normal;' }, */
     { name: 'actions', align: 'right', label: '', field: 'action', sortable: false, style: 'max-width: 120px; width: 80px' }
 ]
 
