@@ -566,6 +566,7 @@ class NewItemSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         events = validated_data.pop("events", None)
         support = validated_data.pop("support", None)
+        documents = validated_data.pop("documents", None)
         item = Item.objects.create(**validated_data)
 
         item.support.set(support)
@@ -573,6 +574,10 @@ class NewItemSerializer(serializers.ModelSerializer):
         if events is not None:
             for event in events:
                 Event.objects.create(item=item, **event)
+
+        if documents is not None:
+            for document in documents:
+                Document.objects.create(items=item, **document)
 
         return item
 
