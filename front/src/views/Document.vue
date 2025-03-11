@@ -36,7 +36,6 @@ import DeleteDialog from '../components/DeleteDialog.vue'
 import DocumentForm from "../components/DocumentForm.vue"
 import NotFound from '../components/NotFound.vue'
 
-
 export default {
     name: 'Document',
     components: { FloatingButtons, DeleteDialog, DocumentForm, NotFound },
@@ -115,7 +114,6 @@ export default {
         },
         async save(redirectTo) {
 
-
             // console.log(`${this.$options.name}.vue | save()`)
             this.wait = true
 
@@ -141,7 +139,6 @@ export default {
             if (redirectTo !== null) {
                 this.$router.push({ path: redirectTo })
             }
-
 
         },
         handleDeletion() {
