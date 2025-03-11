@@ -53,8 +53,9 @@
                                 id: props.row.id
                             }
                         }">
-                            {{ props.row.date }}
-                            <!-- {{ mydate.formatDate(props.row.date, 'DD.MM.YYYY') }} -->
+                            <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none">
+                                <div class="ellipsis"><b>{{ props.row.date }}</b></div>
+                            </q-chip>
                         </router-link>
 
                     </q-td>
@@ -73,20 +74,20 @@
                                 id: props.row.item.id
                             }
                         }">
-                            <div>{{ props.row.item.number }} - {{ props.row.item.type.name }}</div>
+                            <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none">
+                                <div class="ellipsis"><b>{{ props.row.item.number }} - {{ props.row.item.title }}</b></div>
+
+                            </q-chip>
 
                         </router-link>
-
-                        <div>{{ props.row.item.title }}</div>
-
 
                     </q-td>
 
                     <!-- ACTIONS COLUMN -->
                     <q-td key="actions" :props="props">
                         <div class="float-right">
-                            <q-btn dense round flat color="grey" name="calendar" @click="" :href="`${store.host}/api/event/${props.row.uuid}/download/`" icon="sym_o_calendar_add_on">
-                                <q-tooltip class="bg-black">Ajouter au calendrier {{ props.row.filename }}</q-tooltip>
+                            <q-btn dense round flat color="grey" name="calendar" :href="`${store.host}/api/event/${props.row.uuid}/download/`" icon="sym_o_calendar_add_on">
+                                <q-tooltip class="bg-black">Télécharger fichier calendrier ICS</q-tooltip>
                             </q-btn>
                             <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row.id)" icon="sym_o_delete">
                                 <q-tooltip class="bg-black">Supprimer</q-tooltip>
@@ -107,7 +108,7 @@
         </div>
 
         <!-- DELETE DIALOG -->
-        <DeleteDialog v-model="dialog.deletion" @delete-event="remove" />
+        <DeleteDialog v-model="dialog.deletion" @delete-event="remove" content="Supprimer définitivement cet événement? Les objets parlementaires liés ne seront pas supprimés." title="Suppression définitive" />
 
     </div>
 </template>
