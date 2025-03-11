@@ -31,8 +31,8 @@
                         <q-btn dense round flat color="blue" name="edit" @click="handleEdition(props.row)" icon="sym_o_edit" :disable="!edit">
                             <q-tooltip class="bg-black">Modifier</q-tooltip>
                         </q-btn>
-                        <q-btn dense round flat color="grey" name="calendar" @click="" :href="`${store.host}/api/event/${props.row.uuid}/download/`" icon="sym_o_calendar_add_on">
-                            <q-tooltip class="bg-black">Ajouter au calendrier {{ props.row.filename }}</q-tooltip>
+                        <q-btn dense round flat color="grey" name="calendar" :href="`${store.host}/api/event/${props.row.uuid}/download/`" icon="sym_o_calendar_add_on">
+                            <q-tooltip class="bg-black">Télécharger fichier calendrier ICS</q-tooltip>
                         </q-btn>
                         <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row.id)" icon="sym_o_delete" :disable="!edit">
                             <q-tooltip class="bg-black">Supprimer</q-tooltip>
