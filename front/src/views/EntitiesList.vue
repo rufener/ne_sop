@@ -18,12 +18,10 @@
 
                     <template v-slot:append>
                         <q-spinner color="blue-grey" :thickness="3" v-if="loading" />
-                        <!-- FILTER BUTTON -->
-                        <!--
-                            <q-btn unelevated icon="sym_o_filter_alt" padding="xs" @click="console.log('filter')">
-                                <q-tooltip class="bg-black">Filtrer</q-tooltip>
-                            </q-btn>
-                            -->
+
+                        <q-btn unelevated dense icon="close" @click="reset">
+                            <q-tooltip class="bg-black">Réinitialiser</q-tooltip>
+                        </q-btn>
                     </template>
                 </q-input>
             </div>
@@ -191,12 +189,6 @@ export default {
             this.pagination.rowsNumber = this.data.nrows
             this.loading = false
         },
-        /*
-        handleDeletion(val) {
-            this.selected = val
-            this.dialog.deletion = true
-        },
-        */
         async deactivate(val) {
             this.selected = val
             let message = await store.updateEntity(val.id, { active: val.active })
@@ -205,6 +197,9 @@ export default {
                 this.query()
             }
 
+        },
+        reset() {
+            this.filter.search = ""
         },
         async remove() {
 
