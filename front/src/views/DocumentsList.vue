@@ -17,12 +17,10 @@
                     </template>
                     <template v-slot:append>
                         <q-spinner color="blue-grey" :thickness="3" v-if="loading" />
-                        <!-- FILTER BUTTON -->
-                        <!-- 
-                            <q-btn unelevated icon="sym_o_filter_alt" padding="xs" @click="console.log('filter')">
-                                <q-tooltip class="bg-black">Filtrer</q-tooltip>
-                            </q-btn>
-                            -->
+
+                        <q-btn unelevated dense icon="close" @click="reset">
+                            <q-tooltip class="bg-black">Réinitialiser</q-tooltip>
+                        </q-btn>
                     </template>
                 </q-input>
             </div>
@@ -90,7 +88,7 @@
                                                 <div class="bg-white text-black text-subtitle2 text-weight-bolder q-pa-xs">{{ item.number }} - {{ item.type.name }}</div>
                                                 <div class="text-subtitle2">{{ item.title }}</div>
                                                 <div class="text-subtitle2">Auteur: {{ item.author.name }}</div>
-                                                <div class="text-subtitle2">Lead: {{ }}</div>
+                                                <div class="text-subtitle2">Service: {{ item.lead.name }}</div>
                                             </q-card-section>
                                             <q-card-section>
                                                 <div class=""><q-badge :color="item.status.color" rounded class="q-mr-xs" /> {{ item.status.name }}</div>
@@ -249,6 +247,9 @@ export default {
         handleDeletion(val) {
             this.selected = val
             this.dialog.deletion = true
+        },
+        reset() {
+            this.filter.search = ""
         },
         async remove() {
 
