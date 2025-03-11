@@ -57,17 +57,44 @@
             <template v-slot:body="props">
                 <q-tr :props="props">
 
+
+                    <!-- TITLE COLUMN -->
+                    <q-td key="title" :props="props">
+
+                        <router-link :to="{
+                            name: 'Item',
+                            params: {
+                                id: props.row.id
+                            }
+                        }">
+                            <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none">
+                                <div class="ellipsis"><b>{{ props.row.title }}</b></div>
+                                <q-badge color="red" align="top" class="q-ml-xs" v-if="props.row.urgent">
+                                    Urgent
+                                </q-badge>
+                            </q-chip>
+
+                        </router-link>
+
+                        <div>Auteur: {{ props.row.author }}</div>
+                        <div>Lead: {{ props.row.lead }}</div>
+                        <div>Support: {{ props.row.support.join(", ") }}</div>
+
+                    </q-td>
+
+                    <!-- NUMBER COLUMN -->
+                    <q-td key="number" :props="props">
+                        {{ props.row.number }}
+                    </q-td>
+
+                    <!-- TYPE COLUMN -->
+                    <q-td key="type" :props="props">
+                        {{ props.row.type.name }}
+                    </q-td>
+
+
                     <!-- STATUS COLUMN -->
                     <q-td key="status" :props="props">
-
-                        <!--
-                    <q-avatar rounded size="58px" v-if="props.row.islate">
-                        <img src="img/kermit-panicking.gif">
-                    </q-avatar>
-                    -->
-
-                        <!-- <q-badge floating color="yellow" text-color="black">retard</q-badge> -->
-
 
                         <div class="q-gutter-xs">
                             <q-badge color="red" class="q-my-sm" v-if="props.row.urgent">Urgent</q-badge>
@@ -80,39 +107,16 @@
 
                     </q-td>
 
-                    <!-- NUMBER COLUMN -->
-                    <q-td key="number" :props="props">
-                        {{ props.row.number }}
-                    </q-td>
-                    <!-- TYPE COLUMN -->
-                    <q-td key="type" :props="props">
-                        {{ props.row.type.name }}
-                    </q-td>
-                    <!-- TITLE COLUMN -->
-                    <q-td key="title" :props="props">
-
-                        <router-link :to="{
-                            name: 'Item',
-                            params: {
-                                id: props.row.id
-                            }
-                        }">
-                            {{ props.row.title }}
-                        </router-link>
-
-                        <div>Auteur: {{ props.row.author }}</div>
-                        <div>Lead: {{ props.row.lead }}</div>
-                        <div>Support: {{ props.row.support.join(", ") }}</div>
-
-                    </q-td>
                     <!-- START DATE (DEPOSIT) DATE COLUMN -->
                     <q-td key="startdate" :props="props">
                         {{ props.row.startdate }}
                     </q-td>
+
                     <!-- END DATE (DELAY) DATE COLUMN -->
                     <q-td key="enddate" :props="props">
                         {{ props.row.enddate }}
                     </q-td>
+
                     <!-- ACTIONS COLUMN -->
                     <q-td key="actions" :props="props">
                         <div class="float-right">
@@ -129,7 +133,8 @@
         </q-table>
 
         <!-- DELETE DIALOG -->
-        <DeleteDialog v-model="dialog.deletion" @delete-event="remove" />
+        <DeleteDialog v-model="dialog.deletion" @delete-event="remove" content="Supprimer définitivement cet objet parlementaire? Les documents liés ne seront pas supprimés." title="Suppression définitive" />
+
 
         <!-- FILTER DIALOG -->
         <ItemFilterDialog ref="didi" v-model:show="dialog.filter" v-model:filter="filter"></ItemFilterDialog>
@@ -172,11 +177,12 @@ export default {
             },
             columns: [
                 {
-                    name: "status",
+                    name: "title",
                     align: "left",
-                    label: "Statut",
-                    field: "status",
+                    label: "Titre",
+                    field: "title",
                     sortable: true,
+                    style: 'max-width: 600px; width: 500px;white-space: normal;',
                 },
                 {
                     name: "number",
@@ -193,12 +199,11 @@ export default {
                     sortable: true,
                 },
                 {
-                    name: "title",
+                    name: "status",
                     align: "left",
-                    label: "Titre",
-                    field: "title",
+                    label: "Statut",
+                    field: "status",
                     sortable: true,
-                    style: 'max-width: 600px; width: 500px;white-space: normal;',
                 },
                 {
                     name: "startdate",
