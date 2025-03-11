@@ -2,7 +2,7 @@
     <div class="login">
 
         <div class="q-pa-md">
-            <q-card class="my-card">
+            <q-card> <!-- class="my-card" -->
                 <q-card-section>
                     <q-form @submit="processLogin" class="q-gutter-md">
 
@@ -12,7 +12,6 @@
 
                         <q-separator />
 
-                        <!-- <q-input v-model="username" filled label="Nom d'utilisateur *" style="width: inherit;" lazy-rules :rules="[val => val && val.length > 0 || 'Entrer le nom d\'utilisateur']" /> -->
                         <q-input v-model="username" filled label="Nom d'utilisateur *" style="width: inherit;" lazy-rules :rules="[val => val && val.length > 0 || 'Entrer l\'email']" />
 
                         <q-input v-model="password" filled :type="isPwd ? 'password' : 'text'" label="Mot de passe *" lazy-rules :rules="[val => val && val.length > 0 || 'Entrer le mot de passe']">
@@ -63,10 +62,6 @@ export default {
     methods: {
         processLogin() {
             this.loginInProgress = true;
-
-            // store.session.user = 
-
-            // do something here to log in and remove setTimeout above !
             setTimeout(() => {
                 this.loginInProgress = false;
                 this.$router.push({ name: "ItemsList" });
