@@ -193,14 +193,20 @@ class Utils(object):
         dtend = dtstart + timedelta(hours=1)
         ics_event.add('dtend', dtend)
 
-        # Compose a summary from event type and item name if available
-        event_type = event.type.name if event.type and hasattr(event.type, 'name') else 'Event'
-        item_name = event.item.name if event.item and hasattr(event.item, 'name') else ''
-        summary = f"{event_type} - {item_name}" if item_name else event_type
+        # Compose a summary (title) from event type and item name if available
+        summary = f"OP {event.item.number} - {event.type.name}"
         ics_event.add('summary', summary)
 
         # Add description and unique identifier
-        ics_event.add('description', event.description)
+        description = (
+            f"Objet parlementaire: {event.item.number} - {event.item.title}\n"
+            f"Lien: https://sop.ne.ch/#/items/{event.item.id}\n"
+            f"Date: {event.date.strftime('%d.%m.%Y')} {event.time.strftime('%H:%M:%S') if event.time else ''}\n"
+            f"Événement: {event.type.name}\n"
+            f"Description: {event.description}"
+        )
+
+        ics_event.add('description', description)
         ics_event.add('uid', str(event.uuid))
 
         if event.created:
@@ -209,6 +215,6 @@ class Utils(object):
         cal.add_component(ics_event)
 
         response = HttpResponse(cal.to_ical(), content_type='text/calendar; charset=utf-8')
-        filename = f"nesop_cal_{event.date.strftime('%Y%m%d')}.ics"
+        filename = f"nesop_{event.item.number.replace(".", "")}_{event.date.strftime('%Y%m%d')}.ics"
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response
