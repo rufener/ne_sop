@@ -116,9 +116,7 @@ export default {
 
             // console.log(`${this.$options.name}.vue | save()`)
             this.wait = true
-
             let response
-
             if (this.document.id) {
                 // update existing record
                 response = await store.updateMyDocument(this.document.uuid, this.document)
