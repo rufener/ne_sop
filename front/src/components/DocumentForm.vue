@@ -100,10 +100,7 @@
                                         </q-item-section>
 
                                         <q-item-section>
-                                            <!-- <q-item-label>{{ scope.opt.number }} - {{ scope.opt.title }} Added: {{document.items.some(item => item.uuid === scope.opt.uuid)}}</q-item-label>
-                                            -->
                                             <q-item-label>{{ scope.opt.number }} - {{ scope.opt.title }}</q-item-label>
-                                            <!-- <q-item-label caption>{{ scope.opt.type }}</q-item-label> -->
                                         </q-item-section>
                                         <!--
                                         <q-item-section side>
@@ -222,17 +219,10 @@ export default {
         fileDownloadUrl() {
             return `${this.store.host}/api/document/${this.document.uuid}/download/`;
         }
-
     },
     async created() {
         this.documentTypes = await this.store.getDocumentTypes()
-        // getItems(filter = {}, page = 1, size = 10, sortBy = "", descending = "false") 
-
-        // this.itemOptions = (await store.getItems({ search: "" }, 1, 5, "number", "false")).results
-
         this.getItemOptions()
-
-        // this.getDocumentTypes()
     },
     methods: {
         formatBytes,
@@ -249,33 +239,13 @@ export default {
         async getItemOptions(searchstring = "") {
 
             const options = (await store.getItems({ search: searchstring.toLowerCase() }, 1, 5, "number", "false")).results
-
             options.map(x => x.disable = this.document.items.some(item => item.uuid === x.uuid))
             this.itemOptions = options
 
         },
         filterFn(val, update, abort) {
-
-            /*
-            this.loading = true
-            this.data = await store.getItems(this.filter, this.pagination.page, this.pagination.rowsPerPage, this.pagination.sortBy, this.pagination.descending)
-            this.rows = this.data.results
-            this.pagination.rowsNumber = this.data.nrows
-            this.loading = false
-            */
-
             update(async () => {
-
                 this.getItemOptions(val)
-                //const str = val.toLowerCase()
-                // this.itemOptions = (await store.getItems({ search: str }, 1, 5, "number", "false")).results
-
-
-                // this.loading.authors = true
-
-                // getItems(filter = {}, page = 1, size = 10, sortBy = "", descending = "false") 
-
-                // this.loading.authors = false
             })
         },
         selectOption(payload) {
@@ -308,19 +278,6 @@ export default {
             this.document.filename = null
             this.document.size = null
         },
-
-        /*
-        showDeleteDialog(val) {
-            this.dialog_content = `Supprimer définitivement le document '${val.filename}' ?`
-            this.dialog.deletion = true
-        },
-        */
-        /*
-        handleDelete() {
-            this.document.file = null
-            this.newFile = null
-        },
-        */
         handleUnlink(uuid) {
             this.document.items = this.document.items.filter(item => item.uuid !== uuid);
         }
