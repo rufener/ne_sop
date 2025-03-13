@@ -318,8 +318,9 @@ export const store = reactive({
         body: JSON.stringify(data_nodocs),
         redirect: "follow",
       });
-      await this.handleResponse(response);
-      await this.updateDocumentList(documents);
+
+      const item = await this.handleResponse(response);
+      await this.updateDocumentList(documents, item);
 
       return await this.getItem(id);
     } catch (error) {
@@ -332,8 +333,9 @@ export const store = reactive({
   // ADD NEW ITEM
   async addItem(data) {
     let documents = data.documents;
+
+    // remove linked documents (they are updated separately with the updateDocumentList method)
     let data_nodocs = Object.assign({}, data);
-    // let data_nodocs = JSON.parse(JSON.stringify(data))
     delete data_nodocs.documents;
 
     try {
@@ -348,8 +350,8 @@ export const store = reactive({
       });
 
       const item = await this.handleResponse(response);
-
       await this.prepareAddDocuments(documents, item);
+
       return await this.getItem(item.id);
     } catch (error) {
       // handle network and CORS errors (fetch promise rejected)
@@ -547,12 +549,13 @@ export const store = reactive({
     }
   },
 
-  async updateDocumentList(documents) {
+  async updateDocumentList(documents, item) {
     console.log("updateDocumentList");
     console.log(documents);
 
     let promises = [];
     documents.forEach((document) => {
+      document.items.push(item);
       if (document.uuid) {
         promises.push(store.updateMyDocument(document.uuid, document));
       } else {
@@ -710,7 +713,8 @@ export const store = reactive({
     console.log(formData);
 
     try {
-      const query = new URL(`${host}/api/document/${id}/`);
+      const query = new URL(`${host}/api/document/${formInput.uuid}/`);
+      // const query = new URL(`${host}/api/document/${id}/`);
       const response = await fetch(query, {
         method: "PUT", // PUT
         body: formData,
