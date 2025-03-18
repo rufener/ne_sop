@@ -4,6 +4,8 @@ from .models import (
     Item,
     ItemType,
     ItemStatus,
+    Document,
+    DocumentType,
     Entity,
     EntityType,
     Event,
@@ -19,7 +21,8 @@ admin.site.register(ItemType)
 admin.site.register(ItemStatus)
 admin.site.register(Event)
 admin.site.register(EventType)
-
+admin.site.register(Document)
+admin.site.register(DocumentType)
 
 # Widgets
 class TemplateAdmin(admin.ModelAdmin):
