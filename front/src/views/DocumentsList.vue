@@ -101,8 +101,8 @@
                     </q-td>
 
                     <!-- DATE COLUMN -->
-                    <q-td key="created" :props="props">
-                        {{ props.row.created }}
+                    <q-td key="modified" :props="props">
+                        {{ props.row.modified }}
                     </q-td>
 
                     <!-- USER COLUMN -->
@@ -188,10 +188,10 @@ export default {
                     sortable: false,
                 },
                 {
-                    name: "created",
+                    name: "modified",
                     align: "left",
-                    label: "Date",
-                    field: "created",
+                    label: "Modifié le",
+                    field: "modified",
                     sortable: true,
                 },
                 {
