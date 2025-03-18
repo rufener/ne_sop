@@ -652,7 +652,7 @@ export const store = reactive({
     formData.append("size", formInput.size);
     formData.append("file", formInput.file);
     formData.append("valid", formInput.valid);
-    formData.append("created", formInput.created);
+    // formData.append("created", formInput.created);
 
     console.log("formData");
     console.log(formData);
@@ -708,7 +708,7 @@ export const store = reactive({
     formData.append("size", formInput.size);
     formData.append("file", formInput.file);
     formData.append("valid", formInput.valid);
-    formData.append("created", formInput.created);
+    // formData.append("created", formInput.created);
 
     console.log(formData);
 
