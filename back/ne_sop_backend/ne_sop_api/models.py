@@ -250,7 +250,8 @@ class Document(models.Model):
     reference = models.CharField(max_length=200, blank=True, null=True, default="")
     title = models.CharField(max_length=200, blank=True, null=True, default="")
     type = models.ForeignKey(DocumentType, null=True, on_delete=models.PROTECT)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)  # auto_now_add=True
+    modified = models.DateTimeField(auto_now=True)
     # template = models.ForeignKey(Template, null=True, on_delete=models.SET_NULL)
     note = models.CharField(max_length=500, blank=True, default="")
     filename = models.CharField(default=None, max_length=200)
