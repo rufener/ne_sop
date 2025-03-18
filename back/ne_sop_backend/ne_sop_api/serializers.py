@@ -442,6 +442,7 @@ class DocumentSerializer(serializers.ModelSerializer):
             "title",
             "type",
             "created",
+            "modified",
             "filename",
             "note",
             "version",
@@ -452,6 +453,7 @@ class DocumentSerializer(serializers.ModelSerializer):
             "file",
             "filehash",
         ]
+        read_only_fields = ["created", "modified"]
 
     def create(self, validated_data):
         version = "1"
@@ -501,6 +503,7 @@ class NewDocumentSerializer(serializers.ModelSerializer):
             "title",
             "type",
             "created",
+            "modified",
             "filename",
             "note",
             "version",
@@ -511,6 +514,7 @@ class NewDocumentSerializer(serializers.ModelSerializer):
             "file",
             "filehash",
         ]
+        read_only_fields = ["created", "modified"]
 
 
 # %% New item serializer
