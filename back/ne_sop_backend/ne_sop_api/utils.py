@@ -215,6 +215,6 @@ class Utils(object):
         cal.add_component(ics_event)
 
         response = HttpResponse(cal.to_ical(), content_type='text/calendar; charset=utf-8')
-        filename = f"nesop_{event.item.number.replace(".", "")}_{event.date.strftime('%Y%m%d')}.ics"
+        filename = f"nesop_{event.item.number.replace('.', '')}_{event.date.strftime('%Y%m%d')}.ics"
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response
