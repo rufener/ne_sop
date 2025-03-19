@@ -119,7 +119,7 @@ export default {
             let response
             if (this.document.id) {
                 // update existing record
-                response = await store.updateMyDocument(this.document.uuid, this.document)
+                response = await store.updateDocument(this.document.uuid, this.document)
             } else {
                 // create a new record
                 response = await store.addDocument(this.document)
