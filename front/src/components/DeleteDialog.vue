@@ -3,9 +3,19 @@
   <q-dialog :model-value="modelValue" @hide="close()">
     <q-card>
 
+      <q-bar class="bg-red">
+        <q-space />
+        <q-btn dense flat icon="close" v-close-popup>
+          <q-tooltip class="bg-white text-primary">Annuler</q-tooltip>
+        </q-btn>
+      </q-bar>
+
+      <q-card-section>
+        <div class="text-h6" color="red"><q-icon name="warning" color="warning" size="3rem" /> {{ title }}</div>
+      </q-card-section>
+
       <q-card-section class="row items-center">
-        <q-avatar icon="sym_o_delete_forever" color="red" text-color="white" />
-        <span class="q-ml-sm">{{ content }}</span>
+        <span class="text-body1">{{ content }}</span>
       </q-card-section>
 
       <q-card-actions align="right">
@@ -22,7 +32,8 @@ export default {
   name: 'DeleteDialog',
   props: {
     'modelValue': Boolean,
-    'content': {type: String, default: () => 'Supprimer définitivement cette entrée et tous les éléments liés?'}
+    'content': { type: String, default: () => 'Supprimer définitivement cette entrée et tous les éléments liés?' },
+    'title': { type: String, default: () => 'Suppression' }
   },
   emits: ['update:modelValue', 'deleteEvent'],
   methods: {
@@ -35,4 +46,3 @@ export default {
   }
 }
 </script>
-

@@ -1,4 +1,7 @@
 from pathlib import Path, PurePath
+from django.http import HttpResponse
+from icalendar import Calendar, Event as IcsEvent
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
@@ -40,7 +43,8 @@ class Utils(object):
 
     @classmethod
     def get_upload_path(cls, instance, filename):
-        return PurePath(str(instance.item.created.year), str(instance.item.id), filename)
+        return PurePath(str(instance.uuid), filename)
+        # return PurePath(str(instance.item.created.year), str(instance.item.id), filename)
 
     @classmethod
     def get_next_documentVersion(cls, DocumentModel, data):
@@ -164,3 +168,53 @@ class Utils(object):
             adjusted_width = min(max_length + 2, 50)  # Ajouter un peu d'espace
             ws.column_dimensions[column].width = adjusted_width
         return ws
+
+    @staticmethod
+    def generate_ics_file(event):
+        """
+        Generate an ICS file for the provided Event instance
+        :param event: An instance of your Event model
+        :return: HttpResponse containing the ICS file
+        """
+        cal = Calendar()
+        cal.add('prodid', '-//Neuchâtel//NESOP//EN')
+        cal.add('version', '2.0')
+
+        ics_event = IcsEvent()
+
+        # Combine event.date and event.time (or default to midnight if time is None)
+        if event.time:
+            dtstart = datetime.combine(event.date, event.time)
+        else:
+            dtstart = datetime.combine(event.date, datetime.min.time())
+        ics_event.add('dtstart', dtstart)
+
+        # Default event duration: 1 hour
+        dtend = dtstart + timedelta(hours=1)
+        ics_event.add('dtend', dtend)
+
+        # Compose a summary (title) from event type and item name if available
+        summary = f"OP {event.item.number} - {event.type.name}"
+        ics_event.add('summary', summary)
+
+        # Add description and unique identifier
+        description = (
+            f"Objet parlementaire: {event.item.number} - {event.item.title}\n"
+            f"Lien: https://sop.ne.ch/#/items/{event.item.id}\n"
+            f"Date: {event.date.strftime('%d.%m.%Y')} {event.time.strftime('%H:%M:%S') if event.time else ''}\n"
+            f"Événement: {event.type.name}\n"
+            f"Description: {event.description}"
+        )
+
+        ics_event.add('description', description)
+        ics_event.add('uid', str(event.uuid))
+
+        if event.created:
+            ics_event.add('created', event.created)
+
+        cal.add_component(ics_event)
+
+        response = HttpResponse(cal.to_ical(), content_type='text/calendar; charset=utf-8')
+        filename = f"nesop_{event.item.number.replace('.', '')}_{event.date.strftime('%Y%m%d')}.ics"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response

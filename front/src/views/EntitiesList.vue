@@ -18,12 +18,10 @@
 
                     <template v-slot:append>
                         <q-spinner color="blue-grey" :thickness="3" v-if="loading" />
-                        <!-- FILTER BUTTON -->
-                        <!--
-                            <q-btn unelevated icon="sym_o_filter_alt" padding="xs" @click="console.log('filter')">
-                                <q-tooltip class="bg-black">Filtrer</q-tooltip>
-                            </q-btn>
-                            -->
+
+                        <q-btn unelevated dense icon="close" @click="reset">
+                            <q-tooltip class="bg-black">Réinitialiser</q-tooltip>
+                        </q-btn>
                     </template>
                 </q-input>
             </div>
@@ -45,7 +43,7 @@
                 <q-tr :props="props" :class="{ inactive: !props.row.active }">
 
                     <!-- NAME COLUMN -->
-                    <q-td key="type" :props="props">
+                    <q-td key="name" :props="props">
 
                         <router-link :to="{
                             name: 'Entity',
@@ -53,9 +51,17 @@
                                 id: props.row.id
                             }
                         }">
+                            <!-- 
                             {{ props.row.name }}
                             <span v-if="!props.row.active"> (désactivé)</span>
+                            -->
+
+                            <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none">
+                                <div class="ellipsis"><b>{{ props.row.name }}</b></div>
+                            </q-chip>
                         </router-link>
+
+                        <q-icon name="sym_o_person_off" color="black" size="22px" class="q-mx-xs" v-if="!props.row.active" />
 
                     </q-td>
 
@@ -183,12 +189,6 @@ export default {
             this.pagination.rowsNumber = this.data.nrows
             this.loading = false
         },
-        /*
-        handleDeletion(val) {
-            this.selected = val
-            this.dialog.deletion = true
-        },
-        */
         async deactivate(val) {
             this.selected = val
             let message = await store.updateEntity(val.id, { active: val.active })
@@ -197,6 +197,9 @@ export default {
                 this.query()
             }
 
+        },
+        reset() {
+            this.filter.search = ""
         },
         async remove() {
 

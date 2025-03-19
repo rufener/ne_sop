@@ -11,7 +11,7 @@
 
                         <!-- REFERENCE NUMBER TEXT FIELD -->
                         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-                            <q-input bg-color="white" outlined v-model="item.number" label="N°" :rules="[checkFilled]" :disable="!edit || !store.user.is_manager" />
+                            <q-input bg-color="white" outlined v-model="item.number" label="N° (##.###)" mask="##.####" :rules="[checkFilled]" :disable="!edit || !store.user.is_manager" />
                             <!-- <q-input bg-color="white" outlined v-model="item.number" label="N°" :rules="[checkFilled, v => checkUnique(v, exceptions.itemNumber)]" :disable="!edit || !store.user.is_manager" /> -->
                         </div>
 
@@ -233,7 +233,7 @@
             </FormSection>
 
             <!-- DOCUMENTS SECTION -->
-            <FormSection title="Documents">
+            <FormSection title="Documents liés">
                 <template v-slot:content>
 
                     <!-- DOCUMENTS TABLE -->
@@ -355,6 +355,7 @@ export default {
 
         },
         filterFn(val, update, abort) {
+
             update(async () => {
                 this.loading.authors = true
                 const str = val.toLowerCase()

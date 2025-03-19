@@ -7,7 +7,7 @@
         <q-card-section class="row items-center scroll" style="max-height: 70vh">
 
             <!-- FORM -->
-            <DocumentForm class="col" v-model="document" :item_type="item_type" :edit="edit" :changewatch="false"></DocumentForm>
+            <DocumentForm class="col" v-model="document" :item_type="item_type" :edit="edit" :changewatch="false" :excludeFields="['search-items']"></DocumentForm>
 
         </q-card-section>
 
@@ -36,21 +36,18 @@ export default {
             store,
             edit: true,
             document: {
-                "file": null,
-                "created": null,
-                "filename": "",
-                // "filesize": "",
-                // "format": "",
-                // "title": "",
-                // "version": null,
+                "title": "",
+                "reference": "",
                 "type": null,
-                "size": null,
-                // "date": new Date(),
-                // "timestamp": Date.now(),
-                // "author": store.session.user,
-                "note": '',
-                // "content": "",
-                "valid": false
+                "note": "",
+                "file": null,
+                "filename": "",
+                "version": 0,
+                "size": 0.0,
+                "items": [],
+                "valid": false,
+                "author": null,
+                "created": null,
             }
         }
     },
@@ -70,16 +67,18 @@ export default {
         async save() {
 
             this.documents.unshift({
-                'created': "", // new Date().toLocaleString(),
-                'filename': this.document.filename,
-                // 'item_id': this.$route.params.id,
-                'template': this.document.type.name,
-                'template_id': this.document.type.id,
-                'note': this.document.note,
-                'version': null,
-                'size': this.document.size,
-                'item': null,
-                'file': this.document.file,
+                "title": this.document.title,
+                "reference": this.document.reference,
+                "type": this.document.type,
+                "note": this.document.note,
+                "file": this.document.file,
+                "filename": this.document.filename,
+                "version": 0,
+                "size": this.document.size,
+                "items": [],
+                "valid": false,
+                "author": store.user,
+                "created": null,
             })
         }
     }

@@ -11,7 +11,7 @@
     </div>
 
     <!-- EVENTS TABLE -->
-    <q-table :rows="events" :columns="columns" row-key="date" v-model:pagination="pagination" @request="onRequest" binary-state-sort class="q-my-md" v-if="eventTypes.length > 0" :loading="loading" >
+    <q-table :rows="events" :columns="columns" row-key="date" v-model:pagination="pagination" @request="onRequest" binary-state-sort class="q-my-md" v-if="eventTypes.length > 0" :loading="loading">
         <template v-slot:body="props">
             <q-tr :props="props">
                 <q-td key="date" :props="props">
@@ -28,13 +28,11 @@
                 </q-td>
                 <q-td key="actions" :props="props">
                     <div class="float-right">
-                        <!--
-                        <q-btn dense round flat color="grey" name="calendar" @click="downloadICS(props.row)" icon="sym_o_calendar_add_on" :disable="!edit">
-                            <q-tooltip class="bg-black">Ajouter au calendrier</q-tooltip>
-                        </q-btn>
-                        -->
-                        <q-btn dense round flat color="blue" name="delete" @click="handleEdition(props.row)" icon="sym_o_edit" :disable="!edit">
+                        <q-btn dense round flat color="blue" name="edit" @click="handleEdition(props.row)" icon="sym_o_edit" :disable="!edit">
                             <q-tooltip class="bg-black">Modifier</q-tooltip>
+                        </q-btn>
+                        <q-btn dense round flat color="grey" name="calendar" :href="`${store.host}/api/event/${props.row.uuid}/download/`" icon="sym_o_calendar_add_on">
+                            <q-tooltip class="bg-black">Télécharger fichier calendrier ICS</q-tooltip>
                         </q-btn>
                         <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row.id)" icon="sym_o_delete" :disable="!edit">
                             <q-tooltip class="bg-black">Supprimer</q-tooltip>
@@ -65,18 +63,18 @@
     </q-dialog>
 
     <!-- EDIT EVENT DIALOG -->
-    <q-dialog v-model="dialog.edit">
+    <q-dialog v-model="dialog.edition">
         <EditEventDialog v-model="selected"></EditEventDialog>
     </q-dialog>
 
     <!-- DELETE EVENT DIALOG -->
-    <DeleteDialog v-model="dialog.delete" @delete-event="remove" />
+    <DeleteDialog v-model="dialog.deletion" @delete-event="remove" />
 </template>
 
 <script>
 import { store } from '../store/store.js'
 import { date as dateutils } from 'quasar'
-import { downloadICS } from '../store/shared.js'
+// import { downloadICS } from '../store/shared.js'
 import NewEventDialog from "../views/NewEventDialog.vue"
 import EditEventDialog from "../views/EditEventDialog.vue"
 import DeleteDialog from './DeleteDialog.vue'
@@ -99,7 +97,7 @@ export default {
             dateutils: dateutils,
             store,
             selected: null,
-            dialog: { add: false, delete: false, edit: false },
+            dialog: { add: false, deletion: false, edition: false },
             eventTypes: [],
             data: null,
             rows: [],
@@ -143,7 +141,7 @@ export default {
 
     },
     methods: {
-        downloadICS,
+        // downloadICS,
         async onRequest(props) {
 
             this.loading = true
@@ -164,11 +162,11 @@ export default {
         },
         handleDeletion(val) {
             this.selected = val
-            this.dialog.delete = true
+            this.dialog.deletion = true
         },
         handleEdition(val) {
             this.selected = val
-            this.dialog.edit = true
+            this.dialog.edition = true
         },
         async remove() {
 

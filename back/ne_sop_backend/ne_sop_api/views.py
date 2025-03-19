@@ -1,5 +1,6 @@
 from ne_sop_api.models import (
     Document,
+    DocumentType,
     Entity,
     EntityType,
     Event,
@@ -11,6 +12,9 @@ from ne_sop_api.models import (
 )
 from ne_sop_api.serializers import (
     DocumentSerializer,
+    NewDocumentSerializer,
+    DocumentListSerializer,
+    DocumentTypeSerializer,
     EntitySerializer,
     EntityListSerializer,
     EntityTypeSerializer,
@@ -39,7 +43,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import api_view, action
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import filters
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseForbidden, FileResponse
@@ -53,6 +57,7 @@ from ne_sop_api.permissions import (
 )
 
 from pathlib import PurePath
+import shutil
 import os
 import datetime
 import openpyxl
@@ -613,11 +618,18 @@ class ItemViewSet(viewsets.ViewSet):
     )
     def update(self, request, pk=None):
         item = get_object_or_404(self.get_queryset(), pk=pk)
+        # print("Update Item")
+        # print("request data")
+        # print(request.data)
+
         serializer = NewItemSerializer(item, data=request.data)
         if serializer.is_valid():
             item = serializer.save()
             if item.autonotify is True:
                 Utils.itemChangedNotification(item, request)
+
+            # print("serializer.data")
+            # print(serializer.data)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -638,7 +650,7 @@ class ItemViewSet(viewsets.ViewSet):
         now = datetime.datetime.now()
         filename = f'{datetime.datetime.strftime(now, "%Y%m%d-%H%M%S")}_ObjetsParlementaires.xlsx'
 
-        ## Save results in Excel file
+        # Save results in Excel file
         # create workbook
         wb = openpyxl.Workbook()
         ws = wb.active
@@ -840,6 +852,12 @@ class EventViewSet(viewsets.ViewSet):
         event.delete()
         return Response({"msg": "Event deleted"})
 
+    @action(detail=True, methods=['get'], url_path='download', url_name='download')
+    @extend_schema(tags=["Document"], description="Download the iCalendar (.ics) file")
+    def download(self, request, pk=None):
+        event = get_object_or_404(self.get_queryset(), uuid=pk)  # pk=pk
+        return Utils.generate_ics_file(event)
+
 
 # %% TEMPLATE
 class TemplateViewSet(viewsets.ReadOnlyModelViewSet):
@@ -876,13 +894,37 @@ class TemplateTypeViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
 
+# %% DOCUMENT TYPE
+class DocumentTypeViewSet(viewsets.ViewSet):
+    """
+    Document types viewset
+    """
+
+    # order queryset by ascending id
+    sortby = "name"
+    queryset = DocumentType.objects.all().order_by(Lower(sortby).asc())
+    serializer_class = DocumentTypeSerializer
+
+    @extend_schema(
+        responses=DocumentTypeSerializer,
+        tags=["Document types"],
+    )
+    def list(self, request):
+        serializer = DocumentTypeSerializer(self.queryset, many=True)
+        return Response(serializer.data)
+
+
+# %% DOCUMENT
 class DocumentViewSet(viewsets.ViewSet):
     """
     New document viewset
     """
 
-    parser_classes = [MultiPartParser]
-    serializer_class = DocumentSerializer
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = NewDocumentSerializer
+    search_fields = ["title", "reference", "filename", "items__title", "items__number"]
+    # lookup_field = "uuid"
+    # lookup_url_kwarg = "uuid"
 
     def get_queryset(self):
         user = self.request.user
@@ -891,43 +933,161 @@ class DocumentViewSet(viewsets.ViewSet):
         return Document.objects.filter(Q(item__lead__in=user.entities.all()) | Q(item__support__in=user.entities.all()))
 
     @extend_schema(
-        responses=DocumentSerializer,
+        responses=DocumentListSerializer,
+        tags=["Document"],
+    )
+    def list(self, request):
+        filter = filters.SearchFilter()
+        queryset = filter.filter_queryset(request, self.get_queryset(), self)
+
+        # queryset = Event.objects.all()
+        item = request.query_params.get("document", None)
+        page = int(request.query_params.get("page", "1"))
+        size = int(request.query_params.get("size", "10"))
+        sortby = request.query_params.get("sortby", "id")
+        descending = request.query_params.get("descending", "false")
+
+        if sortby not in ["id", "created", "type", "title"]:
+            sortby = "created"
+
+        if descending not in ["true", "false"]:
+            descending = "true"
+
+        if item and len(item) > 0:
+            queryset = queryset.filter(items__id__in=item.split(","))
+
+            # queryset = queryset.filter(items__in=item)
+            # queryset = queryset.filter(Q(lead__id__in=list(filter(None, service.split(",")))) | Q(support__id__in=list(filter(None, service.split(","))))).distinct()
+
+        if descending == "true":
+            paginator = Paginator(queryset.order_by(Lower(sortby).desc()), size)
+        else:
+            paginator = Paginator(queryset.order_by(Lower(sortby).asc()), size)
+
+        queryset = paginator.page(page)
+        nrows = paginator.count
+        npages = paginator.num_pages
+
+        serializer = DocumentListSerializer(queryset, many=True)
+
+        return Response(
+            {
+                "page": page,
+                "npages": npages,
+                "nrows": nrows,
+                "sortby": sortby,
+                "descending": descending,
+                "results": serializer.data,
+            }
+        )
+
+    @extend_schema(
+        responses=NewDocumentSerializer,
         tags=["Document"],
     )
     def create(self, request):
-        serializer = DocumentSerializer(data=request.data, context={"request": self.request})
+        serializer = NewDocumentSerializer(data=request.data, context={"request": request})  # self.request
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            instance = serializer.save()  # Save and get the created instance
+            # Use a different serializer to format the output data
+            output_serializer = DocumentSerializer(instance, context={"request": request})
+            return Response(output_serializer.data, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(
         responses=DocumentSerializer,
         tags=["Document"],
     )
-    def retrieve(self, request, pk):
-        document = get_object_or_404(self.get_queryset(), pk=pk)
+    def retrieve(self, request, pk=None):
+        #  document = get_object_or_404(self.get_queryset(), pk=pk) # TODO: decide if we use uuid or integer PK
+        document = get_object_or_404(self.get_queryset(), uuid=pk)
+        serializer = DocumentSerializer(document)
+        return Response(serializer.data)
 
-        filepath = PurePath(settings.MEDIA_ROOT, document.file.name)
-        filepath = open(filepath, "rb")
+    @extend_schema(
+        responses=NewDocumentSerializer,
+        tags=["Document"],
+    )
+    def update(self, request, pk=None):
+        #  document = get_object_or_404(self.get_queryset(), pk=pk) # TODO: decide if we use uuid or integer PK
+        document = get_object_or_404(self.get_queryset(), uuid=pk)
 
-        response = FileResponse(filepath, filename=document.filename, as_attachment=True)
+        # os.remove(PurePath(settings.MEDIA_ROOT, document.file.name))
 
-        headers = response.headers
-        headers["Content-Type"] = "application/download"
-        headers["Accept-Ranges"] = "bite"
-        response["Content-Disposition"] = f"attachment; filename={document.filename}"
-        return response
+        # Make a mutable copy of request.data.
+        data = request.data.copy()
+
+        # print("update document")
+        # print("request data")
+        # print(data)
+
+        # Clear linked items if the items attribute is not present in the update request
+        if "items" not in request.data:
+            document.items.clear()
+
+        # Check if a new file was uploaded.
+        if 'file' in request.FILES:
+            # If a new file is provided and there's an existing file, delete the old file.
+            if document.file:
+                document.file.close()
+                print("Deleting existing file:", document.file.path)
+                document.file.delete(save=False)
+        else:
+            # No new file uploaded via request.FILES.
+            # Remove the 'file' key if it exists (it might be a string or empty value)
+            data.pop('file', None)
+
+        # Use partial=True so that only provided fields are updated.
+        serializer = NewDocumentSerializer(document, data=data, partial=True)
+
+        '''
+        print("Update document")
+        print("Request:")
+        print(request)
+
+        print("Request FILES:")
+        print(request.FILES)
+
+        print("Request data:")
+        print(request.data)
+        print("Document:")
+        '''
+
+        if serializer.is_valid():
+            serializer.save()
+            print("response data")
+            print(serializer.data)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(
         responses=DocumentSerializer,
         tags=["Document"],
     )
     def destroy(self, request, pk=None):
-        document = get_object_or_404(self.get_queryset(), pk=pk)
-        os.remove(PurePath(settings.MEDIA_ROOT, document.file.name))
+        document = get_object_or_404(self.get_queryset(), uuid=pk)
+        # os.remove(PurePath(settings.MEDIA_ROOT, document.file.name))
+
+        folder_path = os.path.join(settings.MEDIA_ROOT, str(document.uuid))
+
+        if os.path.isdir(folder_path):
+            try:
+                shutil.rmtree(folder_path)
+            except Exception as e:
+                return Response({"msg": f"Error deleting folder: {e}"}, status=500)
+
         document.delete()
         return Response({"msg": "Document deleted"})
+
+    @action(detail=True, methods=['get'], url_path='download', url_name='download')
+    @extend_schema(tags=["Document"], description="Download the file attached to the document")
+    def download_file(self, request, pk=None):
+        document = get_object_or_404(self.get_queryset(), uuid=pk)
+        # Ensure the file is opened and returned as a response. Adjust this if you're using a custom storage.
+        file_handle = document.file.open(mode='rb')
+        response = FileResponse(file_handle, as_attachment=True, filename=document.file.name)
+        return response
 
 
 # %% UPDATE LATE ATTRIBUTE IN ITEMS

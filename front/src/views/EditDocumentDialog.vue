@@ -7,7 +7,7 @@
         <q-card-section class="row items-center scroll" style="max-height: 70vh">
 
             <!-- FORM -->
-            <DocumentForm class="col" :item_type="item_type" v-model="document" :edit="edit" :changewatch="false"></DocumentForm>
+            <DocumentForm class="col" :item_type="item_type" v-model="document" :edit="edit" :changewatch="false" :excludeFields="['search-items']"></DocumentForm>
 
         </q-card-section>
 
@@ -40,10 +40,9 @@ export default {
     },
     methods: {
         save() {
-
+            this.document.update = true;
             Object.assign(this.modelValue, this.document)
             this.$emit('update:modelValue', this.modelValue)
-
         },
 
     }

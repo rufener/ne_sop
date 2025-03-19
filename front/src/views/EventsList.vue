@@ -17,12 +17,9 @@
                     </template>
                     <template v-slot:append>
                         <q-spinner color="blue-grey" :thickness="3" v-if="loading" />
-                        <!-- FILTER BUTTON -->
-                        <!-- 
-                            <q-btn unelevated icon="sym_o_filter_alt" padding="xs" @click="console.log('filter')">
-                                <q-tooltip class="bg-black">Filtrer</q-tooltip>
-                            </q-btn>
-                            -->
+                        <q-btn unelevated dense icon="close" @click="reset">
+                            <q-tooltip class="bg-black">Réinitialiser</q-tooltip>
+                        </q-btn>
                     </template>
                 </q-input>
             </div>
@@ -53,8 +50,9 @@
                                 id: props.row.id
                             }
                         }">
-                            {{ props.row.date }}
-                            <!-- {{ mydate.formatDate(props.row.date, 'DD.MM.YYYY') }} -->
+                            <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none">
+                                <div class="ellipsis"><b>{{ props.row.date }}</b></div>
+                            </q-chip>
                         </router-link>
 
                     </q-td>
@@ -73,20 +71,20 @@
                                 id: props.row.item.id
                             }
                         }">
-                            <div>{{ props.row.item.number }} - {{ props.row.item.type.name }}</div>
+                            <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none">
+                                <div class="ellipsis"><b>{{ props.row.item.number }} - {{ props.row.item.title }}</b></div>
+
+                            </q-chip>
 
                         </router-link>
-
-                        <div>{{ props.row.item.title }}</div>
-
 
                     </q-td>
 
                     <!-- ACTIONS COLUMN -->
                     <q-td key="actions" :props="props">
                         <div class="float-right">
-                            <q-btn dense round flat color="grey" name="calendar" @click="downloadICS(props.row)" icon="sym_o_calendar_add_on">
-                                <q-tooltip class="bg-black">Ajouter au calendrier</q-tooltip>
+                            <q-btn dense round flat color="grey" name="calendar" :href="`${store.host}/api/event/${props.row.uuid}/download/`" icon="sym_o_calendar_add_on">
+                                <q-tooltip class="bg-black">Télécharger fichier calendrier ICS</q-tooltip>
                             </q-btn>
                             <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row.id)" icon="sym_o_delete">
                                 <q-tooltip class="bg-black">Supprimer</q-tooltip>
@@ -107,7 +105,7 @@
         </div>
 
         <!-- DELETE DIALOG -->
-        <DeleteDialog v-model="dialog.deletion" @delete-event="remove" />
+        <DeleteDialog v-model="dialog.deletion" @delete-event="remove" content="Supprimer définitivement cet événement? Les objets parlementaires liés ne seront pas supprimés." title="Suppression définitive" />
 
     </div>
 </template>
@@ -115,12 +113,9 @@
 <script>
 import { date as mydate } from 'quasar'
 import { store } from '../store/store.js'
-import { downloadICS } from '../store/shared.js'
+// import { downloadICS } from '../store/shared.js'
 import DeleteDialog from '../components/DeleteDialog.vue'
 
-/* const timeStamp = Date.now()
-const formattedString = mydate.formatDate(timeStamp, 'YYYY-MM-DDTHH:mm:ss.SSSZ')
-console.log(formattedString) */
 
 export default {
     name: 'EventsList',
@@ -191,7 +186,7 @@ export default {
 
     },
     methods: {
-        downloadICS,
+        // downloadICS,
         async onRequest(props) {
 
             // update pagination object
@@ -213,6 +208,9 @@ export default {
         handleDeletion(val) {
             this.selected = val
             this.dialog.deletion = true
+        },
+        reset() {
+            this.filter.search = ""
         },
         async remove() {
 
