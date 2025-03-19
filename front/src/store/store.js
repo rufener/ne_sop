@@ -1,4 +1,3 @@
-// store.jsoldFormData
 import { ref } from "vue";
 import { reactive } from "vue";
 // import users from '../assets/data/users.json'
@@ -39,11 +38,11 @@ export const store = reactive({
       .replaceAll(/"author":"[^"]+",/gi, "");
 
     /*
-        console.log('oldDataString')
-        console.log(oldDataString)
-        console.log('newDataString')
-        console.log(newDataString)
-        */
+      console.log('oldDataString')
+      console.log(oldDataString)
+      console.log('newDataString')
+      console.log(newDataString)
+    */
 
     if (oldDataString !== newDataString) {
       this.warning = true;
@@ -133,8 +132,6 @@ export const store = reactive({
           query.searchParams.append(key, value);
         }
       }
-      // const query = `${host}/api/entity?page=${page}&size=${size}&search=${filter.search}&type=${filter.type}&service=${filter.service}&sortby=${sortBy}&descending=${descending}`
-      // console.log(`getEntities: ${query.href}`)
 
       const response = await fetch(query, {
         method: "GET",
@@ -157,7 +154,6 @@ export const store = reactive({
       });
 
       return await this.handleResponse(response);
-      // return await response.json()
     } catch (error) {
       console.error(error);
     }
@@ -299,9 +295,11 @@ export const store = reactive({
   // UPDATE ITEM
   async updateItem(id, data) {
     try {
+      /*
       console.log("updateItem");
       console.log("data.documents");
       console.log(data.documents);
+      */
 
       let documents = data.documents;
 
@@ -550,14 +548,14 @@ export const store = reactive({
   },
 
   async updateDocumentList(documents, item) {
-    console.log("updateDocumentList");
-    console.log(documents);
-
     let promises = [];
     documents.forEach((document) => {
       document.items.push(item);
+      // console.log(`document - uuid: ${document.uuid}, update: ${document.update}`);
       if (document.uuid) {
-        promises.push(store.updateMyDocument(document.uuid, document));
+        if (document.update) {
+          promises.push(store.updateDocument(document.uuid, document));
+        }
       } else {
         promises.push(store.addDocument(document));
       }
@@ -570,9 +568,11 @@ export const store = reactive({
   async prepareAddDocuments(documents, item) {
     documents = documents.filter((x) => x.id === undefined);
 
+    /*
     console.log("prepareAddDocuments");
     console.log(documents);
     console.log(item);
+    */
 
     let promises = [];
     documents.forEach((document) => {
@@ -584,7 +584,6 @@ export const store = reactive({
   },
 
   // GET LIST OF EVENTS
-  // async getEvents(search = "", item = "", page = 1, size = 10, sortBy = "", descending = "false") {
   async getDocuments(filter = {}, page = 1, size = 10, sortBy = "", descending = "false") {
     try {
       const query = new URL(`${host}/api/document?`);
@@ -631,9 +630,11 @@ export const store = reactive({
 
   // ADD DOCUMENT
   async addDocument(formInput) {
+    /*
     console.log("addDocument");
     console.log("formInput");
     console.log(formInput);
+    */
 
     const formData = new FormData();
 
@@ -652,10 +653,11 @@ export const store = reactive({
     formData.append("size", formInput.size);
     formData.append("file", formInput.file);
     formData.append("valid", formInput.valid);
-    // formData.append("created", formInput.created);
 
+    /*
     console.log("formData");
     console.log(formData);
+    */
 
     try {
       const query = new URL(`${host}/api/document/`);
@@ -673,24 +675,17 @@ export const store = reactive({
     }
   },
 
-  async updateMyDocument(id, formInput) {
-    // Create a new FormData object
-
-    console.log("updateMyDocument");
-    console.log(formInput);
-
-    const formData = new FormData();
-
-    // Iterate over each key in the input object and append it to formData.
-    // Note: If the file attachment is a File object, it will be appended properly.
-
+  async updateDocument(id, formInput) {
     /*
-    Object.keys(formInput).forEach((key) => {
-      console.log(`Key: ${key}: value: ${formInput[key]}`);
-      formData.append(key, formInput[key]);
-    });
+    console.log("updateDocument");
+    console.log(formInput);
     */
 
+    // Create a new FormData object
+    const formData = new FormData();
+
+    // Iterate over each key in the input object and append it to formData
+    // Note: If the file attachment is a File object, it will be appended properly
     formData.append("id", formInput.id);
     formData.append("uuid", formInput.uuid);
     formData.append("reference", formInput.reference);
@@ -710,7 +705,7 @@ export const store = reactive({
     formData.append("valid", formInput.valid);
     // formData.append("created", formInput.created);
 
-    console.log(formData);
+    // console.log(formData);
 
     try {
       const query = new URL(`${host}/api/document/${formInput.uuid}/`);
@@ -719,7 +714,7 @@ export const store = reactive({
         method: "PUT", // PUT
         body: formData,
         redirect: "follow",
-        // Do not set the Content-Type header manually; the browser will set it automatically.
+        // Do not set the Content-Type header manually; the browser will set it automatically
       });
 
       if (!response.ok) {
@@ -734,6 +729,7 @@ export const store = reactive({
   },
 
   // UPDATE DOCUMENT
+  /*
   async updateDocument(id, data) {
     try {
       const query = new URL(`${host}/api/document/${id}/`);
@@ -753,34 +749,14 @@ export const store = reactive({
       console.error(error);
     }
   },
-
-  // DOWNLOAD DOCUMENT BY ID
-  /*
-    async downloadDocument(document_id) {
-        try {
-
-            window.open(
-                `${host}/api/document/${document_id}/`,
-                {
-                    method: 'GET',
-                    redirect: 'follow'
-                }
-            )
-
-        } catch (error) {
-            // handle network and CORS errors (fetch promise rejected)
-            this.dialogs.error = true
-            console.error(error)
-        }
-    },
-    */
+  */
 
   // DELETE DOCUMENT BY ID
   async deleteDocument(uuid) {
     try {
       const query = new URL(`${host}/api/document/${uuid}/`);
-      console.log("deleteDocument");
-      console.log(query);
+      // console.log("deleteDocument");
+      // console.log(query);
       const response = await fetch(query, {
         method: "DELETE",
         redirect: "follow",
