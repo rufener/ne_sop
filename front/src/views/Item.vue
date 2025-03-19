@@ -88,7 +88,6 @@ export default {
                 this.item = await store.getItem(this.$route.params.id)
                 this.store.loading = false
             }
-            this.store.loading = false
 
         }
     },
@@ -103,9 +102,9 @@ export default {
         if (this.$route.params.hasOwnProperty('id')) {
             this.store.loading = true
             this.item = await store.getItem(this.$route.params.id)
+            this.item.documents.map((x) => { x.update = false })
             this.store.loading = false
         }
-        this.store.loading = false
 
     },
     methods: {
