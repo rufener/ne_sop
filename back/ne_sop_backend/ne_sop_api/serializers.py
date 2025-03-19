@@ -392,6 +392,7 @@ class DocumentListSerializer(serializers.ModelSerializer):
             "type",
             "items",
             "created",
+            "modified",
             "author",
             "filename",
             "filehash",
