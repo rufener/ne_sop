@@ -77,12 +77,6 @@
 
                     </div>
 
-                    <!-- DESCRIPTION TEXT AREA FIELD -->
-                    <div class="row q-col-gutter-lg q-py-md">
-                        <div class="col">
-                            <q-input bg-color="white" outlined v-model="item.description" label="Description" type="textarea" :disable="!edit || !store.user.is_manager" />
-                        </div>
-                    </div>
 
                     <!-- DEV DISPLAY JSON-->
                     <div class="bg-light-blue-1 q-my-md q-pa-md" v-if="store.dev">
@@ -92,6 +86,34 @@
                         <div>{{ this.item.hasOwnProperty('users') }}</div>
                         <div class="text-bold">store.user.is_manager</div>
                         <div>{{ store.user.is_manager }}</div>
+                    </div>
+
+                </template>
+            </FormSection>
+
+            <!-- REMARKS SECTION -->
+            <FormSection title="Remarques">
+                <template v-slot:content>
+
+                    <!-- DESCRIPTION TEXT AREA FIELD -->
+                    <!-- 
+                    <div class="row q-col-gutter-lg q-py-md">
+                        <div class="col">
+                            <q-input bg-color="white" outlined v-model="item.description" label="Description" type="textarea" :disable="!edit || !store.user.is_manager" />
+                        </div>
+                    </div>
+                    -->
+                    <div class="row q-col-gutter-lg q-py-md">
+
+                        <div class="col">
+
+                            <q-editor id="item-remarques" v-model="item.description" placeholder="Remarques" class="q-mt-sm q-pa-one" :toolbar="[
+                                ['bold', 'italic', 'strike', 'underline', 'subscript', 'superscript'],
+                                ['token', 'hr', 'link', 'custom_btn'],
+                                ['unordered', 'ordered'],
+                            ]" :disable="!edit" />
+
+                        </div>
                     </div>
 
                 </template>
