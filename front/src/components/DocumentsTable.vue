@@ -25,6 +25,7 @@
                 <q-td key="modified" :props="props">
                     <div class="text-bold">{{ props.row.modified }}</div>
                     <div>{{ props.row.author.username }}</div>
+                    <!--<div>{{ props.row.update }}</div>-->
                 </q-td>
 
                 <q-td key="actions" :props="props">
@@ -151,15 +152,6 @@ export default {
                 store.deleteDocument(document.uuid)
                 this.loading = false
             }
-
-            /*
-            this.documents = this.documents.filter(x => x.filename !== ressource.filename)
-            if (ressource.id !== undefined) {
-                this.loading = true
-                store.deleteDocument(ressource.id)
-                this.loading = false
-            }
-            */
         },
     }
 }
