@@ -9,6 +9,18 @@
                 <template v-slot:content>
 
                     <div class="row q-col-gutter-lg q-py-md">
+                        <q-toggle
+                            v-model="entity.active"
+                            checked-icon="check"
+                            unchecked-icon="clear"
+                            color="green"
+                            :label="entity.active ? 'Actif' : 'Inactif'"
+                        >
+                            <q-tooltip class="bg-black">Activer/désactiver le parlementaire dans la liste des options </q-tooltip>
+                        </q-toggle>
+                    </div>
+
+                    <div class="row q-col-gutter-lg q-py-md">
 
                         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
                             <!-- NAME TEXT FIELD -->
