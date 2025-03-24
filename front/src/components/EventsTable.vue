@@ -34,7 +34,7 @@
                         <q-btn dense round flat color="grey" name="calendar" :href="`${store.host}/api/event/${props.row.uuid}/download/`" icon="sym_o_calendar_add_on">
                             <q-tooltip class="bg-black">Télécharger fichier calendrier ICS</q-tooltip>
                         </q-btn>
-                        <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row.id)" icon="sym_o_delete" :disable="!edit">
+                        <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row)" icon="sym_o_delete" :disable="!edit">
                             <q-tooltip class="bg-black">Supprimer</q-tooltip>
                         </q-btn>
                     </div>
@@ -161,7 +161,7 @@ export default {
             this.dialog.add = true
         },
         handleDeletion(val) {
-            this.selected = val
+            this.selected = val.uuid
             this.dialog.deletion = true
         },
         handleEdition(val) {
@@ -170,7 +170,7 @@ export default {
         },
         async remove() {
 
-            this.events = this.events.filter((x) => (x.id !== this.selected))
+            this.events = this.events.filter((x) => (x.uuid !== this.selected))
 
             /*
             // Delete event in DB

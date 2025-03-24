@@ -61,7 +61,7 @@ class Utils(object):
         template = loader.get_template("email_create_item_fr-ch.html")
 
         context = {
-            "item_id": item.id,
+            "item_uuid": item.uuid,
             "item_name": item.title,
             "front_url": settings.FRONT_URL,
             "main_service": item.get_entity_lead_name(),
@@ -83,7 +83,7 @@ class Utils(object):
         template = loader.get_template("email_update_item_fr-ch.html")
 
         context = {
-            "item_id": item.id,
+            "item_uuid": item.uuid,
             "item_name": item.title,
             "front_url": settings.FRONT_URL,
             "main_service": item.get_entity_lead_name(),
@@ -123,7 +123,7 @@ class Utils(object):
         template = loader.get_template("email_late_item_fr-ch.html")
 
         context = {
-            "item_id": item.id,
+            "item_uuid": item.uuid,
             "item_name": item.title,
             "front_url": settings.FRONT_URL,
             "main_service": item.get_entity_lead_name(),

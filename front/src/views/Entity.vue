@@ -121,9 +121,9 @@ export default {
 
             let response
 
-            if (this.entity.id) {
+            if (this.entity.uuid) {
                 // update existing record
-                response = await store.updateEntity(this.entity.id, this.entity)
+                response = await store.updateEntity(this.entity.uuid, this.entity)
             } else {
                 // create a new record
                 response = await store.addEntity(this.entity)

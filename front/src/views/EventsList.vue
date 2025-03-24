@@ -25,7 +25,7 @@
             </div>
 
             <!-- ADD NEW RECORD BUTTON -->
-            <!-- 
+            <!--
                 <div class="col-xs-12 col-sm-4 col-md-6 col-lg-6">
                     <q-btn padding="sm md" unelevated no-caps color="blue-grey-8" text-color="white" icon="sym_o_add_circle" label="Ajouter" class="q-py-none q-my-none" @click="" to="/events/new">
                         <q-tooltip class="bg-black">Ajouter un nouvel événement</q-tooltip>
@@ -47,7 +47,7 @@
                         <router-link :to="{
                             name: 'Event',
                             params: {
-                                id: props.row.id
+                                id: props.row.uuid
                             }
                         }">
                             <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none">
@@ -86,7 +86,7 @@
                             <q-btn dense round flat color="grey" name="calendar" :href="`${store.host}/api/event/${props.row.uuid}/download/`" icon="sym_o_calendar_add_on">
                                 <q-tooltip class="bg-black">Télécharger fichier calendrier ICS</q-tooltip>
                             </q-btn>
-                            <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row.id)" icon="sym_o_delete">
+                            <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row.uuid)" icon="sym_o_delete">
                                 <q-tooltip class="bg-black">Supprimer</q-tooltip>
                             </q-btn>
                         </div>
@@ -105,7 +105,7 @@
         </div>
 
         <!-- DELETE DIALOG -->
-        <DeleteDialog v-model="dialog.deletion" @delete-event="remove" content="Supprimer définitivement cet événement? Les objets parlementaires liés ne seront pas supprimés." title="Suppression définitive" />
+        <DeleteDialog v-model="dialog.deletion" @delete-event="remove" content="Supprimer définitivement cet événement? L'objet parlementaire lié ne sera pas supprimé." title="Suppression définitive" />
 
     </div>
 </template>
