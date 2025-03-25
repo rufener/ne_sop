@@ -89,7 +89,7 @@ class Item(models.Model):
 
     type = models.ForeignKey("ItemType", null=True, on_delete=models.PROTECT)
     status = models.ForeignKey("ItemStatus", null=True, on_delete=models.PROTECT)
-    description = models.TextField(max_length=600, blank=True, default="")
+    description = models.TextField(max_length=10000, blank=True, default="")
     urgent = models.BooleanField(default=False)
     writtenresponse = models.BooleanField(default=False)
     oralresponse = models.BooleanField(default=False)
