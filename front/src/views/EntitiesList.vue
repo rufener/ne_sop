@@ -48,10 +48,10 @@
                         <router-link :to="{
                             name: 'Entity',
                             params: {
-                                id: props.row.id
+                                id: props.row.uuid
                             }
                         }">
-                            <!-- 
+                            <!--
                             {{ props.row.name }}
                             <span v-if="!props.row.active"> (désactivé)</span>
                             -->
@@ -83,7 +83,7 @@
                                 <q-tooltip class="bg-black">{{ props.row.active ? "Désactiver" : "Activer" }}</q-tooltip>
                             </q-toggle>
                             <!--
-                            <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row.id)" icon="sym_o_delete" v-if="store.user.is_manager">
+                            <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row.uuid)" icon="sym_o_delete" v-if="store.user.is_manager">
                                 <q-tooltip class="bg-black">Supprimer</q-tooltip>
                             </q-btn>
                             -->
@@ -191,7 +191,7 @@ export default {
         },
         async deactivate(val) {
             this.selected = val
-            let message = await store.updateEntity(val.id, { active: val.active })
+            let message = await store.updateEntity(val.uuid, { active: val.active })
 
             if (message) {
                 this.query()

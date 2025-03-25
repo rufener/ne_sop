@@ -137,7 +137,7 @@
                                             <div class="ellipsis"> <router-link :to="{
                                                 name: 'Item',
                                                 params: {
-                                                    id: item.id
+                                                    id: item.uuid
                                                 }
                                             }">{{ item.number }} - {{ item.title }} </router-link></div>
                                             <!-- </q-chip> -->

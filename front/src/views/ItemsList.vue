@@ -64,7 +64,7 @@
                         <router-link :to="{
                             name: 'Item',
                             params: {
-                                id: props.row.id
+                                id: props.row.uuid
                             }
                         }">
                             <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none">
@@ -122,7 +122,7 @@
                     <!-- ACTIONS COLUMN -->
                     <q-td key="actions" :props="props">
                         <div class="float-right">
-                            <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row.id)" icon="sym_o_delete" v-if="store.user.is_manager">
+                            <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row)" icon="sym_o_delete" v-if="store.user.is_manager">
                                 <q-tooltip class="bg-black">Supprimer</q-tooltip>
                             </q-btn>
                         </div>
@@ -288,7 +288,7 @@ export default {
         async remove() {
 
             // console.log(`delete ${this.selected}`)
-            let message = await store.deleteItem(this.selected)
+            let message = await store.deleteItem(this.selected.uuid)
             if (message) {
                 this.query()
             }

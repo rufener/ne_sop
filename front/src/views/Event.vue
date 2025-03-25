@@ -99,9 +99,9 @@ export default {
 
             let response
 
-            if (this.event.id) {
+            if (this.event.uuid) {
                 // update existing record
-                response = await store.updateEvent(this.event.id, this.event)
+                response = await store.updateEvent(this.event.uuid, this.event)
             } else {
                 // create a new record
                 response = await store.addEvent(this.event)

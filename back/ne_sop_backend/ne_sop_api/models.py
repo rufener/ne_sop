@@ -28,7 +28,7 @@ class EntityType(models.Model):
 # %% ENTITY
 class Entity(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    uuid = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=100, blank=False, null=False, unique=True)
     abbreviation = models.CharField(max_length=16, blank=True, default="")
     type = models.ForeignKey("EntityType", null=True, on_delete=models.PROTECT)
@@ -81,7 +81,7 @@ class ItemStatus(models.Model):
 # %% ITEM
 class Item(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    uuid = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False, unique=True)
     number = models.CharField(max_length=30, blank=True, default="", unique=True)
     title = models.CharField(max_length=512, blank=True, default="")
 
@@ -126,13 +126,13 @@ class Item(models.Model):
 
     def get_user_lead_email(self):
         related_entities = [self.lead]
-        related_users = User.objects.filter(entities__in=related_entities).distinct().values("email")
+        related_users = User.objects.filter(entities__in=related_entities, is_active=True).distinct().values("email")
         related_users = [ru.get("email") for ru in related_users]
         return related_users
 
     def get_users_support_email(self):
         related_entities = list(self.support.all())
-        related_users = User.objects.filter(entities__in=related_entities).distinct().values("email")
+        related_users = User.objects.filter(entities__in=related_entities, is_active=True).distinct().values("email")
         related_users = [ru.get("email") for ru in related_users]
         return related_users
 
@@ -164,7 +164,7 @@ class EventType(models.Model):
 # %% EVENT
 class Event(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    uuid = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False, unique=True)
     date = models.DateField()
     time = models.TimeField(null=True)
     item = models.ForeignKey(Item, related_name="events", on_delete=models.CASCADE)
@@ -246,7 +246,7 @@ class DocumentType(models.Model):
 
 # %% DOCUMENT
 class Document(models.Model):
-    uuid = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False, unique=True)
     reference = models.CharField(max_length=200, blank=True, null=True, default="")
     title = models.CharField(max_length=200, blank=True, null=True, default="")
     type = models.ForeignKey(DocumentType, null=True, on_delete=models.PROTECT)
