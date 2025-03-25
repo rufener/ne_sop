@@ -2,10 +2,23 @@ from pathlib import Path, PurePath
 from django.http import HttpResponse
 from icalendar import Calendar, Event as IcsEvent
 from datetime import datetime, timedelta
+from html.parser import HTMLParser
 
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template import loader
+
+
+class MyHTMLParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.text_parts = []
+
+    def handle_data(self, data):
+        self.text_parts.append(data)
+
+    def get_text(self):
+        return ''.join(self.text_parts)
 
 
 class Utils(object):
