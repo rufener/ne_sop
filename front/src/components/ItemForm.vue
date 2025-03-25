@@ -92,7 +92,7 @@
             </FormSection>
 
             <!-- REMARKS SECTION -->
-            <FormSection title="Remarques">
+            <FormSection title="Remarques (max. 600 signes)">
                 <template v-slot:content>
 
                     <!-- DESCRIPTION TEXT AREA FIELD -->
@@ -111,7 +111,8 @@
                                 ['bold', 'italic', 'strike', 'underline', 'subscript', 'superscript'],
                                 ['token', 'hr', 'link', 'custom_btn'],
                                 ['unordered', 'ordered'],
-                            ]" :disable="!edit" />
+                            ]" :disable="!edit" @input="checkEditorLength" />
+                            <div class="float-right">{{ descriptionText.length }} / 600</div>
 
                         </div>
                     </div>
@@ -299,6 +300,7 @@ export default {
             dialog: { newEntity: false, newEvent: false, newDocument: false },
             exceptions: { itemNumber: null },
             loading: { authors: false },
+            descriptionText: '',
             itemTypes: [],
             itemStatus: [],
             authorOptions: [],
@@ -352,14 +354,68 @@ export default {
     },
     methods: {
         checkFilled,
-        /*
-        async checkUnique(val, exception) {
+        checkEditorLength() {
+            console.log("checkEditorLength");
+            console.log(this.modelValue.description);
+            console.log(this.item.description);
 
-            // console.log(`${this.$options.name} | checkUnique()`)
-            // console.log(val)
-            let isexception = val === exception
-            let request = await store.getItems({ search: "", number: val, title: "", status: [], type: [] }, 1, 20, "id", "false")
-            return ((request.results.length == 0) || isexception) ? true : 'Cette valeur existe déjà'
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(this.item.description, 'text/html');
+            const maxChars = 600;
+            let charCount = 0;
+
+            // Recursive function to traverse and trim text nodes
+            function traverse(node) {
+                if (charCount >= maxChars) {
+                    // If limit reached, remove the node from its parent
+                    if (node.parentNode) {
+                        node.parentNode.removeChild(node);
+                    }
+                    return;
+                }
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const remaining = maxChars - charCount;
+                    if (node.textContent.length > remaining) {
+                        // Trim this text node to the remaining allowed characters
+                        node.textContent = node.textContent.substring(0, remaining);
+                        charCount = maxChars;
+                    } else {
+                        charCount += node.textContent.length;
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    // Use Array.from to safely iterate over childNodes
+                    const children = Array.from(node.childNodes);
+                    for (const child of children) {
+                        traverse(child);
+                    }
+                }
+            }
+            // Start the traversal from the document body
+            traverse(doc.body);
+
+            // Update the descriptions with the modified HTML
+            this.item.description = doc.body.innerHTML;
+            this.modelValue.description = doc.body.innerHTML;
+            this.descriptionText = doc.body.textContent;
+
+            // console.log(`Truncated text length: ${doc.body.textContent.length}`);
+        },
+        /*
+        checkEditorLength() {
+
+            console.log("checkEditorLength")
+            console.log(this.modelValue.description)
+            console.log(this.item.description)
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(this.item.description, 'text/html');
+            console.log(`Length: ${doc.body.textContent.length}`)
+
+
+            this.item.description = this.item.description.substring(0, 600);
+            this.modelValue.description = this.modelValue.description.substring(0, 600);
+
+            this.descriptionText = doc.body.textContent.substring(0, 600);
         },
         */
         reset() {
