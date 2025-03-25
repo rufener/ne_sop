@@ -68,7 +68,7 @@
                             <router-link :to="{
                                 name: 'Item',
                                 params: {
-                                    id: item.id
+                                    id: item.uuid
                                 }
                             }">
                                 <!-- icon="sym_o_loupe" -->
