@@ -111,7 +111,7 @@
                                 ['bold', 'italic', 'strike', 'underline', 'subscript', 'superscript'],
                                 ['token', 'hr', 'link', 'custom_btn'],
                                 ['unordered', 'ordered'],
-                            ]" :disable="!edit" @input="checkEditorLength" />
+                            ]" :disable="!edit" @input="checkEditorLength" @paste="handlePaste"/>
                             <div class="float-right">{{ descriptionText.length }} / 600</div>
 
                         </div>
@@ -350,14 +350,15 @@ export default {
 
         store.item.old = JSON.stringify(this.modelValue)
         this.exceptions.itemNumber = this.modelValue.number
+        this.checkEditorLength()
 
     },
     methods: {
         checkFilled,
         checkEditorLength() {
-            console.log("checkEditorLength");
-            console.log(this.modelValue.description);
-            console.log(this.item.description);
+            // console.log("checkEditorLength");
+            // console.log(this.modelValue.description);
+            // console.log(this.item.description);
 
             const parser = new DOMParser();
             const doc = parser.parseFromString(this.item.description, 'text/html');
@@ -400,24 +401,13 @@ export default {
 
             // console.log(`Truncated text length: ${doc.body.textContent.length}`);
         },
-        /*
-        checkEditorLength() {
-
-            console.log("checkEditorLength")
-            console.log(this.modelValue.description)
-            console.log(this.item.description)
-
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(this.item.description, 'text/html');
-            console.log(`Length: ${doc.body.textContent.length}`)
-
-
-            this.item.description = this.item.description.substring(0, 600);
-            this.modelValue.description = this.modelValue.description.substring(0, 600);
-
-            this.descriptionText = doc.body.textContent.substring(0, 600);
+        handlePaste(event) {
+            event.preventDefault();
+            // Get plain text from the clipboard
+            const text = event.clipboardData.getData('text/plain');
+            // Insert the plain text at the current cursor position
+            document.execCommand('insertText', false, text);
         },
-        */
         reset() {
             this.item.support = []
         },
