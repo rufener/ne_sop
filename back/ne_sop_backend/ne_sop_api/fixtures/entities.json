@@ -108,7 +108,7 @@
     "model": "ne_sop_api.Entity",
     "pk": 5,
     "fields": {
-      "uuid": "4ed0aee9-1e9e-40c4-a570-680f69a9e9e0",
+      "uuid": "2121e68a-fece-4ec0-88a4-ff5c13b8d363",
       "name": "Secrétariat général du DFFD (DFFD)",
       "abbreviation": "DFFD",
       "type": 1,
