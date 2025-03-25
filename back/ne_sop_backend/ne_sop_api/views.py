@@ -48,7 +48,7 @@ from rest_framework import filters
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseForbidden, FileResponse
 
-from ne_sop_api.utils import Utils
+from ne_sop_api.utils import Utils, MyHTMLParser
 from ne_sop_api.permissions import (
     IsSuperuserPermission,
     IsManagerPermission,
@@ -649,6 +649,7 @@ class ItemViewSet(viewsets.ViewSet):
 
         now = datetime.datetime.now()
         filename = f'{datetime.datetime.strftime(now, "%Y%m%d-%H%M%S")}_ObjetsParlementaires.xlsx'
+        
 
         # Save results in Excel file
         # create workbook
@@ -670,7 +671,7 @@ class ItemViewSet(viewsets.ViewSet):
         ws.cell(row_id, 5).value = "Auteur"
         ws.cell(row_id, 6).value = "Type"
         ws.cell(row_id, 7).value = "Statut"
-        ws.cell(row_id, 8).value = "Description"
+        ws.cell(row_id, 8).value = "Remarques"
         ws.cell(row_id, 9).value = "Urgent"
         ws.cell(row_id, 10).value = "Réponse écrite"
         ws.cell(row_id, 11).value = "Réponse orale"
@@ -688,6 +689,7 @@ class ItemViewSet(viewsets.ViewSet):
         for op in queryset:
             row_id += 1
             # table row
+
             ws.cell(row_id, 1).value = str(op.uuid) or None
             ws.cell(row_id, 2).value = op.number or None
             ws.cell(row_id, 3).value = op.title or None
@@ -695,7 +697,10 @@ class ItemViewSet(viewsets.ViewSet):
             ws.cell(row_id, 5).value = op.author.name or None
             ws.cell(row_id, 6).value = op.type.name or None
             ws.cell(row_id, 7).value = op.status.name or None
-            ws.cell(row_id, 8).value = op.description or None
+            parser = MyHTMLParser()
+            parser.feed(op.description)
+            ws.cell(row_id, 8).value = parser.get_text() or None
+            # ws.cell(row_id, 8).value = op.description or None
             ws.cell(row_id, 9).value = op.urgent or None
             ws.cell(row_id, 10).value = op.writtenresponse or None
             ws.cell(row_id, 11).value = op.oralresponse or None
