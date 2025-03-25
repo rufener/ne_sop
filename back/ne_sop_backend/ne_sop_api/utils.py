@@ -200,7 +200,7 @@ class Utils(object):
         # Add description and unique identifier
         description = (
             f"Objet parlementaire: {event.item.number} - {event.item.title}\n"
-            f"Lien: https://sop.ne.ch/#/items/{event.item.id}\n"
+            f"Lien: {settings.FRONT_URL}/#/items/{event.item.uuid}\n"
             f"Date: {event.date.strftime('%d.%m.%Y')} {event.time.strftime('%H:%M:%S') if event.time else ''}\n"
             f"Événement: {event.type.name}\n"
             f"Description: {event.description}"
