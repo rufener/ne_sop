@@ -69,9 +69,11 @@
                         }">
                             <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none">
                                 <div class="ellipsis"><b>{{ props.row.title }}</b></div>
+                                <!-- 
                                 <q-badge color="red" align="top" class="q-ml-xs" v-if="props.row.urgent">
                                     Urgent
                                 </q-badge>
+                                -->
                             </q-chip>
 
                         </router-link>
