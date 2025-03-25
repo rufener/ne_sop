@@ -26,7 +26,7 @@
                 <!--
                 <q-dialog v-model="addEntityDialog">
                     <NewEntityDialog @addNewEntity="addNewEntity"></NewEntityDialog>
-                </q-dialog> 
+                </q-dialog>
                 -->
 
             </q-layout>
@@ -138,9 +138,9 @@ export default {
 
             let response
 
-            if (this.item.id) {
+            if (this.item.uuid) {
                 // update existing record
-                response = await store.updateItem(this.item.id, this.item)
+                response = await store.updateItem(this.item.uuid, this.item)
             } else {
                 // create a new record
                 response = await store.addItem(this.item)

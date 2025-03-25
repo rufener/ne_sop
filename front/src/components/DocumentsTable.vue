@@ -80,7 +80,7 @@ const host = import.meta.env.VITE_API_URL
 const columns = [
     { name: 'title', align: 'left', label: 'Titre / Réf.', field: 'title', sortable: true, style: 'max-width: 250px; width: 250px' },
     { name: 'type', align: 'left', label: 'Type', field: 'type', sortable: true, style: 'max-width: 150px; width: 150px' },
-    { name: 'modified', align: 'left', label: 'Modifié le', field: 'modified', sortable: true }, // style: 'max-width: 110px; width: 110px' 
+    { name: 'modified', align: 'left', label: 'Modifié le', field: 'modified', sortable: true }, // style: 'max-width: 110px; width: 110px'
     { name: 'actions', align: 'right', label: '', field: 'action', sortable: false, style: 'max-width: 120px; width: 80px' }
 ]
 

@@ -263,7 +263,7 @@ class EntityViewSet(viewsets.ViewSet):
     )
     def retrieve(self, request, pk=None):
         queryset = Entity.objects.all()
-        entity = get_object_or_404(queryset, pk=pk)
+        entity = get_object_or_404(queryset, uuid=pk)
         serializer = EntitySerializer(entity)
         return Response(serializer.data)
 
@@ -294,13 +294,13 @@ class EntityViewSet(viewsets.ViewSet):
     @extend_schema(
         tags=["Entities"],
     )
-    def partial_update(self, request, *args, **kwargs):
+    def partial_update(self, request, pk=None):
 
         # instance = self.queryset.get(pk=kwargs.get('pk'))
 
         queryset = Entity.objects.all()
         # entity = get_object_or_404(queryset, pk=pk)
-        entity = get_object_or_404(queryset, pk=kwargs.get("pk"))
+        entity = get_object_or_404(queryset, uuid=pk)
         serializer = EntitySerializer(entity, data=request.data, partial=True)
         # print("UPDATE ENTITY")
         # print(serializer.validated_data.get("type").service)
@@ -324,7 +324,7 @@ class EntityViewSet(viewsets.ViewSet):
     )
     def destroy(self, request, pk=None):
         queryset = Entity.objects.all()
-        entity = get_object_or_404(queryset, pk=pk)
+        entity = get_object_or_404(queryset, uuid=pk)
 
         # print("DESTROY ENTITY")
         # print(entity.type.name)
@@ -609,7 +609,7 @@ class ItemViewSet(viewsets.ViewSet):
         tags=["Items"],
     )
     def retrieve(self, request, pk=None):
-        item = get_object_or_404(self.get_queryset(), pk=pk)
+        item = get_object_or_404(self.get_queryset(), uuid=pk)
         serializer = NewItemSerializer(item)
         return Response(serializer.data)
 
@@ -617,7 +617,7 @@ class ItemViewSet(viewsets.ViewSet):
         tags=["Items"],
     )
     def update(self, request, pk=None):
-        item = get_object_or_404(self.get_queryset(), pk=pk)
+        item = get_object_or_404(self.get_queryset(), uuid=pk)
         # print("Update Item")
         # print("request data")
         # print(request.data)
@@ -637,7 +637,7 @@ class ItemViewSet(viewsets.ViewSet):
         tags=["Items"],
     )
     def destroy(self, request, pk=None):
-        item = get_object_or_404(self.get_queryset(), pk=pk)
+        item = get_object_or_404(self.get_queryset(), uuid=pk)
         Utils.itemRemovedNotification(item, request)
         item.delete()
         return Response({"msg": "Item deleted"})
@@ -829,7 +829,7 @@ class EventViewSet(viewsets.ViewSet):
         tags=["Events"],
     )
     def retrieve(self, request, pk=None):
-        event = get_object_or_404(self.get_queryset(), pk=pk)
+        event = get_object_or_404(self.get_queryset(), uuid=pk)
         serializer = EventSerializer(event)
         return Response(serializer.data)
 
@@ -837,7 +837,7 @@ class EventViewSet(viewsets.ViewSet):
         tags=["Events"],
     )
     def update(self, request, pk=None):
-        event = get_object_or_404(self.get_queryset(), pk=pk)
+        event = get_object_or_404(self.get_queryset(), uuid=pk)
         serializer = EventSerializer(event, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -848,7 +848,7 @@ class EventViewSet(viewsets.ViewSet):
         tags=["Events"],
     )
     def destroy(self, request, pk=None):
-        event = get_object_or_404(self.get_queryset(), pk=pk)
+        event = get_object_or_404(self.get_queryset(), uuid=pk)
         event.delete()
         return Response({"msg": "Event deleted"})
 

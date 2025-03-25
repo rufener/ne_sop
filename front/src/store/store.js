@@ -145,9 +145,9 @@ export const store = reactive({
   },
 
   // GET ENTITY DETAILS
-  async getEntity(id) {
+  async getEntity(uuid) {
     try {
-      const query = new URL(`${host}/api/entity/${id}`);
+      const query = new URL(`${host}/api/entity/${uuid}`);
       const response = await fetch(query, {
         method: "GET",
         redirect: "follow",
@@ -160,10 +160,10 @@ export const store = reactive({
   },
 
   // UPDATE ENTITY
-  async updateEntity(id, data) {
+  async updateEntity(uuid, data) {
     try {
       // await sleep(1000)
-      const query = new URL(`${host}/api/entity/${id}/`);
+      const query = new URL(`${host}/api/entity/${uuid}/`);
       const response = await fetch(query, {
         method: "PATCH",
         headers: {
@@ -271,13 +271,13 @@ export const store = reactive({
   },
 
   // GET ITEM DETAILS
-  async getItem(id, summary = false) {
+  async getItem(uuid, summary = false) {
     try {
       let query;
       if (summary) {
-        query = new URL(`${host}/api/item-summary/${id}`);
+        query = new URL(`${host}/api/item-summary/${uuid}`);   // ?????????? ID ou UUID ?
       } else {
-        query = new URL(`${host}/api/item/${id}`);
+        query = new URL(`${host}/api/item/${uuid}`);
       }
 
       const response = await fetch(query, {
@@ -293,7 +293,7 @@ export const store = reactive({
   },
 
   // UPDATE ITEM
-  async updateItem(id, data) {
+  async updateItem(uuid, data) {
     try {
       /*
       console.log("updateItem");
@@ -307,7 +307,7 @@ export const store = reactive({
       let data_nodocs = Object.assign({}, data);
       delete data_nodocs.documents;
 
-      const query = new URL(`${host}/api/item/${id}/`);
+      const query = new URL(`${host}/api/item/${uuid}/`);
       const response = await fetch(query, {
         method: "PUT",
         headers: {
@@ -320,7 +320,7 @@ export const store = reactive({
       const item = await this.handleResponse(response);
       await this.updateDocumentList(documents, item);
 
-      return await this.getItem(id);
+      return await this.getItem(uuid);
     } catch (error) {
       // handle network and CORS errors (fetch promise rejected)
       this.dialogs.error = true;
@@ -350,7 +350,7 @@ export const store = reactive({
       const item = await this.handleResponse(response);
       await this.prepareAddDocuments(documents, item);
 
-      return await this.getItem(item.id);
+      return await this.getItem(item.uuid);
     } catch (error) {
       // handle network and CORS errors (fetch promise rejected)
       this.dialogs.error = true;
@@ -359,9 +359,9 @@ export const store = reactive({
   },
 
   // DELETE ITEM
-  async deleteItem(id) {
+  async deleteItem(uuid) {
     try {
-      const query = new URL(`${host}/api/item/${id}`);
+      const query = new URL(`${host}/api/item/${uuid}`);
       const response = await fetch(query, {
         method: "DELETE",
         redirect: "follow",
@@ -438,9 +438,9 @@ export const store = reactive({
   },
 
   // GET EVENT DETAILS
-  async getEvent(id) {
+  async getEvent(uuid) {
     try {
-      const query = new URL(`${host}/api/event/${id}`);
+      const query = new URL(`${host}/api/event/${uuid}`);
       const response = await fetch(query, {
         method: "GET",
         redirect: "follow",
@@ -453,9 +453,9 @@ export const store = reactive({
   },
 
   // UPDATE EVENT
-  async updateEvent(id, data) {
+  async updateEvent(uuid, data) {
     try {
-      const query = new URL(`${host}/api/event/${id}/`);
+      const query = new URL(`${host}/api/event/${uuid}/`);
       const response = await fetch(query, {
         method: "PUT",
         headers: {
@@ -495,9 +495,9 @@ export const store = reactive({
   },
 
   // DELETE EVENT
-  async deleteEvent(id) {
+  async deleteEvent(uuid) {
     try {
-      const query = new URL(`${host}/api/event/${id}`);
+      const query = new URL(`${host}/api/event/${uuid}`);
       const response = await fetch(query, {
         method: "DELETE",
         redirect: "follow",
@@ -614,9 +614,9 @@ export const store = reactive({
   },
 
   // GET DOCUMENT DETAILS
-  async getDocument(id) {
+  async getDocument(uuid) {
     try {
-      const query = new URL(`${host}/api/document/${id}`);
+      const query = new URL(`${host}/api/document/${uuid}`);
       const response = await fetch(query, {
         method: "GET",
         redirect: "follow",
@@ -675,7 +675,7 @@ export const store = reactive({
     }
   },
 
-  async updateDocument(id, formInput) {
+  async updateDocument(uuid, formInput) {
     /*
     console.log("updateDocument");
     console.log(formInput);
