@@ -75,5 +75,26 @@
     "fields": {
       "name": "Communiqué de presse"
     }
+  },
+  {
+    "model": "ne_sop_api.DocumentType",
+    "pk": "12",
+    "fields": {
+      "name": "Refus (700 signes)"
+    }
+  },
+  {
+    "model": "ne_sop_api.DocumentType",
+    "pk": "13",
+    "fields": {
+      "name": "Note (interne)"
+    }
+  },
+  {
+    "model": "ne_sop_api.DocumentType",
+    "pk": "14",
+    "fields": {
+      "name": "Rapport"
+    }
   }
 ]
