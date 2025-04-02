@@ -40,5 +40,19 @@
         "fields": {
             "name": "Session du Grand Conseil / Traitement"
         }
+    },
+    {
+        "model": "ne_sop_api.EventType",
+        "pk": 7,
+        "fields": {
+            "name": "Rappel délai traitement échu"
+        }
+    },
+    {
+        "model": "ne_sop_api.EventType",
+        "pk": 8,
+        "fields": {
+            "name": "Rappel délai interne SG"
+        }
     }
 ]
