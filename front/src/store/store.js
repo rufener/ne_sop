@@ -37,12 +37,12 @@ export const store = reactive({
       .replaceAll(/"author_id":\d+,/gi, "")
       .replaceAll(/"author":"[^"]+",/gi, "");
 
-    /*
-      console.log('oldDataString')
-      console.log(oldDataString)
-      console.log('newDataString')
-      console.log(newDataString)
-    */
+
+      // console.log('oldDataString')
+      // console.log(oldDataString)
+      // console.log('newDataString')
+      // console.log(newDataString)
+
 
     if (oldDataString !== newDataString) {
       this.warning = true;
@@ -295,11 +295,11 @@ export const store = reactive({
   // UPDATE ITEM
   async updateItem(uuid, data) {
     try {
-      /*
-      console.log("updateItem");
-      console.log("data.documents");
-      console.log(data.documents);
-      */
+
+      // console.log("updateItem");
+      // console.log("data.documents");
+      // console.log(data.documents);
+
 
       let documents = data.documents;
 
@@ -568,11 +568,9 @@ export const store = reactive({
   async prepareAddDocuments(documents, item) {
     documents = documents.filter((x) => x.id === undefined);
 
-    /*
-    console.log("prepareAddDocuments");
-    console.log(documents);
-    console.log(item);
-    */
+    // console.log("prepareAddDocuments");
+    // console.log(documents);
+    // console.log(item);
 
     let promises = [];
     documents.forEach((document) => {
@@ -630,11 +628,10 @@ export const store = reactive({
 
   // ADD DOCUMENT
   async addDocument(formInput) {
-    /*
-    console.log("addDocument");
-    console.log("formInput");
-    console.log(formInput);
-    */
+
+    // console.log("addDocument");
+    // console.log("formInput");
+    // console.log(formInput);
 
     const formData = new FormData();
 
@@ -654,10 +651,8 @@ export const store = reactive({
     formData.append("file", formInput.file);
     formData.append("valid", formInput.valid);
 
-    /*
-    console.log("formData");
-    console.log(formData);
-    */
+    // console.log("formData");
+    // console.log(formData);
 
     try {
       const query = new URL(`${host}/api/document/`);
