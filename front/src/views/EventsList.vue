@@ -68,7 +68,7 @@
                         <router-link :to="{
                             name: 'Item',
                             params: {
-                                id: props.row.item.id
+                                id: props.row.item.uuid
                             }
                         }">
                             <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none">
@@ -160,6 +160,7 @@ export default {
                     label: "Objet",
                     field: "item",
                     sortable: true,
+                    style: 'max-width: 400px; width: 300px'
                 },
                 {
                     name: "actions",

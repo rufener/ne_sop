@@ -13,7 +13,7 @@
                             <router-link :to="{
                                 name: 'Item',
                                 params: {
-                                    id: item.id
+                                    id: item.uuid
                                 }
                             }">
                                 <div>{{ item.title }}</div>
@@ -38,7 +38,7 @@
                                             </q-date>
                                         </q-popup-proxy>
                                     </q-icon>
-                                    <!-- 
+                                    <!--
                                         <q-icon name="event" class="cursor-pointer">
                                             <q-popup-proxy>
                                                 <q-date v-model="event.date"></q-date>
@@ -78,7 +78,7 @@
                         </div>
 
                         <!-- LINKED ITEM SELECT FIELD -->
-                        <!-- 
+                        <!--
                         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
                             <q-select bg-color="white" outlined v-model="linkedItem" :options="this.store.items" option-label="number" label="Objet lié" @update:model-value="setLinkedItem(val)" :rules="[val => checkFilled(val)]" clearable :disable="!edit">
                                 <template v-slot:option="scope">

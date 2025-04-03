@@ -16,6 +16,14 @@
             <q-tr :props="props">
                 <q-td key="title" :props="props">
                     <div class="text-bold overflow-ellipsis">{{ props.row.title }} / {{ props.row.reference }}</div>
+                    <q-tooltip class="bg-black text-white text-body2 q-pa-none q-ma-none">
+                        <q-card class="bg-black text-white">
+                            <q-card-section>
+                                <div class="text-subtitle2">{{ props.row.title }}</div>
+                                <div class="text-subtitle2" v-if="props.row.reference">{{ props.row.reference }}</div>
+                            </q-card-section>
+                        </q-card>
+                    </q-tooltip>
                 </q-td>
 
                 <q-td key="type" :props="props">
@@ -78,8 +86,8 @@ import DeleteDialog from './DeleteDialog.vue'
 const host = import.meta.env.VITE_API_URL
 
 const columns = [
-    { name: 'title', align: 'left', label: 'Titre / Réf.', field: 'title', sortable: true, style: 'max-width: 250px; width: 250px' },
-    { name: 'type', align: 'left', label: 'Type', field: 'type', sortable: true, style: 'max-width: 150px; width: 150px' },
+    { name: 'title', align: 'left', label: 'Titre / Réf.', field: 'title', sortable: true, style: 'max-width: 270px; width: 270px' },
+    { name: 'type', align: 'left', label: 'Type', field: 'type', sortable: true, style: 'max-width: 200px; width: 180px' },
     { name: 'modified', align: 'left', label: 'Modifié le', field: 'modified', sortable: true }, // style: 'max-width: 110px; width: 110px'
     { name: 'actions', align: 'right', label: '', field: 'action', sortable: false, style: 'max-width: 120px; width: 80px' }
 ]
