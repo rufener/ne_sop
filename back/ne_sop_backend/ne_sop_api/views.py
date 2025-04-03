@@ -469,7 +469,7 @@ class ItemStatusViewSet(viewsets.ViewSet):
 
     # order queryset by ascending id
     sortby = "id"
-    queryset = ItemStatus.objects.all().order_by(Lower(sortby).asc())
+    queryset = ItemStatus.objects.all().order_by(sortby)
     serializer_class = ItemStatusSerializer
 
     @extend_schema(
@@ -649,7 +649,7 @@ class ItemViewSet(viewsets.ViewSet):
 
         now = datetime.datetime.now()
         filename = f'{datetime.datetime.strftime(now, "%Y%m%d-%H%M%S")}_ObjetsParlementaires.xlsx'
-        
+
 
         # Save results in Excel file
         # create workbook

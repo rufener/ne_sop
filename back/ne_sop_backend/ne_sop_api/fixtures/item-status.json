@@ -12,7 +12,7 @@
         "model": "ne_sop_api.ItemStatus",
         "pk": 2,
         "fields": {
-            "name": "En traitement",
+            "name": "Interne service",
             "deadline": true,
             "color": "yellow-7"
         }
@@ -21,32 +21,77 @@
         "model": "ne_sop_api.ItemStatus",
         "pk": 3,
         "fields": {
-            "name": "Terminé",
-            "deadline": false,
-            "color": "green"
+            "name": "Interne département",
+            "deadline": true,
+            "color": "orange-6"
         }
     },
     {
         "model": "ne_sop_api.ItemStatus",
         "pk": 4,
         "fields": {
-            "name": "Terminé - Rapport à produire",
-            "deadline": false,
-            "color": "cyan-7"
+            "name": "Soumis CE",
+            "deadline": true,
+            "color": "blue-6 "
         }
     },
     {
         "model": "ne_sop_api.ItemStatus",
         "pk": 5,
         "fields": {
-            "name": "Terminé - Archivé",
-            "deadline": false,
-            "color": "blue-grey-1"
+            "name": "Validé CE",
+            "deadline": true,
+            "color": "indigo-6"
         }
     },
     {
         "model": "ne_sop_api.ItemStatus",
         "pk": 6,
+        "fields": {
+            "name": "Traitement commissions",
+            "deadline": true,
+            "color": "cyan-7"
+        }
+    },
+    {
+        "model": "ne_sop_api.ItemStatus",
+        "pk": 7,
+        "fields": {
+            "name": "Soumis GC",
+            "deadline": true,
+            "color": "blue-grey-4"
+        }
+    },
+    {
+        "model": "ne_sop_api.ItemStatus",
+        "pk": 8,
+        "fields": {
+            "name": "Validé GC",
+            "deadline": true,
+            "color": "blue-grey-1"
+        }
+    },
+    {
+        "model": "ne_sop_api.ItemStatus",
+        "pk": 9,
+        "fields": {
+            "name": "Terminé rapport à produire",
+            "deadline": false,
+            "color": "lime-8"
+        }
+    },
+    {
+        "model": "ne_sop_api.ItemStatus",
+        "pk": 10,
+        "fields": {
+            "name": "Terminé archivé",
+            "deadline": false,
+            "color": "green"
+        }
+    },
+    {
+        "model": "ne_sop_api.ItemStatus",
+        "pk": 11,
         "fields": {
             "name": "Retiré",
             "deadline": false,

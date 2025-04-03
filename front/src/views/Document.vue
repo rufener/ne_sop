@@ -110,8 +110,8 @@ export default {
                 "valid": false,
                 "author": store.user,
             }
-            console.log("initialize_document()")
-            console.log(this.document)
+            // console.log("initialize_document()")
+            // console.log(this.document)
         },
         async save(redirectTo) {
 
