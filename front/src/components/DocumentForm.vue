@@ -233,9 +233,6 @@ export default {
             this.valid = val
             // this.$emit('validationEvent', this.valid)
         },
-        checkFilename(val) {
-            console.log(val)
-        },
         async getItemOptions(searchstring = "") {
 
             const options = (await store.getItems({ search: searchstring.toLowerCase() }, 1, 5, "number", "false")).results
@@ -250,10 +247,12 @@ export default {
         },
         selectOption(payload) {
 
-            console.log("select Option")
-            console.log(payload)
-            console.log("myitem")
-            console.log(this.myitem)
+
+            // console.log("select Option")
+            // console.log(payload)
+            // console.log("myitem")
+            // console.log(this.myitem)
+
 
             // Check if item has already been added to list
             const exists = this.document.items.some(item => item.uuid === payload.uuid);
@@ -263,10 +262,10 @@ export default {
 
         },
         getFileAttributes() {
-            console.log("getFileAttributes()")
-            console.log(this.newFile)
+            // console.log("getFileAttributes()")
+            // console.log(this.newFile)
             if (this.newFile) {
-                console.log("this.newFile exists")
+                // console.log("this.newFile exists")
                 this.document.file = this.newFile
                 this.document.filename = this.newFile.name
                 this.document.size = this.newFile.size
