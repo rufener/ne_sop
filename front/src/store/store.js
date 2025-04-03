@@ -717,7 +717,7 @@ export const store = reactive({
       }
 
       const data = await response.json();
-      console.log("Document updated successfully:", data);
+      // console.log("Document updated successfully:", data);
     } catch (error) {
       console.error("Error updating document:", error);
     }
