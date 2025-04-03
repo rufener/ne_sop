@@ -134,8 +134,8 @@ export default {
             this.dialog.newDocument = true
         },
         handleEdition(val) {
-            console.log("DocumentsTable - handleEdition")
-            console.log(val)
+            // console.log("DocumentsTable - handleEdition")
+            // console.log(val)
             this.selected = val
             this.dialog.edition = true
         },

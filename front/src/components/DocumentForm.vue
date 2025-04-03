@@ -86,7 +86,7 @@
 
                         <div class="col">
 
-                            <q-select bg-color="white" outlined v-model="myitem" use-input hide-selected :options="itemOptions" option-label="title" @update:model-value="selectOption" @filter="filterFn" label="Lier des objets parlementaires à ce document" :disable="!edit || !store.user.is_manager">
+                            <q-select bg-color="white" popup-content-class="custom-dropdown" outlined v-model="myitem" use-input hide-selected :options="itemOptions" option-label="title" @update:model-value="selectOption" @filter="filterFn" label="Lier des objets parlementaires à ce document" :disable="!edit || !store.user.is_manager">
                                 <template v-slot:prepend>
                                     <q-icon name="sym_o_search" />
                                 </template>
@@ -134,7 +134,7 @@
                                         <q-item-section>
 
                                             <!--<q-chip clickable square outline color="blue-5" text-color="white" icon="sym_o_loupe"> -->
-                                            <div class="ellipsis"> <router-link :to="{
+                                            <div class="ellipsis" style="max-width:100%;"> <router-link :to="{
                                                 name: 'Item',
                                                 params: {
                                                     id: item.uuid
@@ -172,7 +172,7 @@
     </Form>
 
     <!-- DELETE DIALOG -->
-    <!-- 
+    <!--
     <DeleteDialog v-model="dialog.deletion" @delete-event="handleDelete" :content="dialog_content" />
     -->
 
@@ -233,9 +233,6 @@ export default {
             this.valid = val
             // this.$emit('validationEvent', this.valid)
         },
-        checkFilename(val) {
-            console.log(val)
-        },
         async getItemOptions(searchstring = "") {
 
             const options = (await store.getItems({ search: searchstring.toLowerCase() }, 1, 5, "number", "false")).results
@@ -250,10 +247,12 @@ export default {
         },
         selectOption(payload) {
 
-            console.log("select Option")
-            console.log(payload)
-            console.log("myitem")
-            console.log(this.myitem)
+
+            // console.log("select Option")
+            // console.log(payload)
+            // console.log("myitem")
+            // console.log(this.myitem)
+
 
             // Check if item has already been added to list
             const exists = this.document.items.some(item => item.uuid === payload.uuid);
@@ -263,10 +262,10 @@ export default {
 
         },
         getFileAttributes() {
-            console.log("getFileAttributes()")
-            console.log(this.newFile)
+            // console.log("getFileAttributes()")
+            // console.log(this.newFile)
             if (this.newFile) {
-                console.log("this.newFile exists")
+                // console.log("this.newFile exists")
                 this.document.file = this.newFile
                 this.document.filename = this.newFile.name
                 this.document.size = this.newFile.size
@@ -285,4 +284,11 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.custom-dropdown {
+    white-space: nowrap; /* Empêche le retour à la ligne */
+    overflow: hidden; /* Cache le texte qui dépasse */
+    text-overflow: ellipsis; /* Ajoute "..." si le texte est trop lon */
+    max-width: 100% !important; /* Ensures dropdown does not exceed the select width */
+}
+</style>

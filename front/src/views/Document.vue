@@ -84,6 +84,7 @@ export default {
 
         if (this.$route.name === "NewDocument") {
             this.edit = true
+            this.store.loading = false
         }
 
         // console.log(`this.$route.params.id: ${this.$route.params.id}`)

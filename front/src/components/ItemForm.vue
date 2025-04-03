@@ -96,7 +96,7 @@
                 <template v-slot:content>
 
                     <!-- DESCRIPTION TEXT AREA FIELD -->
-                    <!-- 
+                    <!--
                     <div class="row q-col-gutter-lg q-py-md">
                         <div class="col">
                             <q-input bg-color="white" outlined v-model="item.description" label="Description" type="textarea" :disable="!edit || !store.user.is_manager" />
@@ -418,7 +418,7 @@ export default {
 
             // console.log(`${this.$options.name} | addNewEntity()`)
             let newEntity = await store.addEntity(val)
-            this.authorOptions = [await store.getEntity(newEntity.id)]
+            this.authorOptions = [await store.getEntity(newEntity.uuid)]
             this.item.author = await newEntity.id
 
         },

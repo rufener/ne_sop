@@ -56,7 +56,7 @@ export const checkFile = (val) => {
 };
 
 export const checkFilename = (val) => {
-  console.log(val);
+  // console.log(val);
   if (val) {
     return true;
   } else {
