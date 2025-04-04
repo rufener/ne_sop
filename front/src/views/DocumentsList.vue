@@ -135,7 +135,7 @@
         </div>
 
         <!-- DELETE DIALOG -->
-        <DeleteDialog v-model="dialog.deletion" @delete-event="remove" content="Supprimer définitivement ce document? Les objets parlementaires liés ne seront pas supprimés." title="Suppression définitive du document" />
+        <DeleteDialog v-model="dialog.deletion" @delete-event="remove" content="Supprimer définitivement ce document? Les objets politiques liés ne seront pas supprimés." title="Suppression définitive du document" />
 
     </div>
 </template>

@@ -7,7 +7,7 @@
                 <!-- BREADCRUMBS NAVIGATION -->
                 <div class="q-pa-sm q-gutter-sm">
                     <q-breadcrumbs style="font-size: 16px">
-                        <q-breadcrumbs-el label="Objets parlementaires" to="/items" />
+                        <q-breadcrumbs-el label="Objets politiques" to="/items" />
                         <q-breadcrumbs-el :label="item.number.toString()" />
                     </q-breadcrumbs>
                 </div>

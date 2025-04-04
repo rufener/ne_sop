@@ -94,7 +94,7 @@
                 </q-tr>
             </template>
             <template v-slot:no-data>
-                Aucune objet
+                Aucun objet
             </template>
         </q-table>
 
@@ -105,7 +105,7 @@
         </div>
 
         <!-- DELETE DIALOG -->
-        <DeleteDialog v-model="dialog.deletion" @delete-event="remove" content="Supprimer définitivement cet événement? L'objet parlementaire lié ne sera pas supprimé." title="Suppression définitive" />
+        <DeleteDialog v-model="dialog.deletion" @delete-event="remove" content="Supprimer définitivement cet événement? L'objet politique lié ne sera pas supprimé." title="Suppression définitive" />
 
     </div>
 </template>

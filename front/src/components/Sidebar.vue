@@ -9,7 +9,7 @@
                     </q-item-section>
 
                     <q-item-section>
-                        Objets parlementaires
+                        Objets politiques
                     </q-item-section>
                 </q-item>
 
@@ -61,7 +61,7 @@
                                 <q-item-section avatar>
                                     <q-icon name="sym_o_admin_panel_settings" size="lg" />
                                 </q-item-section>
-        
+
                                 <q-item-section>
                                     Administration
                                 </q-item-section>

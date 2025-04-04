@@ -3,7 +3,7 @@
 
         <!-- BREADCRUMBS NAVIGATION -->
         <q-breadcrumbs style="font-size: 16px">
-            <q-breadcrumbs-el label="Objets parlementaires" to="/items" />
+            <q-breadcrumbs-el label="Objets politiques" to="/items" />
         </q-breadcrumbs>
 
         <div class="row q-col-gutter-md q-px-sm q-mt-xs items-center">
@@ -37,13 +37,13 @@
 
                     <!-- ADD NEW ITEM BUTTON -->
                     <q-btn padding="sm md" unelevated no-caps color="blue-grey-8" text-color="white" icon="sym_o_add_circle" label="Ajouter" to="/items/new">
-                        <q-tooltip class="bg-black">Ajouter un nouvel objet parlementaire</q-tooltip>
+                        <q-tooltip class="bg-black">Ajouter un nouvel objet politique</q-tooltip>
                     </q-btn>
 
                     <!-- DOWNLOAD ITEM LIST BUTTON -->
                     <q-btn padding="sm md" unelevated no-caps color="blue-grey-8" text-color="white" icon="sym_o_download" label="Télécharger" :href="`${store.host}/api/item/download/`">
                         <!-- <q-btn round padding="sm" unelevated no-caps color="blue-grey-8" icon="download" :href="`${store.host}/api/item/download/`">-->
-                        <q-tooltip class="bg-black">Télécharger la liste Excel de tous les objets parlementaires</q-tooltip>
+                        <q-tooltip class="bg-black">Télécharger la liste Excel de tous les objets politiques</q-tooltip>
                     </q-btn>
 
                 </div>
@@ -69,7 +69,7 @@
                         }">
                             <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none">
                                 <div class="ellipsis"><b>{{ props.row.title }}</b></div>
-                                <!-- 
+                                <!--
                                 <q-badge color="red" align="top" class="q-ml-xs" v-if="props.row.urgent">
                                     Urgent
                                 </q-badge>
@@ -130,12 +130,12 @@
                 </q-tr>
             </template>
             <template v-slot:no-data>
-                Aucune objet
+                Aucun objet
             </template>
         </q-table>
 
         <!-- DELETE DIALOG -->
-        <DeleteDialog v-model="dialog.deletion" @delete-event="remove" content="Supprimer définitivement cet objet parlementaire? Les documents liés ne seront pas supprimés." title="Suppression définitive" />
+        <DeleteDialog v-model="dialog.deletion" @delete-event="remove" content="Supprimer définitivement cet objet politique? Les documents liés ne seront pas supprimés." title="Suppression définitive" />
 
 
         <!-- FILTER DIALOG -->

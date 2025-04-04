@@ -36,7 +36,7 @@
 
                         <div class="text-h5 q-my-md">Créer un nouvel objet</div>
                         <ol class="instructions">
-                            <li>Aller sur la page <a href="./items">Objets parlementaires</a></li>
+                            <li>Aller sur la page <a href="./items">Objets politiques</a></li>
                             <li>Pour ouvrir le formulaire d'un nouvel objet, cliquer sur le bouton <q-btn size="sm" unelevated no-caps color="blue-grey-8" text-color="white" icon="sym_o_add_circle" label="Ajouter" class="q-py-none q-my-none"></q-btn></li>
                             <li>Remplir la section <b>Informations générales</b>:</li>
 
@@ -71,12 +71,12 @@
 
                         <!--
                         <p>
-                            Tous les champs du formulaire des objets parlementaires sont enregistrés lorsque l'utilisateur clique sur le bouton "enregistrer".
+                            Tous les champs du formulaire des objets politiques sont enregistrés lorsque l'utilisateur clique sur le bouton "enregistrer".
                             C'est également le cas pour les évènements créés et pour les fichiers enregistrés.
-                            De même, les évènements supprimés le seront définitivement lorsque l'objet parlementaire est enregistré.
+                            De même, les évènements supprimés le seront définitivement lorsque l'objet politique est enregistré.
                         </p>
                         <p>
-                            <q-icon name="warning" color="warning" size="1.5rem" style="margin-right: 10pt;" /> La suppression de documents est un cas particulier: les documents supprimés sont définitivement supprimés lorsque l'utilisateur confirme leur suppression, même si l'objet parlementaire n'est pas enregistré.
+                            <q-icon name="warning" color="warning" size="1.5rem" style="margin-right: 10pt;" /> La suppression de documents est un cas particulier: les documents supprimés sont définitivement supprimés lorsque l'utilisateur confirme leur suppression, même si l'objet politique n'est pas enregistré.
                         </p>
                         -->
 
@@ -95,8 +95,8 @@
                         <div class="text-h5 q-my-md">Modifier un objet</div>
 
                         <ol class="instructions">
-                            <li>Aller sur la page <a href="./items">Objets parlementaires</a></li>
-                            <li>Cliquer sur le titre (lien souligné) de l'objet parlementaire à modifier, pour accéder au formulaire</li>
+                            <li>Aller sur la page <a href="./items">Objets politiques</a></li>
+                            <li>Cliquer sur le titre (lien souligné) de l'objet politique à modifier, pour accéder au formulaire</li>
                             <li>Cliquer sur le bouton <b>Modifier</b> <q-btn round unelevated size="sm" color="blue" icon="sym_o_edit"></q-btn> en bas à droite, pour activer le formulaire</li>
                             <li>Modifier les champs souhaités dans le formulaire</li>
                             <li>Cliquer sur le bouton <b>Enregister</b> <q-btn round unelevated size="sm" color="green-5" icon="sym_o_save"></q-btn> en bas à droite</li>
@@ -125,7 +125,7 @@
                         </q-banner>
 
                         <ol class="instructions">
-                            <li>Aller sur la page <a href="./items">Objets parlementaires</a></li>
+                            <li>Aller sur la page <a href="./items">Objets politiques</a></li>
                             <li>Cliquer sur le bouton <b>Supprimer</b> <q-btn dense round flat color="red" name="delete" icon="sym_o_delete"></q-btn> à la ligne de l'objet concerné</li>
                         </ol>
 
@@ -253,7 +253,7 @@ export default {
                     children: [
                         { label: 'Résumé du processus' },
                         {
-                            label: 'Objets parlementaires',
+                            label: 'Objets politiques',
                             icon: 'sym_o_list_alt',
                             children: [
                                 { label: 'Créer un nouvel objet' },

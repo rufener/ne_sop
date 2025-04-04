@@ -1,8 +1,8 @@
 # ne_sop
-Suivi des objets parlementaires
+Suivi des objets politiques
 
 # Installation
-## Requirements 
+## Requirements
 This applications requires:
 * Backend: [Python](https://www.python.org/) (v10), [Django REST framework](https://www.django-rest-framework.org/)
 * Frontend: [Vite](https://vitejs.dev/) (v4)
