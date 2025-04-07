@@ -68,5 +68,19 @@
         "fields": {
             "name": "Motion populaire"
         }
+    },
+    {
+        "model": "ne_sop_api.ItemType",
+        "pk": 11,
+        "fields": {
+            "name": "Communiqué de presse"
+        }
+    },
+    {
+        "model": "ne_sop_api.ItemType",
+        "pk": 12,
+        "fields": {
+            "name": "Conférence depresse"
+        }
     }
 ]

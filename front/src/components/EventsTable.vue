@@ -68,7 +68,7 @@
     </q-dialog>
 
     <!-- DELETE EVENT DIALOG -->
-    <DeleteDialog v-model="dialog.deletion" content="Supprimer définitivement cet événement? L'objet parlementaire lié ne sera pas supprimé." @delete-event="remove" />
+    <DeleteDialog v-model="dialog.deletion" content="Supprimer définitivement cet événement? L'objet politique lié ne sera pas supprimé." @delete-event="remove" />
 </template>
 
 <script>

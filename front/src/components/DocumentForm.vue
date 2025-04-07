@@ -86,7 +86,7 @@
 
                         <div class="col">
 
-                            <q-select bg-color="white" popup-content-class="custom-dropdown" outlined v-model="myitem" use-input hide-selected :options="itemOptions" option-label="title" @update:model-value="selectOption" @filter="filterFn" label="Lier des objets parlementaires à ce document" :disable="!edit || !store.user.is_manager">
+                            <q-select bg-color="white" popup-content-class="custom-dropdown" outlined v-model="myitem" use-input hide-selected :options="itemOptions" option-label="title" @update:model-value="selectOption" @filter="filterFn" label="Lier des objets politiques à ce document" :disable="!edit || !store.user.is_manager">
                                 <template v-slot:prepend>
                                     <q-icon name="sym_o_search" />
                                 </template>
@@ -146,7 +146,7 @@
 
                                         <q-item-section avatar>
                                             <q-btn outline dense round color="red" name="unlink" @click="handleUnlink(item.uuid)" icon="sym_o_remove" :disable="!edit">
-                                                <q-tooltip class="bg-black">Déconnecter cet objet parlementaire du document</q-tooltip>
+                                                <q-tooltip class="bg-black">Déconnecter cet objet politique du document</q-tooltip>
                                             </q-btn>
                                         </q-item-section>
 

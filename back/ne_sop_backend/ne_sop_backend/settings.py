@@ -172,7 +172,7 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Suivi des Objets Parlementaires (SOP)",
+    "TITLE": "Suivi des Objets Politiques (SOP)",
     "DESCRIPTION": "API documentation",
     "VERSION": "1.0.0",
     "COMPONENT_SPLIT_REQUEST": True,

@@ -1,11 +1,11 @@
 <template>
     <q-header class="bg-blue-grey text-white q-py-sm">
 
-        <!-- 
+        <!--
     <div class="row full-height justify-center items-center" style="padding:0 12px;">
 
         <div class="col text-left">
-            <div class="row items-center"> 
+            <div class="row items-center">
                 <q-btn size="lg" flat @click="drawer = !drawer" round dense icon="menu" />
                 <a href="https://www.ne.ch/autorites/DDTE/" target="_blank" class="q-px-md"><img src="/img/ne_logo_white.svg"
                         alt="Neuchâtel" /></a>
@@ -13,7 +13,7 @@
         </div>
 
         <div class="col text-center text-body1">
-            DDTE - Suivi des objets parlementaires
+            DDTE - Suivi des objets politiques
         </div>
 
         <div class="col text-right">
@@ -31,20 +31,20 @@
                 <a href="https://www.ne.ch/autorites/DDTE/" target="_blank"><img src="img/ne_logo_white.svg" alt="Neuchâtel" /></a>
             </q-toolbar-title>
 
-            <div class="text-center text-body1 gt-sm">Suivi des objets parlementaires</div>
+            <div class="text-center text-body1 gt-sm">Suivi des objets politiques</div>
 
             <q-space></q-space>
 
             <div class="text-center text-body1 gt-sm">{{ store.user.username }} <q-icon size="lg" name="account_circle" text-color="white" flat round dense />
             </div>
 
-            <!-- 
+            <!--
         <q-btn size="lg" text-color="white" round label="" dense unelevated icon="sym_o_logout" @click="processLogout" v-if="$route.name !== 'Login'">
             <q-tooltip class="bg-black">Déconnexion</q-tooltip>
         </q-btn>
         -->
 
-            <!-- 
+            <!--
         <q-btn-dropdown size="lg" label="" dense icon="account_circle" dropdown-icon="" unelevated v-if="$route.name !== 'Login'">
             <q-list style="width:180px">
                 <q-item clickable v-close-popup @click="">

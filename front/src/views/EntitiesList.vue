@@ -94,7 +94,7 @@
             </template>
 
             <template v-slot:no-data>
-                Aucune objet
+                Aucun objet
             </template>
         </q-table>
 

@@ -648,15 +648,14 @@ class ItemViewSet(viewsets.ViewSet):
         queryset = self.get_queryset()
 
         now = datetime.datetime.now()
-        filename = f'{datetime.datetime.strftime(now, "%Y%m%d-%H%M%S")}_ObjetsParlementaires.xlsx'
-
+        filename = f'{datetime.datetime.strftime(now, "%Y%m%d-%H%M%S")}_ObjetsPolitiques.xlsx'
 
         # Save results in Excel file
         # create workbook
         wb = openpyxl.Workbook()
         ws = wb.active
-        ws.title = "Objets parlementaires"
-        ws.cell(1, 1).value = "Liste des objets parlementaires"
+        ws.title = "Objets politiques"
+        ws.cell(1, 1).value = "Liste des objets politiques"
         ws.cell(1, 1).font = Font(size=16, bold=True)
         ws.cell(2, 1).value = "Date"
         ws.cell(2, 2).value = datetime.datetime.strftime(now, "%d.%m.%Y")
@@ -857,7 +856,7 @@ class EventViewSet(viewsets.ViewSet):
         event.delete()
         return Response({"msg": "Event deleted"})
 
-    @action(detail=True, methods=['get'], url_path='download', url_name='download')
+    @action(detail=True, methods=["get"], url_path="download", url_name="download")
     @extend_schema(tags=["Document"], description="Download the iCalendar (.ics) file")
     def download(self, request, pk=None):
         event = get_object_or_404(self.get_queryset(), uuid=pk)  # pk=pk
@@ -1032,7 +1031,7 @@ class DocumentViewSet(viewsets.ViewSet):
             document.items.clear()
 
         # Check if a new file was uploaded.
-        if 'file' in request.FILES:
+        if "file" in request.FILES:
             # If a new file is provided and there's an existing file, delete the old file.
             if document.file:
                 document.file.close()
@@ -1041,12 +1040,12 @@ class DocumentViewSet(viewsets.ViewSet):
         else:
             # No new file uploaded via request.FILES.
             # Remove the 'file' key if it exists (it might be a string or empty value)
-            data.pop('file', None)
+            data.pop("file", None)
 
         # Use partial=True so that only provided fields are updated.
         serializer = NewDocumentSerializer(document, data=data, partial=True)
 
-        '''
+        """
         print("Update document")
         print("Request:")
         print(request)
@@ -1057,7 +1056,7 @@ class DocumentViewSet(viewsets.ViewSet):
         print("Request data:")
         print(request.data)
         print("Document:")
-        '''
+        """
 
         if serializer.is_valid():
             serializer.save()
@@ -1085,12 +1084,12 @@ class DocumentViewSet(viewsets.ViewSet):
         document.delete()
         return Response({"msg": "Document deleted"})
 
-    @action(detail=True, methods=['get'], url_path='download', url_name='download')
+    @action(detail=True, methods=["get"], url_path="download", url_name="download")
     @extend_schema(tags=["Document"], description="Download the file attached to the document")
     def download_file(self, request, pk=None):
         document = get_object_or_404(self.get_queryset(), uuid=pk)
         # Ensure the file is opened and returned as a response. Adjust this if you're using a custom storage.
-        file_handle = document.file.open(mode='rb')
+        file_handle = document.file.open(mode="rb")
         response = FileResponse(file_handle, as_attachment=True, filename=document.file.name)
         return response
 
