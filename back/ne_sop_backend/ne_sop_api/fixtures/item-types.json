@@ -80,7 +80,7 @@
         "model": "ne_sop_api.ItemType",
         "pk": 12,
         "fields": {
-            "name": "Conférence depresse"
+            "name": "Conférence de presse"
         }
     }
 ]
