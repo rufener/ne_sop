@@ -65,7 +65,7 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Alignment, Font
 from io import BytesIO
-
+from collections import OrderedDict
 
 # %% TEST BACKEND
 @api_view(["GET"])
@@ -1145,29 +1145,44 @@ class ItemTypeStatisticsDepositedViewSet(viewsets.ViewSet):
         tags=["Statistics"],
     )
     def list(self, request):
-        queryset = ItemType.objects.annotate(year=TruncYear("item__startdate")).annotate(num_items=Count("item"))
+        user = request.user
+        user_entities = user.entities.all()
 
-        # get unique set of years
-        years = list(set(int(x.year.year) if x.year is not None else None for x in queryset))
-        years.remove(None)
-        years.sort(reverse=True)
+        # Tous les ItemTypes, même ceux sans Item
+        all_itemtypes = ItemType.objects.all()
+        itemtype_names = sorted([it.name for it in all_itemtypes])
 
-        # get unique set of itemtypes
-        itemtypes = list(set(x.name for x in queryset))
-        itemtypes.sort()
+        # Stats : nombre d'Items par type et année, pour les entités accessibles
+        queryset = (
+            Item.objects
+            .filter(lead__in=user_entities)
+            .annotate(year=TruncYear("startdate"))
+            .values("type__name", "year")
+            .annotate(num_items=Count("id"))
+            .order_by("year", "type__name")
+        )
 
-        # prepare result object
-        result = []
+        # Années présentes dans les données
+        years = sorted({entry["year"].year for entry in queryset if entry["year"] is not None}, reverse=True)
+
+        # Construction du tableau final
+        data_map = {}
         for year in years:
-            tmp = {"year": year}
-            for itemtype in itemtypes:
-                for qs in queryset:
-                    if qs.year is not None and qs.year.year == year and qs.name == itemtype:
-                        tmp[itemtype] = qs.num_items
-                        break
-                    else:
-                        tmp[itemtype] = 0
-            result.append(tmp)
+            od = OrderedDict()
+            od["year"] = year
+            for it_name in itemtype_names:
+                od[it_name] = 0  # Valeur par défaut
+            data_map[year] = od
+
+        for entry in queryset:
+            year = entry["year"].year if entry["year"] else None
+            item_type = entry["type__name"]
+            count = entry["num_items"]
+
+            if year in data_map:
+                data_map[year][item_type] = count
+
+        result = list(data_map.values())
 
         return Response(result)
 
