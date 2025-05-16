@@ -307,6 +307,7 @@ export default {
             serviceOptions: [],
             events: [],
             documents: [],
+            isPasting: false,
         }
     },
     computed: {
@@ -402,11 +403,19 @@ export default {
             // console.log(`Truncated text length: ${doc.body.textContent.length}`);
         },
         handlePaste(event) {
+            if (this.isPasting) return; // évite le second appel
+            this.isPasting = true;
+
             event.preventDefault();
             // Get plain text from the clipboard
             const text = event.clipboardData.getData('text/plain');
             // Insert the plain text at the current cursor position
-            document.execCommand('insertText', false, text);
+            document.execCommand('insertText', false, " " + text);
+
+            // Laisser un petit délai pour réinitialiser
+            setTimeout(() => {
+                this.isPasting = false;
+            }, 0);
         },
         reset() {
             this.item.support = []
