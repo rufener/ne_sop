@@ -17,6 +17,10 @@ class MyHTMLParser(HTMLParser):
     def handle_data(self, data):
         self.text_parts.append(data)
 
+    def handle_starttag(self, tag, attrs):
+        if tag.lower() == "div":
+            self.text_parts.append("\n")
+
     def get_text(self):
         return ''.join(self.text_parts)
 

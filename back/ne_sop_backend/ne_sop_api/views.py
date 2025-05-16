@@ -698,8 +698,10 @@ class ItemViewSet(viewsets.ViewSet):
             ws.cell(row_id, 7).value = op.status.name or None
             parser = MyHTMLParser()
             parser.feed(op.description)
-            ws.cell(row_id, 8).value = parser.get_text() or None
+            remarks = parser.get_text() or None
+            ws.cell(row_id, 8).value = remarks
             # ws.cell(row_id, 8).value = op.description or None
+            ws.cell(row_id, 8).alignment = Alignment(wrap_text=True)
             ws.cell(row_id, 9).value = op.urgent or None
             ws.cell(row_id, 10).value = op.writtenresponse or None
             ws.cell(row_id, 11).value = op.oralresponse or None
@@ -710,14 +712,14 @@ class ItemViewSet(viewsets.ViewSet):
             ws.cell(row_id, 16).value = op.late or None
             ws.cell(row_id, 17).value = op.lead.name or None
             ws.cell(row_id, 18).value = sep.join([sup.name for sup in op.support.all()])
-            ws.cell(row_id, 19).value = sep.join([tmp.type.name for tmp in op.events.all()])
-            ws.cell(row_id, 20).value = sep.join([tmp.filename for tmp in op.documents.all()])
             ws.cell(row_id, 18).alignment = Alignment(wrap_text=True)
+            ws.cell(row_id, 19).value = sep.join([tmp.type.name for tmp in op.events.all()])
             ws.cell(row_id, 19).alignment = Alignment(wrap_text=True)
+            ws.cell(row_id, 20).value = sep.join([tmp.filename for tmp in op.documents.all()])
             ws.cell(row_id, 20).alignment = Alignment(wrap_text=True)
 
             # adjust row height
-            ws.row_dimensions[row_id].height = (max([len(op.support.all()), len(op.events.all()), len(op.events.all())]) - 1) * 15 + 15
+            ws.row_dimensions[row_id].height = (max([len(op.support.all()), len(op.events.all()), len((remarks or "").split("\n"))]) - 1) * 15 + 15
 
         # adjust column width
         ws = Utils.auto_adjust_excel_column_width(ws)
