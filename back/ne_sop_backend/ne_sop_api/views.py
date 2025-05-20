@@ -1329,7 +1329,10 @@ class UrgentWrittenStatisticsViewSet(viewsets.ViewSet):
         tags=["Statistics"],
     )
     def list(self, request):
-        queryset = Item.objects.annotate(year=TruncYear("startdate"))
+        user = request.user
+        user_entities = user.entities.all()
+
+        queryset = Item.objects.filter(lead__in=user_entities).annotate(year=TruncYear("startdate"))
         # queryset_urgent = Item.objects.filter(urgent=True).annotate(year=TruncYear("startdate"))
         # queryset_writtenresponse = Item.objects.filter(writtenresponse=True).annotate(year=TruncYear("startdate"))
 
