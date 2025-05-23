@@ -86,6 +86,9 @@ class EntityTypeSerializer(serializers.ModelSerializer):
 # %% ENTITY LIST
 class EntityListSerializer(serializers.ModelSerializer):
     type = serializers.StringRelatedField()
+    # has_access = serializers.SerializerMethodField()
+    has_access = serializers.BooleanField(read_only=True)
+    # has_access = serializers.SerializerMethodField()
 
     class Meta:
         model = Entity
@@ -107,7 +110,16 @@ class EntityListSerializer(serializers.ModelSerializer):
             "telephone",
             "active",
             "valid",
+            "has_access"
         ]
+
+    '''
+    def get_has_access(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj in request.user.entities.all()
+        return False
+    '''
 
 
 # %% ENTITY
@@ -136,6 +148,7 @@ class EntitySerializer(serializers.ModelSerializer):
             "active",
             "valid",
         ]
+
 
 
 # %% ITEM TYPE
@@ -201,6 +214,8 @@ class ItemSerializer(serializers.ModelSerializer):
     lead = serializers.PrimaryKeyRelatedField(
         queryset=Entity.objects.all(),
     )
+
+    support = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Item

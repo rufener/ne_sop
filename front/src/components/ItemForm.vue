@@ -111,7 +111,7 @@
                                 ['bold', 'italic', 'strike', 'underline', 'subscript', 'superscript'],
                                 ['token', 'hr', 'link', 'custom_btn'],
                                 ['unordered', 'ordered'],
-                            ]" :disable="!edit" @input="checkEditorLength" @paste="handlePaste"/>
+                            ]" :disable="!edit" @input="checkEditorLength" @paste="handlePaste" />
                             <div class="float-right">{{ descriptionText.length }} / 600</div>
 
                         </div>
@@ -130,10 +130,14 @@
                         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
                             <q-select bg-color="white" outlined v-model="item.lead" :options="serviceOptions" option-label="name" option-value="id" emit-value map-options label="Service principal" clearable :rules="[v => checkFilled(v)]" :disable="!edit || !store.user.is_manager">
                                 <template v-slot:option="scope">
-                                    <q-item v-bind="scope.itemProps">
+                                    <q-item v-bind="scope.itemProps" :disable="!scope.opt.has_access">
+                                        <q-item-section avatar>
+                                            <q-icon :color="scope.opt.has_access ? 'green' : 'red'" :name="scope.opt.has_access ? 'lock_open' : 'lock'" />
+                                        </q-item-section>
                                         <q-item-section>
                                             <q-item-label>{{ scope.opt.name }}</q-item-label>
                                         </q-item-section>
+                                        <q-tooltip class="bg-black" v-if="!scope.opt.has_access">Vous n'avez pas accès à ce service</q-tooltip>
                                     </q-item>
                                 </template>
                             </q-select>
@@ -143,7 +147,7 @@
                         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
                             <q-select bg-color="white" outlined v-model="item.support" :options="serviceOptions" option-label="name" option-value="id" emit-value map-options label="Service(s) en appui" multiple clearable @clear="reset()" :disable="!edit || !store.user.is_manager">
                                 <template v-slot:option="scope">
-                                    <q-item v-bind="scope.itemProps">
+                                    <q-item v-bind="scope.itemProps" :disable="!scope.opt.has_access">
                                         <q-item-section side>
                                             <q-checkbox :model-value="scope.selected" @update:model-value="scope.toggleOption(scope.opt)" />
                                         </q-item-section>
@@ -340,8 +344,11 @@ export default {
     },
     async created() {
 
-        this.serviceOptions = (await store.getEntities({ search: "", type: [], service: "true" }, 1, 100, "name", "false")).results
+        // this.serviceOptions = (await store.getEntities({ search: "", type: [], service: "true" }, 1, 100, "name", "false")).results
+        this.serviceOptions = (await store.getServices({ search: "" }, 1, 100, "has_access", "false")).results
+
         this.authorOptions = (await store.getEntities({ search: "", type: [], service: "false" }, 1, 200, "name", "false")).results
+        
         this.itemStatus = await store.getItemStatus()
         this.itemTypes = await store.getItemTypes()
 

@@ -16,7 +16,7 @@
                             color="green"
                             :label="entity.active ? 'Actif' : 'Inactif'"
                         >
-                            <q-tooltip class="bg-black">Activer/désactiver le parlementaire dans la liste des options </q-tooltip>
+                            <q-tooltip class="bg-black">Activer/désactiver le parlementaire dans la liste des options disponibles</q-tooltip>
                         </q-toggle>
                     </div>
 
