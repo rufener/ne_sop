@@ -111,7 +111,7 @@
                                 ['bold', 'italic', 'strike', 'underline', 'subscript', 'superscript'],
                                 ['token', 'hr', 'link', 'custom_btn'],
                                 ['unordered', 'ordered'],
-                            ]" :disable="!edit" @input="checkEditorLength" @paste="handlePaste"/>
+                            ]" :disable="!edit" @input="checkEditorLength" @paste="handlePaste" />
                             <div class="float-right">{{ descriptionText.length }} / 600</div>
 
                         </div>
@@ -180,19 +180,6 @@
 
                     <div class="row q-py-md">
 
-                        <!-- URGENT CHECKBOX FIELD -->
-                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-                            <q-item tag="label" v-ripple :disable="!edit || !store.user.is_manager">
-                                <q-item-section avatar>
-                                    <q-checkbox v-model="item.urgent" val="true" color="blue" :disable="!edit || !store.user.is_manager" />
-                                </q-item-section>
-                                <q-item-section>
-                                    <q-item-label>Urgent</q-item-label>
-                                    <q-item-label caption>Demande nécessite un traitement prioritaire</q-item-label>
-                                </q-item-section>
-                            </q-item>
-                        </div>
-
                         <!-- WRITTEN RESPONSE CHECKBOX FIELD -->
                         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
                             <q-item tag="label" v-ripple :disable="!edit || !store.user.is_manager">
@@ -219,16 +206,44 @@
                             </q-item>
                         </div>
 
+                        <!-- STRATEGIC CHECKBOX FIELD -->
+                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                            <q-item tag="label" v-ripple :disable="!edit || !store.user.is_manager">
+                                <q-item-section avatar>
+                                    <q-checkbox v-model="item.strategic" val="true" color="blue" :disable="!edit || !store.user.is_manager" />
+                                </q-item-section>
+                                <q-item-section>
+                                    <q-item-label>Objet stratégique</q-item-label>
+                                    <q-item-label caption>Demande présente un intérêt stratégique</q-item-label>
+                                </q-item-section>
+                            </q-item>
+                        </div>
+
+                        <!-- URGENT CHECKBOX FIELD -->
+                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                            <q-item tag="label" v-ripple :disable="!edit || !store.user.is_manager">
+                                <q-item-section avatar>
+                                    <q-checkbox v-model="item.urgent" val="true" color="blue" :disable="!edit || !store.user.is_manager" />
+                                </q-item-section>
+                                <q-item-section>
+                                    <q-item-label>Urgent</q-item-label>
+                                    <q-item-label caption>Demande nécessite un traitement prioritaire</q-item-label>
+                                </q-item-section>
+                            </q-item>
+                        </div>
+
                         <!-- AUTOMATIC NOTIFICATIONS CHECKBOX FIELD -->
-                        <q-item tag="label" v-ripple :disable="!edit || !store.user.is_manager">
-                            <q-item-section avatar>
-                                <q-checkbox v-model="item.autonotify" val="true" color="blue" :disable="!edit || !store.user.is_manager" />
-                            </q-item-section>
-                            <q-item-section>
-                                <q-item-label>Notification automatique</q-item-label>
-                                <q-item-label caption>Notifier le(s) service(s) à chaque changement</q-item-label>
-                            </q-item-section>
-                        </q-item>
+                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                            <q-item tag="label" v-ripple :disable="!edit || !store.user.is_manager">
+                                <q-item-section avatar>
+                                    <q-checkbox v-model="item.autonotify" val="true" color="blue" :disable="!edit || !store.user.is_manager" />
+                                </q-item-section>
+                                <q-item-section>
+                                    <q-item-label>Notification automatique</q-item-label>
+                                    <q-item-label caption>Notifier le(s) service(s) à chaque changement</q-item-label>
+                                </q-item-section>
+                            </q-item>
+                        </div>
 
 
                     </div>
@@ -307,6 +322,7 @@ export default {
             serviceOptions: [],
             events: [],
             documents: [],
+            isPasting: false,
         }
     },
     computed: {
@@ -402,11 +418,19 @@ export default {
             // console.log(`Truncated text length: ${doc.body.textContent.length}`);
         },
         handlePaste(event) {
+            if (this.isPasting) return; // évite le second appel
+            this.isPasting = true;
+
             event.preventDefault();
             // Get plain text from the clipboard
             const text = event.clipboardData.getData('text/plain');
             // Insert the plain text at the current cursor position
-            document.execCommand('insertText', false, text);
+            document.execCommand('insertText', false, " " + text);
+
+            // Laisser un petit délai pour réinitialiser
+            setTimeout(() => {
+                this.isPasting = false;
+            }, 0);
         },
         reset() {
             this.item.support = []
