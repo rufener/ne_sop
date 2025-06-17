@@ -699,8 +699,8 @@ class ItemViewSet(viewsets.ViewSet):
             ws.cell(row_id, 7).value = op.status.name or None
             parser = MyHTMLParser()
             parser.feed(op.description)
-            ws.cell(row_id, 8).value = parser.get_text() or None
-            # ws.cell(row_id, 8).value = op.description or None
+            remarks = parser.get_text() or None
+            ws.cell(row_id, 8).value = remarks
             ws.cell(row_id, 9).value = op.strategic or None
             ws.cell(row_id, 10).value = op.urgent or None
             ws.cell(row_id, 11).value = op.writtenresponse or None
@@ -714,12 +714,9 @@ class ItemViewSet(viewsets.ViewSet):
             ws.cell(row_id, 19).value = sep.join([sup.name for sup in op.support.all()])
             ws.cell(row_id, 20).value = sep.join([(f"{' '.join(filter(None, [datetime.date.strftime(tmp.date, '%d.%m.%Y'), datetime.time.strftime(tmp.time, '%H:%M') if tmp.time else None]))} - {tmp.type.name}") for tmp in op.events.all()])
             ws.cell(row_id, 21).value = sep.join([tmp.filename for tmp in op.documents.all()])
-            ws.cell(row_id, 19).alignment = Alignment(wrap_text=True)
-            ws.cell(row_id, 20).alignment = Alignment(wrap_text=True)
-            ws.cell(row_id, 21).alignment = Alignment(wrap_text=True)
 
-            # adjust row height
-            ws.row_dimensions[row_id].height = (max([len(op.support.all()), len(op.events.all()), len(op.events.all())]) - 1) * 15 + 15
+            for i in range(1, 22):
+                ws.cell(row_id, i).alignment = Alignment(wrap_text=True)
 
         # adjust column width
         ws = Utils.auto_adjust_excel_column_width(ws)
