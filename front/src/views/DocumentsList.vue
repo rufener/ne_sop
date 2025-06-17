@@ -51,10 +51,15 @@
                         }">
 
                             <!-- icon="sym_o_loupe" -->
-                            <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none">
-                                <div class="ellipsis"><b>{{ props.row.title }}</b> / {{ props.row.reference }}</div>
+                            <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none" style="height: fit-content;">
+                                <div style="overflow-wrap: break-word; white-space: normal; max-width: inherit;"><b>{{ props.row.title }}</b></div>
                             </q-chip>
                         </router-link>
+                    </q-td>
+
+                    <!-- REFERENCE COLUMN -->
+                    <q-td key="type" :props="props" style="max-width: 200px">
+                        <div class="ellipsis">{{ props.row.reference }}</div>
                     </q-td>
 
                     <!-- TYPE COLUMN -->
@@ -169,8 +174,15 @@ export default {
                 {
                     name: "title",
                     align: "left",
-                    label: "Titre / Réf.",
+                    label: "Titre",
                     field: "title",
+                    sortable: true,
+                },
+                {
+                    name: "reference",
+                    align: "left",
+                    label: "Référence",
+                    field: "reference",
                     sortable: true,
                 },
                 {
