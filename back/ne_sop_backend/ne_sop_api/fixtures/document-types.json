@@ -96,5 +96,19 @@
     "fields": {
       "name": "Rapport"
     }
+  },
+  {
+    "model": "ne_sop_api.DocumentType",
+    "pk": "15",
+    "fields": {
+      "name": "Fiche CE"
+    }
+  },
+  {
+    "model": "ne_sop_api.DocumentType",
+    "pk": "16",
+    "fields": {
+      "name": "Brève"
+    }
   }
 ]
