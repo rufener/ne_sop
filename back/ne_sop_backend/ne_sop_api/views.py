@@ -671,18 +671,19 @@ class ItemViewSet(viewsets.ViewSet):
         ws.cell(row_id, 6).value = "Type"
         ws.cell(row_id, 7).value = "Statut"
         ws.cell(row_id, 8).value = "Remarques"
-        ws.cell(row_id, 9).value = "Urgent"
-        ws.cell(row_id, 10).value = "Réponse écrite"
-        ws.cell(row_id, 11).value = "Réponse orale"
-        ws.cell(row_id, 12).value = "Date de dépôt"
-        ws.cell(row_id, 13).value = "Date de retour au SG"
-        ws.cell(row_id, 14).value = "Notifications auto"
-        ws.cell(row_id, 15).value = "Valide"
-        ws.cell(row_id, 16).value = "Retard"
-        ws.cell(row_id, 17).value = "Service principal"
-        ws.cell(row_id, 18).value = "Service(s) en appui"
-        ws.cell(row_id, 19).value = "Événements"
-        ws.cell(row_id, 20).value = "Documents"
+        ws.cell(row_id, 9).value = "Stratégique"
+        ws.cell(row_id, 10).value = "Urgent"
+        ws.cell(row_id, 11).value = "Réponse écrite"
+        ws.cell(row_id, 12).value = "Réponse orale"
+        ws.cell(row_id, 13).value = "Date de dépôt"
+        ws.cell(row_id, 14).value = "Date de retour au SG"
+        ws.cell(row_id, 15).value = "Notifications auto"
+        ws.cell(row_id, 16).value = "Valide"
+        ws.cell(row_id, 17).value = "Retard"
+        ws.cell(row_id, 18).value = "Service principal"
+        ws.cell(row_id, 19).value = "Service(s) en appui"
+        ws.cell(row_id, 20).value = "Événements"
+        ws.cell(row_id, 21).value = "Documents"
 
         sep = "\n"
         for op in queryset:
@@ -700,21 +701,22 @@ class ItemViewSet(viewsets.ViewSet):
             parser.feed(op.description)
             ws.cell(row_id, 8).value = parser.get_text() or None
             # ws.cell(row_id, 8).value = op.description or None
-            ws.cell(row_id, 9).value = op.urgent or None
-            ws.cell(row_id, 10).value = op.writtenresponse or None
-            ws.cell(row_id, 11).value = op.oralresponse or None
-            ws.cell(row_id, 12).value = datetime.datetime.strftime(op.startdate, "%d.%m.%Y") if op.startdate is not None else None
-            ws.cell(row_id, 13).value = datetime.datetime.strftime(op.enddate, "%d.%m.%Y") if op.enddate is not None else None
-            ws.cell(row_id, 14).value = op.autonotify or None
-            ws.cell(row_id, 15).value = op.valid or None
-            ws.cell(row_id, 16).value = op.late or None
-            ws.cell(row_id, 17).value = op.lead.name or None
-            ws.cell(row_id, 18).value = sep.join([sup.name for sup in op.support.all()])
-            ws.cell(row_id, 19).value = sep.join([tmp.type.name for tmp in op.events.all()])
-            ws.cell(row_id, 20).value = sep.join([tmp.filename for tmp in op.documents.all()])
-            ws.cell(row_id, 18).alignment = Alignment(wrap_text=True)
+            ws.cell(row_id, 9).value = op.strategic or None
+            ws.cell(row_id, 10).value = op.urgent or None
+            ws.cell(row_id, 11).value = op.writtenresponse or None
+            ws.cell(row_id, 12).value = op.oralresponse or None
+            ws.cell(row_id, 13).value = datetime.datetime.strftime(op.startdate, "%d.%m.%Y") if op.startdate is not None else None
+            ws.cell(row_id, 14).value = datetime.datetime.strftime(op.enddate, "%d.%m.%Y") if op.enddate is not None else None
+            ws.cell(row_id, 15).value = op.autonotify or None
+            ws.cell(row_id, 16).value = op.valid or None
+            ws.cell(row_id, 17).value = op.late or None
+            ws.cell(row_id, 18).value = op.lead.name or None
+            ws.cell(row_id, 19).value = sep.join([sup.name for sup in op.support.all()])
+            ws.cell(row_id, 20).value = sep.join([tmp.type.name for tmp in op.events.all()])
+            ws.cell(row_id, 21).value = sep.join([tmp.filename for tmp in op.documents.all()])
             ws.cell(row_id, 19).alignment = Alignment(wrap_text=True)
             ws.cell(row_id, 20).alignment = Alignment(wrap_text=True)
+            ws.cell(row_id, 21).alignment = Alignment(wrap_text=True)
 
             # adjust row height
             ws.row_dimensions[row_id].height = (max([len(op.support.all()), len(op.events.all()), len(op.events.all())]) - 1) * 15 + 15

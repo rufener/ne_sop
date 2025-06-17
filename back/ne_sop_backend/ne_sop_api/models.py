@@ -98,6 +98,7 @@ class Item(models.Model):
     autonotify = models.BooleanField(default=False)
     valid = models.BooleanField(default=True)
     late = models.BooleanField(default=False)
+    strategic = models.BooleanField(default=False)
 
     lead = models.ForeignKey(
         "Entity",
