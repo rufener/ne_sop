@@ -247,7 +247,7 @@ export default {
         // initialize filters
         this.filter.type = (await store.getItemTypes()).map(x => x.id)
         this.filter.status = (await store.getItemStatus()).map(x => x.id)
-        this.filter.service = (await store.getEntities({ search: "", type: [], service: "true" }, 1, 20, "name", "false")).results.map(x => x.id)
+        this.filter.service = (await store.getEntities({ search: "", type: [], service: "true" }, 1, 1000, "name", "false")).results.map(x => x.id)
 
         this.enableWatch = true;
 

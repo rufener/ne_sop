@@ -181,6 +181,7 @@ class ItemListSerializer(serializers.ModelSerializer):
             "startdate",
             "enddate",
             "valid",
+            "strategic",
         ]
 
 
@@ -223,6 +224,7 @@ class ItemSerializer(serializers.ModelSerializer):
             "events",
             "autonotify",
             "valid",
+            "strategic",
         ]
 
 
@@ -271,6 +273,7 @@ class NestedItemSerializer(serializers.ModelSerializer):
             "lead",
             "support",
             "valid",
+            "strategic",
         ]
 
 
@@ -572,6 +575,7 @@ class NewItemSerializer(serializers.ModelSerializer):
             "documents",
             "users",
             "valid",
+            "strategic",
         ]
 
     def create(self, validated_data):
@@ -610,6 +614,7 @@ class NewItemSerializer(serializers.ModelSerializer):
         instance.support.set(support)
         instance.autonotify = validated_data.get("autonotify", instance.autonotify)
         instance.valid = validated_data.get("valid", instance.valid)
+        instance.strategic = validated_data.get("strategic", instance.strategic)
 
         # for key, value in validated_data.items():
         #    setattr(instance, key, value)

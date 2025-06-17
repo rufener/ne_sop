@@ -98,6 +98,7 @@ class Item(models.Model):
     autonotify = models.BooleanField(default=False)
     valid = models.BooleanField(default=True)
     late = models.BooleanField(default=False)
+    strategic = models.BooleanField(default=False)
 
     lead = models.ForeignKey(
         "Entity",
@@ -173,7 +174,7 @@ class Event(models.Model):
     valid = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ["created"]
+        ordering = ["date", "time"]
 
     def __str__(self):
         return str(self.date) + " - " + str(self.type)

@@ -65,6 +65,7 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Alignment, Font
 from io import BytesIO
+from collections import OrderedDict
 
 
 # %% TEST BACKEND
@@ -671,18 +672,19 @@ class ItemViewSet(viewsets.ViewSet):
         ws.cell(row_id, 6).value = "Type"
         ws.cell(row_id, 7).value = "Statut"
         ws.cell(row_id, 8).value = "Remarques"
-        ws.cell(row_id, 9).value = "Urgent"
-        ws.cell(row_id, 10).value = "Réponse écrite"
-        ws.cell(row_id, 11).value = "Réponse orale"
-        ws.cell(row_id, 12).value = "Date de dépôt"
-        ws.cell(row_id, 13).value = "Date de retour au SG"
-        ws.cell(row_id, 14).value = "Notifications auto"
-        ws.cell(row_id, 15).value = "Valide"
-        ws.cell(row_id, 16).value = "Retard"
-        ws.cell(row_id, 17).value = "Service principal"
-        ws.cell(row_id, 18).value = "Service(s) en appui"
-        ws.cell(row_id, 19).value = "Événements"
-        ws.cell(row_id, 20).value = "Documents"
+        ws.cell(row_id, 9).value = "Stratégique"
+        ws.cell(row_id, 10).value = "Urgent"
+        ws.cell(row_id, 11).value = "Réponse écrite"
+        ws.cell(row_id, 12).value = "Réponse orale"
+        ws.cell(row_id, 13).value = "Date de dépôt"
+        ws.cell(row_id, 14).value = "Date de retour au SG"
+        ws.cell(row_id, 15).value = "Notifications auto"
+        ws.cell(row_id, 16).value = "Valide"
+        ws.cell(row_id, 17).value = "Retard"
+        ws.cell(row_id, 18).value = "Service principal"
+        ws.cell(row_id, 19).value = "Service(s) en appui"
+        ws.cell(row_id, 20).value = "Événements"
+        ws.cell(row_id, 21).value = "Documents"
 
         sep = "\n"
         for op in queryset:
@@ -698,32 +700,30 @@ class ItemViewSet(viewsets.ViewSet):
             ws.cell(row_id, 7).value = op.status.name or None
             parser = MyHTMLParser()
             parser.feed(op.description)
-            ws.cell(row_id, 8).value = parser.get_text() or None
-            # ws.cell(row_id, 8).value = op.description or None
-            ws.cell(row_id, 9).value = op.urgent or None
-            ws.cell(row_id, 10).value = op.writtenresponse or None
-            ws.cell(row_id, 11).value = op.oralresponse or None
-            ws.cell(row_id, 12).value = datetime.datetime.strftime(op.startdate, "%d.%m.%Y") if op.startdate is not None else None
-            ws.cell(row_id, 13).value = datetime.datetime.strftime(op.enddate, "%d.%m.%Y") if op.enddate is not None else None
-            ws.cell(row_id, 14).value = op.autonotify or None
-            ws.cell(row_id, 15).value = op.valid or None
-            ws.cell(row_id, 16).value = op.late or None
-            ws.cell(row_id, 17).value = op.lead.name or None
-            ws.cell(row_id, 18).value = sep.join([sup.name for sup in op.support.all()])
-            ws.cell(row_id, 19).value = sep.join([tmp.type.name for tmp in op.events.all()])
-            ws.cell(row_id, 20).value = sep.join([tmp.filename for tmp in op.documents.all()])
-            ws.cell(row_id, 18).alignment = Alignment(wrap_text=True)
-            ws.cell(row_id, 19).alignment = Alignment(wrap_text=True)
-            ws.cell(row_id, 20).alignment = Alignment(wrap_text=True)
+            remarks = parser.get_text() or None
+            ws.cell(row_id, 8).value = remarks
+            ws.cell(row_id, 9).value = op.strategic or None
+            ws.cell(row_id, 10).value = op.urgent or None
+            ws.cell(row_id, 11).value = op.writtenresponse or None
+            ws.cell(row_id, 12).value = op.oralresponse or None
+            ws.cell(row_id, 13).value = datetime.datetime.strftime(op.startdate, "%d.%m.%Y") if op.startdate is not None else None
+            ws.cell(row_id, 14).value = datetime.datetime.strftime(op.enddate, "%d.%m.%Y") if op.enddate is not None else None
+            ws.cell(row_id, 15).value = op.autonotify or None
+            ws.cell(row_id, 16).value = op.valid or None
+            ws.cell(row_id, 17).value = op.late or None
+            ws.cell(row_id, 18).value = op.lead.name or None
+            ws.cell(row_id, 19).value = sep.join([sup.name for sup in op.support.all()])
+            ws.cell(row_id, 20).value = sep.join([(f"{' '.join(filter(None, [datetime.date.strftime(tmp.date, '%d.%m.%Y'), datetime.time.strftime(tmp.time, '%H:%M') if tmp.time else None]))} - {tmp.type.name}") for tmp in op.events.all()])
+            ws.cell(row_id, 21).value = sep.join([tmp.filename for tmp in op.documents.all()])
 
-            # adjust row height
-            ws.row_dimensions[row_id].height = (max([len(op.support.all()), len(op.events.all()), len(op.events.all())]) - 1) * 15 + 15
+            for i in range(1, 22):
+                ws.cell(row_id, i).alignment = Alignment(wrap_text=True)
 
         # adjust column width
         ws = Utils.auto_adjust_excel_column_width(ws)
 
         # create table in worksheet
-        table = Table(displayName="Table1", ref="A4:" + get_column_letter(20) + str(row_id))
+        table = Table(displayName="Table1", ref="A4:" + get_column_letter(21) + str(row_id))
         style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False, showLastColumn=False, showRowStripes=True, showColumnStripes=False)
         table.tableStyleInfo = style
         ws.add_table(table)
@@ -1145,29 +1145,37 @@ class ItemTypeStatisticsDepositedViewSet(viewsets.ViewSet):
         tags=["Statistics"],
     )
     def list(self, request):
-        queryset = ItemType.objects.annotate(year=TruncYear("item__startdate")).annotate(num_items=Count("item"))
+        user = request.user
+        user_entities = user.entities.all()
 
-        # get unique set of years
-        years = list(set(int(x.year.year) if x.year is not None else None for x in queryset))
-        years.remove(None)
-        years.sort(reverse=True)
+        # Tous les ItemTypes, même ceux sans Item
+        all_itemtypes = ItemType.objects.all()
+        itemtype_names = sorted([it.name for it in all_itemtypes])
 
-        # get unique set of itemtypes
-        itemtypes = list(set(x.name for x in queryset))
-        itemtypes.sort()
+        # Stats : nombre d'Items par type et année, pour les entités accessibles
+        queryset = Item.objects.filter(lead__in=user_entities).annotate(year=TruncYear("startdate")).values("type__name", "year").annotate(num_items=Count("id")).order_by("year", "type__name")
 
-        # prepare result object
-        result = []
+        # Années présentes dans les données
+        years = sorted({entry["year"].year for entry in queryset if entry["year"] is not None}, reverse=True)
+
+        # Construction du tableau final
+        data_map = {}
         for year in years:
-            tmp = {"year": year}
-            for itemtype in itemtypes:
-                for qs in queryset:
-                    if qs.year is not None and qs.year.year == year and qs.name == itemtype:
-                        tmp[itemtype] = qs.num_items
-                        break
-                    else:
-                        tmp[itemtype] = 0
-            result.append(tmp)
+            od = OrderedDict()
+            od["year"] = year
+            for it_name in itemtype_names:
+                od[it_name] = 0  # Valeur par défaut
+            data_map[year] = od
+
+        for entry in queryset:
+            year = entry["year"].year if entry["year"] else None
+            item_type = entry["type__name"]
+            count = entry["num_items"]
+
+            if year in data_map:
+                data_map[year][item_type] = count
+
+        result = list(data_map.values())
 
         return Response(result)
 
@@ -1186,29 +1194,37 @@ class ItemTypeStatisticsTreatedViewSet(viewsets.ViewSet):
         tags=["Statistics"],
     )
     def list(self, request):
-        queryset = ItemType.objects.annotate(year=TruncYear("item__enddate")).annotate(num_items=Count("item"))
+        user = request.user
+        user_entities = user.entities.all()
 
-        # get unique set of years
-        years = list(set(int(x.year.year) if x.year is not None else None for x in queryset))
-        years.remove(None)
-        years.sort(reverse=True)
+        # Tous les ItemTypes, même ceux sans Item
+        all_itemtypes = ItemType.objects.all()
+        itemtype_names = sorted([it.name for it in all_itemtypes])
 
-        # get unique set of itemtypes
-        itemtypes = list(set(x.name for x in queryset))
-        itemtypes.sort()
+        # Stats : nombre d'Items par type et année, pour les entités accessibles
+        queryset = Item.objects.filter(lead__in=user_entities).annotate(year=TruncYear("enddate")).values("type__name", "year").annotate(num_items=Count("id")).order_by("year", "type__name")
 
-        # prepare result object
-        result = []
+        # Années présentes dans les données
+        years = sorted({entry["year"].year for entry in queryset if entry["year"] is not None}, reverse=True)
+
+        # Construction du tableau final
+        data_map = {}
         for year in years:
-            tmp = {"year": year}
-            for itemtype in itemtypes:
-                for qs in queryset:
-                    if qs.year is not None and qs.year.year == year and qs.name == itemtype:
-                        tmp[itemtype] = qs.num_items
-                        break
-                    else:
-                        tmp[itemtype] = 0
-            result.append(tmp)
+            od = OrderedDict()
+            od["year"] = year
+            for it_name in itemtype_names:
+                od[it_name] = 0  # Valeur par défaut
+            data_map[year] = od
+
+        for entry in queryset:
+            year = entry["year"].year if entry["year"] else None
+            item_type = entry["type__name"]
+            count = entry["num_items"]
+
+            if year in data_map:
+                data_map[year][item_type] = count
+
+        result = list(data_map.values())
 
         return Response(result)
 
@@ -1227,7 +1243,10 @@ class ServiceStatisticsViewSet(viewsets.ViewSet):
         tags=["Statistics"],
     )
     def list(self, request):
-        queryset = Entity.objects.filter(type__service=True).prefetch_related("item__lead").annotate(year=TruncYear("item__startdate"))
+        user = request.user
+        user_entities = user.entities.all()
+
+        queryset = Entity.objects.filter(type__service=True).filter(item__lead__in=user_entities).prefetch_related("item__lead").annotate(year=TruncYear("item__startdate"))
 
         # get unique set of years
         years = list(set(int(x.year.year) if x.year is not None else None for x in queryset))
@@ -1265,15 +1284,18 @@ class StatutStatisticsViewSet(viewsets.ViewSet):
         tags=["Statistics"],
     )
     def list(self, request):
-        queryset = ItemStatus.objects.annotate(year=TruncYear("item__startdate")).annotate(num_items=Count("item"))
+        user = request.user
+        user_entities = user.entities.all()
+
+        queryset = Item.objects.filter(lead__in=user_entities).annotate(year=TruncYear("startdate")).values("status__name", "year").annotate(num_items=Count("id")).order_by("year", "status__name")
 
         # get unique set of years
-        years = list(set(int(x.year.year) if x.year is not None else None for x in queryset))
+        years = list(set(int(x["year"].year) if x["year"] is not None else None for x in queryset))
         years.remove(None)
         years.sort(reverse=True)
 
         # get unique set of statuts
-        statuts = list(set(x.name for x in queryset))
+        statuts = list(set(x["status__name"] for x in queryset))
         statuts.sort()
 
         # prepare result object
@@ -1282,8 +1304,8 @@ class StatutStatisticsViewSet(viewsets.ViewSet):
             tmp = {"year": year}
             for statut in statuts:
                 for qs in queryset:
-                    if qs.year is not None and qs.year.year == year and qs.name == statut:
-                        tmp[statut] = qs.num_items
+                    if qs["year"] is not None and qs["year"].year == year and qs["status__name"] == statut:
+                        tmp[statut] = qs["num_items"]
                         break
                     else:
                         tmp[statut] = 0
@@ -1306,7 +1328,10 @@ class UrgentWrittenStatisticsViewSet(viewsets.ViewSet):
         tags=["Statistics"],
     )
     def list(self, request):
-        queryset = Item.objects.annotate(year=TruncYear("startdate"))
+        user = request.user
+        user_entities = user.entities.all()
+
+        queryset = Item.objects.filter(lead__in=user_entities).annotate(year=TruncYear("startdate"))
         # queryset_urgent = Item.objects.filter(urgent=True).annotate(year=TruncYear("startdate"))
         # queryset_writtenresponse = Item.objects.filter(writtenresponse=True).annotate(year=TruncYear("startdate"))
 
