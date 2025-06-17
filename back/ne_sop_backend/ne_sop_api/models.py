@@ -174,7 +174,7 @@ class Event(models.Model):
     valid = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ["created"]
+        ordering = ["date", "time"]
 
     def __str__(self):
         return str(self.date) + " - " + str(self.type)

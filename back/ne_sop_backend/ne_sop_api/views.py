@@ -712,7 +712,7 @@ class ItemViewSet(viewsets.ViewSet):
             ws.cell(row_id, 17).value = op.late or None
             ws.cell(row_id, 18).value = op.lead.name or None
             ws.cell(row_id, 19).value = sep.join([sup.name for sup in op.support.all()])
-            ws.cell(row_id, 20).value = sep.join([tmp.type.name for tmp in op.events.all()])
+            ws.cell(row_id, 20).value = sep.join([(f"{' '.join(filter(None, [datetime.date.strftime(tmp.date, '%d.%m.%Y'), datetime.time.strftime(tmp.time, '%H:%M') if tmp.time else None]))} - {tmp.type.name}") for tmp in op.events.all()])
             ws.cell(row_id, 21).value = sep.join([tmp.filename for tmp in op.documents.all()])
             ws.cell(row_id, 19).alignment = Alignment(wrap_text=True)
             ws.cell(row_id, 20).alignment = Alignment(wrap_text=True)
@@ -725,7 +725,7 @@ class ItemViewSet(viewsets.ViewSet):
         ws = Utils.auto_adjust_excel_column_width(ws)
 
         # create table in worksheet
-        table = Table(displayName="Table1", ref="A4:" + get_column_letter(20) + str(row_id))
+        table = Table(displayName="Table1", ref="A4:" + get_column_letter(21) + str(row_id))
         style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False, showLastColumn=False, showRowStripes=True, showColumnStripes=False)
         table.tableStyleInfo = style
         ws.add_table(table)
