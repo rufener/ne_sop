@@ -544,6 +544,7 @@ class ItemViewSet(viewsets.ViewSet):
             "status",
             "urgent",
             "startdate",
+            "nextdate",
             "enddate",
         ]:
             sortby = "id"
