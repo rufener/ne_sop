@@ -55,6 +55,19 @@ export const checkFile = (val) => {
   }
 };
 
+export const checkHref = (val) => {
+  if (val) {
+    try {
+      new URL(val);
+      return true;
+    } catch (err) {
+      return "Le lien ne semble pas valide";
+    }
+  } else {
+    return "Champ obligatoire";
+  }
+};
+
 export const checkFilename = (val) => {
   // console.log(val);
   if (val) {

@@ -4,7 +4,7 @@ from pathlib import Path, PurePath
 
 from django.contrib.auth.models import User, Group
 from django.db import models
-
+from django.core.exceptions import ValidationError
 # from django.utils import timezone
 import datetime
 from ne_sop_api.utils import Utils
@@ -269,15 +269,16 @@ class Document(models.Model):
     modified = models.DateTimeField(auto_now=True)
     # template = models.ForeignKey(Template, null=True, on_delete=models.SET_NULL)
     note = models.CharField(max_length=500, blank=True, default="")
-    filename = models.CharField(default=None, max_length=200)
+    filename = models.CharField(default=None, max_length=200, blank=True, null=True)
     version = models.PositiveIntegerField(default=None)
-    size = models.PositiveIntegerField(default=0, null=False)
+    size = models.PositiveIntegerField(default=0, null=True)
     # item = models.ForeignKey(Item, related_name="documents", on_delete=models.CASCADE)
 
     items = models.ManyToManyField(Item, blank=True, related_name="documents")
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
-    file = models.FileField(upload_to=Utils.get_upload_path)
-    filehash = models.CharField(max_length=64, blank=True)
+    file = models.FileField(upload_to=Utils.get_upload_path, blank=True, null=True, default=None)
+    filehash = models.CharField(max_length=64, blank=True, null=True)
+    external_url = models.URLField(blank=True, null=True)
 
     class Meta:
         ordering = ["created"]
@@ -289,7 +290,17 @@ class Document(models.Model):
     def __str__(self):
         return self.file.name
 
+    def clean(self):
+        # Make sure that at least one of them is not empty
+        if not self.file and not self.external_url:
+            raise ValidationError("Un document doit avoir soit un fichier soit une URL externe.")
+        # Make sure that only one is not empty
+        if self.file and self.external_url:
+            raise ValidationError("Un document ne peut être enregistré que sous la forme d'un fichier OU d'une URL externe.")
+
     def save(self, *args, **kwargs):
+        self.full_clean()
+
         # Only calculate the hash if it hasn't been set
         if self.file:
             hasher = hashlib.sha256()
