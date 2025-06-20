@@ -114,10 +114,22 @@
                         {{ props.row.startdate }}
                     </q-td>
 
+                    <!-- NEXT DATE (DELAY) DATE COLUMN -->
+                    <q-td key="nextdate" :props="props">
+                        <div v-if="props.row.nextdate">
+
+                            <!-- <div><b>{{ props.row.nextdate }}</b></div> -->
+                            <div><b>{{ props.row.nextdate.date }}</b></div>
+                            <div>{{ props.row.nextdate.type }}</div>
+                        </div>
+                    </q-td>
+
                     <!-- END DATE (DELAY) DATE COLUMN -->
+                    <!-- 
                     <q-td key="enddate" :props="props">
                         {{ props.row.enddate }}
                     </q-td>
+                    -->
 
                     <!-- ACTIONS COLUMN -->
                     <q-td key="actions" :props="props">
@@ -215,12 +227,21 @@ export default {
                     sortable: true,
                 },
                 {
+                    name: "nextdate",
+                    align: "left",
+                    label: "Prochain délai",
+                    field: "events",
+                    sortable: true,
+                },
+                /*
+                {
                     name: "enddate",
                     align: "left",
                     label: "Délai retour sec. gén.",
                     field: "events",
                     sortable: true,
                 },
+                */
                 {
                     name: "actions",
                     align: "center",

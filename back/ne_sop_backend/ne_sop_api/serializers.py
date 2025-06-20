@@ -2,6 +2,7 @@ from rest_framework import serializers
 from ne_sop_api.utils import Utils
 from django.conf import settings
 from django.contrib.auth.models import User
+from datetime import date
 
 from ne_sop_api.models import (
     Document,
@@ -160,6 +161,8 @@ class ItemListSerializer(serializers.ModelSerializer):
     lead = serializers.StringRelatedField()
     support = serializers.StringRelatedField(many=True)
 
+    nextdate = serializers.SerializerMethodField()  # TEST
+
     class Meta:
         model = Item
         fields = [
@@ -179,10 +182,20 @@ class ItemListSerializer(serializers.ModelSerializer):
             "support",
             "events",
             "startdate",
+            "nextdate",
             "enddate",
             "valid",
             "strategic",
         ]
+
+    def get_nextdate(self, obj):
+        # find the next event whose date is strictly in the future
+        today = date.today()
+        next_ev = obj.events.filter(date__gt=today).order_by("date").first()
+        if not next_ev:
+            return None
+        # serialize with your NewEventSerializer
+        return EventSummarySerializer(next_ev).data
 
 
 # %% ITEM
@@ -215,7 +228,6 @@ class ItemSerializer(serializers.ModelSerializer):
             "description",
             "urgent",
             "late",
-            # "islate",
             "writtenresponse",
             "oralresponse",
             "author",
@@ -305,6 +317,22 @@ class EventListSerializer(serializers.ModelSerializer):
             "time",
             "type",
             "item",
+            "description",
+            "valid",
+        ]
+
+
+# %% EVENT SUMMARY
+class EventSummarySerializer(serializers.ModelSerializer):
+    type = serializers.StringRelatedField()  # EventTypeSerializer(read_only=True)
+
+    class Meta:
+        model = Event
+        fields = [
+            "uuid",
+            "date",
+            "time",
+            "type",
             "description",
             "valid",
         ]

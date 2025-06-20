@@ -37,12 +37,10 @@ export const store = reactive({
       .replaceAll(/"author_id":\d+,/gi, "")
       .replaceAll(/"author":"[^"]+",/gi, "");
 
-
-      // console.log('oldDataString')
-      // console.log(oldDataString)
-      // console.log('newDataString')
-      // console.log(newDataString)
-
+    // console.log('oldDataString')
+    // console.log(oldDataString)
+    // console.log('newDataString')
+    // console.log(newDataString)
 
     if (oldDataString !== newDataString) {
       this.warning = true;
@@ -73,7 +71,6 @@ export const store = reactive({
   // HANDLE HTTP FETCH RESPONSE
   async handleResponse(response) {
     let payload = await response.json();
-
     // handle server errors
     if (response.ok) {
       return payload;
@@ -275,7 +272,7 @@ export const store = reactive({
     try {
       let query;
       if (summary) {
-        query = new URL(`${host}/api/item-summary/${uuid}`);   // ?????????? ID ou UUID ?
+        query = new URL(`${host}/api/item-summary/${uuid}`);
       } else {
         query = new URL(`${host}/api/item/${uuid}`);
       }
@@ -295,11 +292,9 @@ export const store = reactive({
   // UPDATE ITEM
   async updateItem(uuid, data) {
     try {
-
       // console.log("updateItem");
       // console.log("data.documents");
       // console.log(data.documents);
-
 
       let documents = data.documents;
 
@@ -464,7 +459,6 @@ export const store = reactive({
         body: JSON.stringify(data),
         redirect: "follow",
       });
-
       return await this.handleResponse(response);
     } catch (error) {
       // handle network and CORS errors (fetch promise rejected)
@@ -628,7 +622,6 @@ export const store = reactive({
 
   // ADD DOCUMENT
   async addDocument(formInput) {
-
     // console.log("addDocument");
     // console.log("formInput");
     // console.log(formInput);
