@@ -118,9 +118,16 @@
                     <!-- ACTIONS COLUMN -->
                     <q-td key="actions" :props="props">
                         <div class="float-right">
-                            <q-btn dense round flat color="grey" name="download" @click="" :href="`${store.host}/api/document/${props.row.uuid}/download/`" icon="sym_o_download">
-                                <q-tooltip class="bg-black">Télécharger {{ props.row.filename }}</q-tooltip>
-                            </q-btn>
+                            <template v-if="props.row.filename">
+                                <q-btn dense round flat color="grey" name="download" @click="" :href="`${store.host}/api/document/${props.row.uuid}/download/`" icon="sym_o_download">
+                                    <q-tooltip class="bg-black">Télécharger {{ props.row.filename }}</q-tooltip>
+                                </q-btn>
+                            </template>
+                            <template v-if="props.row.external_url">
+                                <q-btn dense round flat color="grey" name="download" @click="" :href="props.row.external_url" target="_blank" icon="sym_o_open_in_new">
+                                    <q-tooltip class="bg-black">Ouvrir dans un nouvel onglet {{ props.row.filename }}</q-tooltip>
+                                </q-btn>
+                            </template>
                             <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row.uuid)" icon="sym_o_delete">
                                 <q-tooltip class="bg-black">Supprimer</q-tooltip>
                             </q-btn>

@@ -428,6 +428,7 @@ class DocumentListSerializer(serializers.ModelSerializer):
             "author",
             "filename",
             "filehash",
+            "external_url",
         ]
 
 
