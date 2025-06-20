@@ -94,7 +94,6 @@
                         {{ props.row.type.name }}
                     </q-td>
 
-
                     <!-- STATUS COLUMN -->
                     <q-td key="status" :props="props">
 
@@ -296,24 +295,18 @@ export default {
 
         },
         handleDeletion(val) {
-
             this.selected = val
             this.dialog.deletion = true
-
         },
         handleFilter() {
-
             this.dialog.filter = true
-
         },
         async remove() {
-
             // console.log(`delete ${this.selected}`)
             let message = await store.deleteItem(this.selected.uuid)
             if (message) {
                 this.query()
             }
-
         },
         reset() {
             this.$refs.itemfilter.resetall()
