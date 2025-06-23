@@ -16,7 +16,6 @@ from ne_sop_api.models import (
     ItemStatus,
     Template,
     Group,
-    # User,
 )
 
 
@@ -483,7 +482,7 @@ class DocumentSerializer(serializers.ModelSerializer):
             "author",
             "author_id",
             "file",
-            "filehash",
+            "filehash"
         ]
         read_only_fields = ["created", "modified"]
 
