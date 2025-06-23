@@ -942,11 +942,12 @@ class DocumentViewSet(viewsets.ViewSet):
         tags=["Document"],
     )
     def list(self, request):
-        filter = filters.SearchFilter()
-        queryset = filter.filter_queryset(request, self.get_queryset(), self)
+        search_filter = filters.SearchFilter()
+        queryset = search_filter.filter_queryset(request, self.get_queryset(), self)
 
         # queryset = Event.objects.all()
         item = request.query_params.get("document", None)
+        document_type = request.query_params.get("type")
         page = int(request.query_params.get("page", "1"))
         size = int(request.query_params.get("size", "10"))
         sortby = request.query_params.get("sortby", "id")
@@ -957,6 +958,9 @@ class DocumentViewSet(viewsets.ViewSet):
 
         if descending not in ["true", "false"]:
             descending = "true"
+
+        if document_type:
+            queryset = queryset.filter(type__id__in=list(filter(None, document_type.split(",")))).distinct()
 
         if item and len(item) > 0:
             queryset = queryset.filter(items__id__in=item.split(","))
