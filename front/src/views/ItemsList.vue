@@ -94,7 +94,6 @@
                         {{ props.row.type.name }}
                     </q-td>
 
-
                     <!-- STATUS COLUMN -->
                     <q-td key="status" :props="props">
 
@@ -114,10 +113,22 @@
                         {{ props.row.startdate }}
                     </q-td>
 
+                    <!-- NEXT DATE (DELAY) DATE COLUMN -->
+                    <q-td key="nextdate" :props="props">
+                        <div v-if="props.row.nextdate">
+
+                            <!-- <div><b>{{ props.row.nextdate }}</b></div> -->
+                            <div><b>{{ props.row.nextdate.date }}</b></div>
+                            <div>{{ props.row.nextdate.type }}</div>
+                        </div>
+                    </q-td>
+
                     <!-- END DATE (DELAY) DATE COLUMN -->
+                    <!-- 
                     <q-td key="enddate" :props="props">
                         {{ props.row.enddate }}
                     </q-td>
+                    -->
 
                     <!-- ACTIONS COLUMN -->
                     <q-td key="actions" :props="props">
@@ -215,12 +226,21 @@ export default {
                     sortable: true,
                 },
                 {
+                    name: "nextdate",
+                    align: "left",
+                    label: "Prochain délai",
+                    field: "events",
+                    sortable: true,
+                },
+                /*
+                {
                     name: "enddate",
                     align: "left",
                     label: "Délai retour sec. gén.",
                     field: "events",
                     sortable: true,
                 },
+                */
                 {
                     name: "actions",
                     align: "center",
@@ -247,7 +267,7 @@ export default {
         // initialize filters
         this.filter.type = (await store.getItemTypes()).map(x => x.id)
         this.filter.status = (await store.getItemStatus()).map(x => x.id)
-        this.filter.service = (await store.getEntities({ search: "", type: [], service: "true" }, 1, 20, "name", "false")).results.map(x => x.id)
+        this.filter.service = (await store.getEntities({ search: "", type: [], service: "true" }, 1, 1000, "name", "false")).results.map(x => x.id)
 
         this.enableWatch = true;
 
@@ -275,24 +295,18 @@ export default {
 
         },
         handleDeletion(val) {
-
             this.selected = val
             this.dialog.deletion = true
-
         },
         handleFilter() {
-
             this.dialog.filter = true
-
         },
         async remove() {
-
             // console.log(`delete ${this.selected}`)
             let message = await store.deleteItem(this.selected.uuid)
             if (message) {
                 this.query()
             }
-
         },
         reset() {
             this.$refs.itemfilter.resetall()

@@ -94,6 +94,7 @@ class Item(models.Model):
     writtenresponse = models.BooleanField(default=False)
     oralresponse = models.BooleanField(default=False)
     startdate = models.DateField(null=True)
+    nextdate = models.DateField(null=True)
     enddate = models.DateField(null=True)
     autonotify = models.BooleanField(default=False)
     valid = models.BooleanField(default=True)
@@ -182,6 +183,8 @@ class Event(models.Model):
     def save(self, *args, **kwargs):
         super(Event, self).save(*args, **kwargs)
 
+        today = datetime.date.today()
+
         start_event = Event.objects.filter(item=self.item.pk, type=1).order_by("date").first()
 
         # update item start date
@@ -192,8 +195,19 @@ class Event(models.Model):
 
         end_event = Event.objects.filter(item=self.item.pk, type=3).order_by("date").last()
 
+        next_event = Event.objects.filter(item=self.item.pk, date__gt=today).order_by("date").first()
+
         # get item instance
         item_instance = Item.objects.get(id=self.item.pk)
+
+        # update item next date
+        if next_event:
+
+            item_instance.nextdate = next_event.date
+            item_instance.save()
+
+        else:
+            item_instance.nextdate = None
 
         # update item end date and late status
         if end_event:
@@ -201,7 +215,7 @@ class Event(models.Model):
             # Item.objects.filter(id=self.item.pk).update(enddate=end_event.date)
             item_instance.enddate = end_event.date
 
-            if (item_instance.enddate < datetime.date.today()) and (item_instance.status.deadline):
+            if (item_instance.enddate < today) and (item_instance.status.deadline):
                 item_instance.late = True
                 # Item.objects.filter(id=self.item.pk, status__in=[1, 2]).update(late=True)
             else:

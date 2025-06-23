@@ -69,10 +69,10 @@
                                 <q-spinner color="blue-grey" :thickness="3" v-if="loading" />
                             </template>
 
-                            <!--                         
+                            <!--
                         <template v-if="filter.type" v-slot:append>
                             <q-icon name="cancel" @click.stop.prevent="filter.type = []" class="cursor-pointer" />
-                        </template> 
+                        </template>
                         -->
                         </q-select>
                     </div>
@@ -109,10 +109,10 @@
                                 <q-spinner color="blue-grey" :thickness="3" v-if="loading" />
                             </template>
 
-                            <!--                         
+                            <!--
                         <template v-if="filter.type" v-slot:append>
                             <q-icon name="cancel" @click.stop.prevent="filter.type = []" class="cursor-pointer" />
-                        </template> 
+                        </template>
                         -->
                         </q-select>
                     </div>
@@ -182,7 +182,7 @@ export default {
         // console.log(`${this.$options.name} | created`)
         this.itemStatus = await store.getItemStatus()
         this.itemTypes = await store.getItemTypes()
-        this.services = (await store.getEntities({ search: "", type: [], service: "true" }, 1, 20, "name", "false")).results
+        this.services = (await store.getEntities({ search: "", type: [], service: "true" }, 1, 1000, "name", "false")).results
         this.loading = false
     }
 }

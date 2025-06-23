@@ -18,6 +18,10 @@
                     <template v-slot:append>
                         <q-spinner color="blue-grey" :thickness="3" v-if="loading" />
 
+                        <q-btn unelevated no-caps icon="sym_o_filter_alt" dense padding="xs" label="Filtres" @click="handleFilter()">
+                            <q-tooltip class="bg-black">Filtrer</q-tooltip>
+                        </q-btn>
+
                         <q-btn unelevated dense icon="close" @click="reset">
                             <q-tooltip class="bg-black">Réinitialiser</q-tooltip>
                         </q-btn>
@@ -137,24 +141,28 @@
         <!-- DELETE DIALOG -->
         <DeleteDialog v-model="dialog.deletion" @delete-event="remove" content="Supprimer définitivement ce document? Les objets politiques liés ne seront pas supprimés." title="Suppression définitive du document" />
 
+        <!-- FILTER DIALOG -->
+        <DocumentFilterDialog ref="documentfilter" v-model:show="dialog.filter" v-model:filter="filter"></DocumentFilterDialog>
+
     </div>
 </template>
 
 <script>
 import { store } from '../store/store.js'
 import DeleteDialog from '../components/DeleteDialog.vue'
+import DocumentFilterDialog from './DocumentFilterDialog.vue'
 
 export default {
     name: 'DocumentsList',
-    components: { DeleteDialog },
+    components: { DeleteDialog , DocumentFilterDialog},
     props: { 'title': String },
     emits: [],
     data() {
         return {
             store,
             selected: null,
-            filter: { search: "" },
-            dialog: { deletion: false },
+            filter: { search: "", type: [] },
+            dialog: { deletion: false, filter: false },
             data: null,
             rows: [],
             loading: false,
@@ -215,19 +223,23 @@ export default {
         filter: {
             handler(newValue, oldValue) {
                 // console.log(`${this.$options.name} | filter()`)
-                this.query()
+                if (this.enableWatch) {
+                    this.query()
+                }
             },
             deep: true
         },
     },
     async created() {
 
-        this.query()
+        this.filter.type = (await store.getDocumentTypes()).map(x => x.id)
+        this.enableWatch = true;
+
+        // this.query()
 
     },
     methods: {
         async onRequest(props) {
-
             // update pagination object
             this.pagination = props.pagination
             this.pagination.rowsPerPage = props.pagination.rowsPerPage === 0 ? this.pagination.rowsNumber : props.pagination.rowsPerPage
@@ -236,7 +248,6 @@ export default {
             this.query()
         },
         async query() {
-
             this.loading = true
             // if (this.filter.search.length >= 3) {
             this.data = await store.getDocuments(this.filter, this.pagination.page, this.pagination.rowsPerPage, this.pagination.sortBy, this.pagination.descending)
@@ -249,10 +260,13 @@ export default {
             this.dialog.deletion = true
         },
         reset() {
-            this.filter.search = ""
+            // this.filter.search = ""
+            this.$refs.documentfilter.resetall()
+        },
+        handleFilter() {
+            this.dialog.filter = true
         },
         async remove() {
-
             // console.log(`delete ${this.selected}`)
             let message = await store.deleteDocument(this.selected)
             if (message) {
