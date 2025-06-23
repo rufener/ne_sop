@@ -88,7 +88,6 @@ class EntityListSerializer(serializers.ModelSerializer):
     type = serializers.StringRelatedField()
     # has_access = serializers.SerializerMethodField()
     has_access = serializers.BooleanField(read_only=True)
-    # has_access = serializers.SerializerMethodField()
 
     class Meta:
         model = Entity

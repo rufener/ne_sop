@@ -159,7 +159,6 @@
                             </q-select>
                         </div>
 
-
                     </div>
 
                     <div class="row q-col-gutter-lg q-py-md">
