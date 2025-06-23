@@ -935,7 +935,8 @@ class DocumentViewSet(viewsets.ViewSet):
         user = self.request.user
         if user.groups.filter(name="Manager").exists():
             return Document.objects.all()
-        return Document.objects.filter(Q(item__lead__in=user.entities.all()) | Q(item__support__in=user.entities.all()))
+        # The current user can access documents he created and documents related to items associated with his service(s)
+        return Document.objects.filter(Q(author=user) | Q(items__lead__in=user.entities.all()) | Q(items__support__in=user.entities.all())).distinct()
 
     @extend_schema(
         responses=DocumentListSerializer,
@@ -1065,8 +1066,6 @@ class DocumentViewSet(viewsets.ViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            print("response data")
-            print(serializer.data)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
