@@ -17,15 +17,15 @@
                         /> -->
 
                     <div class="q-gutter-sm">
-                        <q-radio v-model="documentModel" val="Document" label="Document" @update:model-value="updateDocumentType" />
-                        <q-radio v-model="documentModel" val="Lien hypertexte" label="Lien hypertexte" @update:model-value="updateDocumentType" />
+                        <q-radio v-model="documentModel" val="Document" label="Fichier" @update:model-value="updateDocumentType" :disable="!edit" />
+                        <q-radio v-model="documentModel" val="Lien hypertexte" label="Lien hypertexte" @update:model-value="updateDocumentType" :disable="!edit" />
                     </div>
 
 
                     <div v-if="documentModel === 'Document'">
                         <!-- FILE SELECTOR FIELD -->
                         <div class="col q-my-md" v-if="!document.filename">
-                            <q-file bg-color="white" outlined v-model="newFile" label="Sélectionner un fichier" :rules="[v => checkFile(v)]" @update:model-value="getFileAttributes">
+                            <q-file bg-color="white" outlined v-model="newFile" label="Sélectionner un fichier" :rules="[v => checkFile(v)]" @update:model-value="getFileAttributes" :disable="!edit">
                                 <template v-slot:prepend>
                                     <q-icon name="sym_o_attach_file" />
                                 </template>
@@ -113,7 +113,7 @@
 
                         <div class="col">
 
-                            <q-select bg-color="white" popup-content-class="custom-dropdown" outlined v-model="myitem" use-input hide-selected :options="itemOptions" option-label="title" @update:model-value="selectOption" @filter="filterFn" label="Lier des objets politiques à ce document" :disable="!edit || !store.user.is_manager">
+                            <q-select bg-color="white" popup-content-class="custom-dropdown" outlined v-model="myitem" use-input hide-selected :options="itemOptions" option-label="title" @update:model-value="selectOption" @filter="filterFn" label="Lier des objets politiques à ce document" :disable="!edit">
                                 <template v-slot:prepend>
                                     <q-icon name="sym_o_search" />
                                 </template>
