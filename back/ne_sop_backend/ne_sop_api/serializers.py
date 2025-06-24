@@ -16,7 +16,6 @@ from ne_sop_api.models import (
     ItemStatus,
     Template,
     Group,
-    # User,
 )
 
 
