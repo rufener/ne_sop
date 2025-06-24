@@ -373,6 +373,7 @@ class FileSerializer(serializers.Serializer):
 
 # %% TESTING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
 class NewEventSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False, read_only=False)
 
@@ -426,6 +427,7 @@ class DocumentListSerializer(serializers.ModelSerializer):
             "author",
             "filename",
             "filehash",
+            "external_url",
         ]
 
 
@@ -442,7 +444,7 @@ class DocumentSerializer(serializers.ModelSerializer):
     # type = serializers.PrimaryKeyRelatedField(queryset=DocumentType.objects.all())
     items = NestedItemSerializer(read_only=True, many=True)
 
-    '''
+    """
     type = DocumentTypeSerializer(read_only=True)
 
     type_id = serializers.PrimaryKeyRelatedField(
@@ -450,7 +452,7 @@ class DocumentSerializer(serializers.ModelSerializer):
         queryset=DocumentType.objects.all(),
         write_only=True,
     )
-    '''
+    """
 
     type = DocumentTypeSerializer(read_only=True)  # TODO
 
@@ -482,20 +484,26 @@ class DocumentSerializer(serializers.ModelSerializer):
             "author",
             "author_id",
             "file",
-            "filehash"
+            "filehash",
+            "external_url",
         ]
         read_only_fields = ["created", "modified"]
 
     def create(self, validated_data):
         version = "1"
         file = validated_data.get("file", None)
-        filename = file.name
-        file_extension = filename.rsplit(".", 1)[1]
-        filename = filename.rsplit(".", 1)[0] + f"_v{version}." + file_extension
-        file.name = filename
-        validated_data["file"] = file
-        validated_data["filename"] = filename
-        document = Document.objects.create(**validated_data)
+        external_url = validated_data.get("external_url", None)
+        if not file and not external_url:
+            raise serializers.ValidationError("Un document doit avoir soit un fichier, soit une URL externe.")
+
+        if file is not None:
+            filename = file.name
+            file_extension = filename.rsplit(".", 1)[1]
+            filename = filename.rsplit(".", 1)[0] + f"_v{version}." + file_extension
+            file.name = filename
+            validated_data["file"] = file
+            validated_data["filename"] = filename
+            document = Document.objects.create(**validated_data)
         return document
 
 
@@ -544,8 +552,18 @@ class NewDocumentSerializer(serializers.ModelSerializer):
             "author_id",
             "file",
             "filehash",
+            "external_url",
         ]
         read_only_fields = ["created", "modified"]
+
+    def validate(self, data):
+        file = data.get("file")
+        external_url = data.get("external_url")
+
+        if not file and not external_url:
+            raise serializers.ValidationError("Un document doit avoir soit un fichier, soit une URL externe.")
+
+        return data
 
 
 # %% New item serializer

@@ -7,55 +7,82 @@
             <FormSection title="" class="q-mt-none">
                 <template v-slot:content>
 
-                    <!-- FILE SELECTOR FIELD -->
-                    <div class="col q-my-md" v-if="!document.filename">
-                        <q-file bg-color="white" outlined v-model="newFile" label="Sélectionner un fichier" :rules="[v => checkFile(v)]" @update:model-value="getFileAttributes">
-                            <template v-slot:prepend>
-                                <q-icon name="sym_o_attach_file" />
-                            </template>
-                        </q-file>
+                    <!-- <q-toggle
+                        v-model="documentModel"
+                        :label="documentModel"
+                        false-value="Document"
+                        true-value="Lien hypertexte"
+                        color="primary"
+                        keep-color
+                        /> -->
+
+                    <div class="q-gutter-sm">
+                        <q-radio v-model="documentModel" val="Document" label="Document" @update:model-value="updateDocumentType" />
+                        <q-radio v-model="documentModel" val="Lien hypertexte" label="Lien hypertexte" @update:model-value="updateDocumentType" />
                     </div>
 
-                    <!-- ATTACHED FILE CARD -->
-                    <q-card class="col q-my-md" flat bordered v-if="document.filename">
 
-                        <q-item>
-                            <q-item-section avatar>
-                                <!-- <q-avatar color="none" text-color="black" icon="sym_o_file_present" /> -->
-                                <q-icon name="sym_o_file_present" color="grey-8" size="30px" class="q-ma-none" />
-                            </q-item-section>
+                    <div v-if="documentModel === 'Document'">
+                        <!-- FILE SELECTOR FIELD -->
+                        <div class="col q-my-md" v-if="!document.filename">
+                            <q-file bg-color="white" outlined v-model="newFile" label="Sélectionner un fichier" :rules="[v => checkFile(v)]" @update:model-value="getFileAttributes">
+                                <template v-slot:prepend>
+                                    <q-icon name="sym_o_attach_file" />
+                                </template>
+                            </q-file>
+                        </div>
 
-                            <q-item-section>
-                                <q-item-label><a :href="fileDownloadUrl">{{ document.filename }}</a></q-item-label>
-                                <q-item-label caption>{{ formatBytes(document.size) }}</q-item-label>
-                            </q-item-section>
+                        <!-- ATTACHED FILE CARD -->
+                        <q-card class="col q-my-md" flat bordered v-if="document.filename">
 
-                            <q-item-section avatar>
-                                <q-btn dense round flat color="red" name="delete" @click="showFilepicker()" icon="sym_o_delete" :disable="!edit">
-                                    <!-- <q-btn dense round flat color="red" name="delete" @click="showDeleteDialog(document)" icon="sym_o_delete" :disable="!edit">-->
-                                    <q-tooltip class="bg-black">Supprimer</q-tooltip>
-                                </q-btn>
-                            </q-item-section>
-                        </q-item>
+                            <q-item>
+                                <q-item-section avatar>
+                                    <!-- <q-avatar color="none" text-color="black" icon="sym_o_file_present" /> -->
+                                    <q-icon name="sym_o_file_present" color="grey-8" size="30px" class="q-ma-none" />
+                                </q-item-section>
 
-                    </q-card>
+                                <q-item-section>
+                                    <q-item-label><a :href="fileDownloadUrl">{{ document.filename }}</a></q-item-label>
+                                    <q-item-label caption>{{ formatBytes(document.size) }}</q-item-label>
+                                </q-item-section>
+
+                                <q-item-section avatar>
+                                    <q-btn dense round flat color="red" name="delete" @click="showFilepicker()" icon="sym_o_delete" :disable="!edit">
+                                        <!-- <q-btn dense round flat color="red" name="delete" @click="showDeleteDialog(document)" icon="sym_o_delete" :disable="!edit">-->
+                                        <q-tooltip class="bg-black">Supprimer</q-tooltip>
+                                    </q-btn>
+                                </q-item-section>
+                            </q-item>
+
+                        </q-card>
+                    </div>
+
+                    <div v-if="documentModel === 'Lien hypertexte'">
+                        <!-- EXTERNAL URL FIELD -->
+                        <div class="col q-my-md">
+                            <q-input bg-color="white" outlined v-model="document.external_url" label="Lien hypertexte vers le fichier" placeholder="Insérer un lien hypertexte vers le fichier" :rules="[v => checkHref(v)]">
+                                <template v-slot:prepend>
+                                    <q-icon name="sym_o_globe" />
+                                </template>
+                            </q-input>
+                        </div>
+                    </div>
+
 
 
                     <div class="row q-col-gutter-lg q-py-md">
-
-                        <!-- REFERENCE TEXT FIELD -->
-                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-                            <q-input bg-color="white" outlined v-model="document.reference" label="N° référence" :disable="!edit" />
-                        </div>
-
                         <!-- TITLE TEXT FIELD -->
-                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                             <q-input bg-color="white" outlined v-model="document.title" label="Titre" :rules="[v => checkFilled(v)]" :disable="!edit" />
                         </div>
 
                     </div>
 
                     <div class="row q-col-gutter-lg q-py-md">
+                        <!-- REFERENCE TEXT FIELD -->
+                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                            <q-input bg-color="white" outlined v-model="document.reference" label="N° référence" :disable="!edit" />
+                        </div>
 
                         <!-- TYPE SELECT FIELD -->
                         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
@@ -180,7 +207,7 @@
 
 <script>
 import { store } from '../store/store.js'
-import { checkFilled, checkFile, formatBytes } from '../store/shared.js'
+import { checkFilled, checkFile, checkHref, formatBytes } from '../store/shared.js'
 import Form from "../components/Form.vue"
 import FormSection from "../components/FormSection.vue"
 import DeleteDialog from './DeleteDialog.vue'
@@ -205,6 +232,7 @@ export default {
             itemOptions: [],
             newFile: null,
             valid: null,
+            documentModel: "Document",
         }
     },
     computed: {
@@ -223,11 +251,13 @@ export default {
     async created() {
         this.documentTypes = await this.store.getDocumentTypes()
         this.getItemOptions()
+        this.documentModel = this.document.external_url ? "Lien hypertexte" : "Document"
     },
     methods: {
         formatBytes,
         checkFilled,
         checkFile,
+        checkHref,
         validation(val) {
             // console.log(`${this.$options.name} | validation: ${val}`)
             this.valid = val
@@ -279,6 +309,10 @@ export default {
         },
         handleUnlink(uuid) {
             this.document.items = this.document.items.filter(item => item.uuid !== uuid);
+        },
+        updateDocumentType() {
+            this.showFilepicker()
+            this.document.external_url = null
         }
     }
 }
