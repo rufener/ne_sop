@@ -9,29 +9,61 @@
     <!-- Statistics section -->
     <FormSection title="Année de dépôt">
         <template v-slot:content>
+
+            <q-banner class="q-my-sm blue-grey-5">
+                <template v-slot:avatar>
+                    <q-icon name="sym_o_info" color="primary" />
+                </template>
+                Ces statistiques n'incluent que les objets politiques des services auxquels vous avez accès.
+            </q-banner>
+
             <StatisticsTable :data="data_deposition" v-if="data_deposition.length > 0"></StatisticsTable>
         </template>
     </FormSection>
     <FormSection title="Année de traitement (retour au secrétériat général)">
         <template v-slot:content>
+            <q-banner class="q-my-sm blue-grey-5">
+                <template v-slot:avatar>
+                    <q-icon name="sym_o_info" color="primary" />
+                </template>
+                Ces statistiques n'incluent que les objets politiques des services auxquels vous avez accès.
+            </q-banner>
             <StatisticsTable :data="data_treatment" v-if="data_treatment.length > 0"></StatisticsTable>
         </template>
     </FormSection>
 
     <FormSection title="Nombre d'objets par service et par année de dépôt">
         <template v-slot:content>
+            <q-banner class="q-my-sm blue-grey-5">
+                <template v-slot:avatar>
+                    <q-icon name="sym_o_info" color="primary" />
+                </template>
+                Ces statistiques n'incluent que les objets politiques des services auxquels vous avez accès.
+            </q-banner>
             <StatisticsTable :data="data_services" v-if="data_services.length > 0"></StatisticsTable>
         </template>
     </FormSection>
 
     <FormSection title="Nombre d'objets par statut et par année de dépôt">
         <template v-slot:content>
+            <q-banner class="q-my-sm blue-grey-5">
+                <template v-slot:avatar>
+                    <q-icon name="sym_o_info" color="primary" />
+                </template>
+                Ces statistiques n'incluent que les objets politiques des services auxquels vous avez accès.
+            </q-banner>
             <StatisticsTable :data="data_itemstatus" v-if="data_itemstatus.length > 0"></StatisticsTable>
         </template>
     </FormSection>
 
     <FormSection title="Réponses urgentes et/ou écrites demandées et par année de dépôt">
         <template v-slot:content>
+            <q-banner class="q-my-sm blue-grey-5">
+                <template v-slot:avatar>
+                    <q-icon name="sym_o_info" color="primary" />
+                </template>
+                Ces statistiques n'incluent que les objets politiques des services auxquels vous avez accès.
+            </q-banner>
             <StatisticsTable :data="data_urgentWritten" v-if="data_urgentWritten.length > 0"></StatisticsTable>
         </template>
     </FormSection>
