@@ -1258,7 +1258,8 @@ class ServiceStatisticsViewSet(viewsets.ViewSet):
 
         # get unique set of years
         years = list(set(int(x.year.year) if x.year is not None else None for x in queryset))
-        years.remove(None)
+        if None in years:
+            years.remove(None)
         years.sort(reverse=True)
 
         # get unique set of services
@@ -1299,7 +1300,8 @@ class StatutStatisticsViewSet(viewsets.ViewSet):
 
         # get unique set of years
         years = list(set(int(x["year"].year) if x["year"] is not None else None for x in queryset))
-        years.remove(None)
+        if None in years:
+            years.remove(None)
         years.sort(reverse=True)
 
         # get unique set of statuts
@@ -1346,7 +1348,8 @@ class UrgentWrittenStatisticsViewSet(viewsets.ViewSet):
         # get unique set of years
         years = list(set(int(x.year.year) if x.year is not None else None for x in queryset))
         if None in years:
-            years.remove(None)
+            if None in years:
+                years.remove(None)
         years.sort(reverse=True)
 
         # get unique set of statuts
