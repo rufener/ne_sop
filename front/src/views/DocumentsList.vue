@@ -55,10 +55,15 @@
                         }">
 
                             <!-- icon="sym_o_loupe" -->
-                            <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none">
-                                <div class="ellipsis"><b>{{ props.row.title }}</b> / {{ props.row.reference }}</div>
+                            <q-chip clickable square outline color="blue-5" text-color="white" class="q-mx-none" style="height: fit-content;">
+                                <div style="overflow-wrap: break-word; white-space: normal; max-width: inherit;"><b>{{ props.row.title }}</b></div>
                             </q-chip>
                         </router-link>
+                    </q-td>
+
+                    <!-- REFERENCE COLUMN -->
+                    <q-td key="type" :props="props" style="max-width: 200px">
+                        <div class="ellipsis">{{ props.row.reference }}</div>
                     </q-td>
 
                     <!-- TYPE COLUMN -->
@@ -117,9 +122,16 @@
                     <!-- ACTIONS COLUMN -->
                     <q-td key="actions" :props="props">
                         <div class="float-right">
-                            <q-btn dense round flat color="grey" name="download" @click="" :href="`${store.host}/api/document/${props.row.uuid}/download/`" icon="sym_o_download">
-                                <q-tooltip class="bg-black">Télécharger {{ props.row.filename }}</q-tooltip>
-                            </q-btn>
+                            <template v-if="props.row.filename">
+                                <q-btn dense round flat color="grey" name="download" @click="" :href="`${store.host}/api/document/${props.row.uuid}/download/`" icon="sym_o_download">
+                                    <q-tooltip class="bg-black">Télécharger {{ props.row.filename }}</q-tooltip>
+                                </q-btn>
+                            </template>
+                            <template v-if="props.row.external_url">
+                                <q-btn dense round flat color="grey" name="download" @click="" :href="props.row.external_url" target="_blank" icon="sym_o_open_in_new">
+                                    <q-tooltip class="bg-black">Ouvrir dans un nouvel onglet {{ props.row.filename }}</q-tooltip>
+                                </q-btn>
+                            </template>
                             <q-btn dense round flat color="red" name="delete" @click="handleDeletion(props.row.uuid)" icon="sym_o_delete">
                                 <q-tooltip class="bg-black">Supprimer</q-tooltip>
                             </q-btn>
@@ -177,8 +189,15 @@ export default {
                 {
                     name: "title",
                     align: "left",
-                    label: "Titre / Réf.",
+                    label: "Titre",
                     field: "title",
+                    sortable: true,
+                },
+                {
+                    name: "reference",
+                    align: "left",
+                    label: "Référence",
+                    field: "reference",
                     sortable: true,
                 },
                 {
