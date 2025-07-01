@@ -113,7 +113,7 @@
 
                         <div class="col">
 
-                            <q-select bg-color="white" popup-content-class="custom-dropdown" outlined v-model="myitem" use-input hide-selected :options="itemOptions" option-label="title" @update:model-value="selectOption" @filter="filterFn" label="Lier des objets politiques à ce document" :disable="!edit">
+                            <q-select bg-color="white" popup-content-class="custom-dropdown" outlined v-model="myitem" use-input hide-selected :options="itemOptions" option-label="title" @update:model-value="selectOption" @filter="filterFn" :rules="[() => checkItemList()]" label="Lier des objets politiques à ce document" :disable="!edit">
                                 <template v-slot:prepend>
                                     <q-icon name="sym_o_search" />
                                 </template>
@@ -313,6 +313,11 @@ export default {
         updateDocumentType() {
             this.showFilepicker()
             this.document.external_url = null
+        },
+        checkItemList () {
+            if (this.document.items && this.document.items.length < 1) {
+                return "Champ obligatoire"
+            }
         }
     }
 }
