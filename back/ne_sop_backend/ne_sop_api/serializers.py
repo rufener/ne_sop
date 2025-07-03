@@ -578,6 +578,11 @@ class NewDocumentSerializer(serializers.ModelSerializer):
         if not file and not external_url:
             raise serializers.ValidationError("Un document doit avoir soit un fichier, soit une URL externe.")
 
+        # Check that at least one item is linked to document
+        items = data.get("items", None)
+        if not items or len(items) == 0:
+            raise serializers.ValidationError("Un document doit être lié à au moins un item.")
+
         return data
 
 
