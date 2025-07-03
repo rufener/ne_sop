@@ -263,7 +263,7 @@ class DocumentType(models.Model):
 class Document(models.Model):
     uuid = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False, unique=True)
     reference = models.CharField(max_length=200, blank=True, null=True, default="")
-    title = models.CharField(max_length=200, blank=True, null=True, default="")
+    title = models.CharField(max_length=200)
     type = models.ForeignKey(DocumentType, null=True, on_delete=models.PROTECT)
     created = models.DateTimeField(auto_now_add=True)  # auto_now_add=True
     modified = models.DateTimeField(auto_now=True)
@@ -271,14 +271,14 @@ class Document(models.Model):
     note = models.CharField(max_length=500, blank=True, default="")
     filename = models.CharField(default=None, max_length=200, blank=True, null=True)
     version = models.PositiveIntegerField(default=None)
-    size = models.PositiveIntegerField(default=0, null=True)
+    size = models.PositiveIntegerField(default=0, blank=True, null=True)
     # item = models.ForeignKey(Item, related_name="documents", on_delete=models.CASCADE)
 
-    items = models.ManyToManyField(Item, blank=True, related_name="documents")
+    items = models.ManyToManyField(Item, related_name="documents")
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     file = models.FileField(upload_to=Utils.get_upload_path, blank=True, null=True, default=None)
-    filehash = models.CharField(max_length=64, blank=True, null=True)
-    external_url = models.URLField(blank=True, null=True)
+    filehash = models.CharField(max_length=64, blank=True, null=True, default=None)
+    external_url = models.URLField(blank=True, null=True, default=None)
 
     class Meta:
         ordering = ["created"]

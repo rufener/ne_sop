@@ -638,14 +638,10 @@ export const store = reactive({
     });
 
     formData.append("author", formInput.author.id);
-    if (formInput.file) {
-      formData.append("filename", formInput.filename);
-      formData.append("size", formInput.size);
-      formData.append("file", formInput.file);
-    }
-    if (formInput.external_url) {
-      formData.append("external_url", formInput.external_url);
-    }
+    formData.append("filename", formInput.filename);
+    formData.append("size", formInput.size);
+    formData.append("file", formInput.file);
+    formData.append("external_url", formInput.external_url);
     formData.append("version", formInput.version);
     formData.append("valid", formInput.valid);
 
@@ -691,11 +687,12 @@ export const store = reactive({
     });
 
     formData.append("author", formInput.author.id);
+    formData.append("external_url", formInput.external_url);
     formData.append("filename", formInput.filename);
-    formData.append("version", formInput.version); // TODO remove
     formData.append("size", formInput.size);
     formData.append("file", formInput.file);
     formData.append("valid", formInput.valid);
+    formData.append("version", formInput.version); // TODO remove
     // formData.append("created", formInput.created);
 
     // console.log(formData);

@@ -60,9 +60,14 @@
                     <div v-if="documentModel === 'Lien hypertexte'">
                         <!-- EXTERNAL URL FIELD -->
                         <div class="col q-my-md">
-                            <q-input bg-color="white" outlined v-model="document.external_url" label="Lien hypertexte vers le fichier" placeholder="Insérer un lien hypertexte vers le fichier" :rules="[v => checkHref(v)]">
+                            <q-input bg-color="white" outlined v-model="document.external_url" label="Lien hypertexte vers le fichier" placeholder="Insérer un lien hypertexte vers le fichier" :rules="[v => checkHref(v)]" :disable="!edit">
                                 <template v-slot:prepend>
                                     <q-icon name="sym_o_globe" />
+                                </template>
+                                <template v-slot:after>
+                                    <q-btn dense round flat color="grey" @click="openExternalUrl" icon="sym_o_open_in_new">
+                                        <q-tooltip class="bg-black">Ouvrir dans un nouvel onglet: {{ document.title }}</q-tooltip>
+                                    </q-btn>
                                 </template>
                             </q-input>
                         </div>
@@ -314,9 +319,15 @@ export default {
             this.showFilepicker()
             this.document.external_url = null
         },
-        checkItemList () {
+        checkItemList() {
             if (this.document.items && this.document.items.length < 1) {
                 return "Champ obligatoire"
+            }
+        },
+        openExternalUrl(e) {
+            e.preventDefault()
+            if (this.document.external_url) {
+                window.open(this.document.external_url, '_blank')
             }
         }
     }

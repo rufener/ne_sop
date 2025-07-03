@@ -1040,21 +1040,28 @@ class DocumentViewSet(viewsets.ViewSet):
         if "items" not in request.data:
             document.items.clear()
 
-        # Check if a new file was uploaded.
+        # Explicit clean : if file is sent, remove `external_url` field
         if "file" in request.FILES:
-            # If a new file is provided and there's an existing file, delete the old file.
+            if document.external_url:
+                document.external_url = None  # supprimer le lien existant
+            data.pop("external_url", None)
+
+        # If url is sent, remove `file` field
+        elif data.get("external_url"):
             if document.file:
-                document.file.close()
-                print("Deleting existing file:", document.file.path)
                 document.file.delete(save=False)
-        else:
-            # No new file uploaded via request.FILES.
-            # Remove the 'file' key if it exists (it might be a string or empty value)
+                document.file = None
             data.pop("file", None)
+            data.pop("size", None)
+            data.pop("filename", None)
+
+        # If no file nor URL is sent, force validation to fail
+        else:
+            data.pop("file", None)
+            data.pop("external_url", None)
 
         # Use partial=True so that only provided fields are updated.
         serializer = NewDocumentSerializer(document, data=data, partial=True)
-
         """
         print("Update document")
         print("Request:")
@@ -1071,6 +1078,7 @@ class DocumentViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(

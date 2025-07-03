@@ -557,8 +557,23 @@ class NewDocumentSerializer(serializers.ModelSerializer):
         read_only_fields = ["created", "modified"]
 
     def validate(self, data):
-        file = data.get("file")
-        external_url = data.get("external_url")
+        file = data.get("file", None)
+        external_url = data.get("external_url", None)
+
+        # Convert "null" string to None
+        if isinstance(file, str) and file.lower() == "null":
+            file = None
+            data["file"] = None
+
+        # Set filename and size to "null" if file is None
+        if file is None:
+            data["filename"] = None
+            data["size"] = None
+
+        # Convert "null" string to None
+        if isinstance(external_url, str) and external_url.lower() == "null":
+            external_url = None
+            data["external_url"] = None
 
         if not file and not external_url:
             raise serializers.ValidationError("Un document doit avoir soit un fichier, soit une URL externe.")
