@@ -112,7 +112,6 @@
                                 ['token', 'hr', 'link', 'custom_btn'],
                                 ['unordered', 'ordered'],
                             ]" :disable="!edit" @input="checkEditorLength" @paste="handlePaste" />
-                            ]" :disable="!edit" @input="checkEditorLength" @paste="handlePaste" />
                             <div class="float-right">{{ descriptionText.length }} / 600</div>
 
                         </div>
@@ -150,11 +149,12 @@
                                 <template v-slot:option="scope">
                                     <q-item v-bind="scope.itemProps" :disable="!scope.opt.has_access">
                                         <q-item-section side>
-                                            <q-checkbox :model-value="scope.selected" @update:model-value="scope.toggleOption(scope.opt)" />
+                                            <q-checkbox :model-value="scope.selected" @update:model-value="scope.toggleOption(scope.opt)" :disable="!scope.opt.has_access" />
                                         </q-item-section>
                                         <q-item-section>
                                             <q-item-label>{{ scope.opt.name }}</q-item-label>
                                         </q-item-section>
+                                        <q-tooltip class="bg-black" v-if="!scope.opt.has_access">Vous n'avez pas accès à ce service</q-tooltip>
                                     </q-item>
                                 </template>
                             </q-select>
@@ -362,7 +362,6 @@ export default {
 
         // this.serviceOptions = (await store.getEntities({ search: "", type: [], service: "true" }, 1, 100, "name", "false")).results
         this.serviceOptions = (await store.getServices({ search: "" }, 1, 100, "has_access", "false")).results
-
         this.authorOptions = (await store.getEntities({ search: "", type: [], service: "false" }, 1, 200, "name", "false")).results
         
         this.itemStatus = await store.getItemStatus()
