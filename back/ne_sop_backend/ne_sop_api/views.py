@@ -36,7 +36,7 @@ from ne_sop_api.serializers import (
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.db.models.functions import Lower, TruncYear
-from django.db.models import Q, Count, BooleanField, Case, When, Value
+from django.db.models import Q, Count, BooleanField, Case, When, Value, Exists, OuterRef
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -164,29 +164,20 @@ class ServiceViewSet(viewsets.ViewSet):
     Services viewset
     """
     serializer_class = EntityListSerializer
-    # search_fields = ["name", "email", "telephone"]
     permission_classes = [IsManagerOrReadOnlyPermission]
 
-    '''
     def get_queryset(self):
         user = self.request.user
-        return user.entities.all().distinct()
-    '''
 
-    def get_queryset(self):
-        user = self.request.user
         return (
             Entity.objects
             .filter(type__service=True)
-            .annotate(
-                has_access=Case(
-                    When(users=user, then=Value(True)),
-                    default=Value(False),
-                    output_field=BooleanField()
+            .annotate( 
+                has_access=Exists(
+                    user.entities.filter(pk=OuterRef('pk'))
                 )
             )
-            .order_by('-has_access', 'abbreviation')
-            .distinct()
+            .order_by('-has_access', 'abbreviation')  # True first, then A-Z
         )
 
     @extend_schema(
@@ -195,9 +186,10 @@ class ServiceViewSet(viewsets.ViewSet):
     def list(self, request):
         filter = filters.SearchFilter()
 
-        print("DIDIDIDIDIDII")
-        print(len(self.get_queryset()))
-        print(len(Entity.objects.all()))
+        print("ServiceViewSet - LIST")
+
+        print(f"len(self.get_queryset()): {len(self.get_queryset())}")
+        print(f"len(Entity.objects.all()): {len(Entity.objects.all())}")
 
         # queryset = filter.filter_queryset(request, Entity.objects.all(), self)
         # queryset = filter.filter_queryset(request, self.get_queryset(), self)
@@ -222,10 +214,7 @@ class ServiceViewSet(viewsets.ViewSet):
         if descending not in ["true", "false"]:
             descending = "false"
 
-        print(len(queryset))
-
-        #print("HAS ACCESS")
-        #print(queryset)
+        print(f"Queryset length: {len(queryset)}")
 
         '''
         if descending == "true":
@@ -234,7 +223,7 @@ class ServiceViewSet(viewsets.ViewSet):
             paginator = Paginator(queryset.order_by(Lower(sortby).asc()), size)
         '''
 
-        queryset = list({entity.id: entity for entity in queryset}.values())
+        # queryset = list({entity.id: entity for entity in queryset}.values())
 
         paginator = Paginator(queryset, size)
 
@@ -242,7 +231,7 @@ class ServiceViewSet(viewsets.ViewSet):
         nrows = paginator.count
         npages = paginator.num_pages
 
-        print(len(queryset))
+        print(f"Queryset (modified) length: {len(queryset)}")
 
         serializer = EntityListSerializer(queryset, many=True, context={'request': request})
 
@@ -256,7 +245,6 @@ class ServiceViewSet(viewsets.ViewSet):
                 "results": serializer.data,
             }
         )
-
 
 
 # %% ENTITY
