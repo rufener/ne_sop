@@ -177,61 +177,30 @@ class ServiceViewSet(viewsets.ViewSet):
                     user.entities.filter(pk=OuterRef('pk'))
                 )
             )
-            .order_by('-has_access', 'abbreviation')  # True first, then A-Z
+            .order_by('-has_access', 'abbreviation')
         )
 
     @extend_schema(
         tags=["Entities"],
     )
     def list(self, request):
-        # filter = filters.SearchFilter()
-        # print("ServiceViewSet - LIST")
-
-        # print(f"len(self.get_queryset()): {len(self.get_queryset())}")
-        # print(f"len(Entity.objects.all()): {len(Entity.objects.all())}")
-
-        # queryset = filter.filter_queryset(request, Entity.objects.all(), self)
-        # queryset = filter.filter_queryset(request, self.get_queryset(), self)
 
         queryset = self.get_queryset()
 
-        # queryset = Entity.objects.all()
         page = int(request.query_params.get("page", "1"))
         size = int(request.query_params.get("size", "10"))
         sortby = request.query_params.get("sortby", "id")
         descending = request.query_params.get("descending", "false")
-
-        # queryset = queryset.filter(type__service=True)
-
-        '''
-        if sortby not in ["id", "name", "type", "has_access"]:
-            sortby = "id"
-        '''
 
         sortby = "has_access"
 
         if descending not in ["true", "false"]:
             descending = "false"
 
-        # print(f"Queryset length: {len(queryset)}")
-
-        '''
-        if descending == "true":
-            paginator = Paginator(queryset.order_by(Lower(sortby).desc()), size)
-        else:
-            paginator = Paginator(queryset.order_by(Lower(sortby).asc()), size)
-        '''
-
-        # queryset = list({entity.id: entity for entity in queryset}.values())
-
         paginator = Paginator(queryset, size)
-
         queryset = paginator.page(page)
         nrows = paginator.count
         npages = paginator.num_pages
-
-        # print(f"Queryset (modified) length: {len(queryset)}")
-
         serializer = EntityListSerializer(queryset, many=True, context={'request': request})
 
         return Response(

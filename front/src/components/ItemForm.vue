@@ -96,13 +96,6 @@
                 <template v-slot:content>
 
                     <!-- DESCRIPTION TEXT AREA FIELD -->
-                    <!--
-                    <div class="row q-col-gutter-lg q-py-md">
-                        <div class="col">
-                            <q-input bg-color="white" outlined v-model="item.description" label="Description" type="textarea" :disable="!edit || !store.user.is_manager" />
-                        </div>
-                    </div>
-                    -->
                     <div class="row q-col-gutter-lg q-py-md">
 
                         <div class="col">
@@ -150,6 +143,9 @@
                                     <q-item v-bind="scope.itemProps" :disable="!scope.opt.has_access">
                                         <q-item-section side>
                                             <q-checkbox :model-value="scope.selected" @update:model-value="scope.toggleOption(scope.opt)" :disable="!scope.opt.has_access" />
+                                        </q-item-section>
+                                        <q-item-section avatar>
+                                            <q-icon :color="scope.opt.has_access ? 'green' : 'red'" :name="scope.opt.has_access ? 'lock_open' : 'lock'" />
                                         </q-item-section>
                                         <q-item-section>
                                             <q-item-label>{{ scope.opt.name }}</q-item-label>
