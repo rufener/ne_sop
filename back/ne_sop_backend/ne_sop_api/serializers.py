@@ -2,6 +2,7 @@ from rest_framework import serializers
 from ne_sop_api.utils import Utils
 from django.conf import settings
 from django.contrib.auth.models import User
+from datetime import date
 
 from ne_sop_api.models import (
     Document,
@@ -15,7 +16,6 @@ from ne_sop_api.models import (
     ItemStatus,
     Template,
     Group,
-    # User,
 )
 
 
@@ -172,6 +172,8 @@ class ItemListSerializer(serializers.ModelSerializer):
     lead = serializers.StringRelatedField()
     support = serializers.StringRelatedField(many=True)
 
+    nextdate = serializers.SerializerMethodField()  # TEST
+
     class Meta:
         model = Item
         fields = [
@@ -191,9 +193,20 @@ class ItemListSerializer(serializers.ModelSerializer):
             "support",
             "events",
             "startdate",
+            "nextdate",
             "enddate",
             "valid",
+            "strategic",
         ]
+
+    def get_nextdate(self, obj):
+        # find the next event whose date is strictly in the future
+        today = date.today()
+        next_ev = obj.events.filter(date__gt=today).order_by("date").first()
+        if not next_ev:
+            return None
+        # serialize with your NewEventSerializer
+        return EventSummarySerializer(next_ev).data
 
 
 # %% ITEM
@@ -228,7 +241,6 @@ class ItemSerializer(serializers.ModelSerializer):
             "description",
             "urgent",
             "late",
-            # "islate",
             "writtenresponse",
             "oralresponse",
             "author",
@@ -237,6 +249,7 @@ class ItemSerializer(serializers.ModelSerializer):
             "events",
             "autonotify",
             "valid",
+            "strategic",
         ]
 
 
@@ -285,6 +298,7 @@ class NestedItemSerializer(serializers.ModelSerializer):
             "lead",
             "support",
             "valid",
+            "strategic",
         ]
 
 
@@ -316,6 +330,22 @@ class EventListSerializer(serializers.ModelSerializer):
             "time",
             "type",
             "item",
+            "description",
+            "valid",
+        ]
+
+
+# %% EVENT SUMMARY
+class EventSummarySerializer(serializers.ModelSerializer):
+    type = serializers.StringRelatedField()  # EventTypeSerializer(read_only=True)
+
+    class Meta:
+        model = Event
+        fields = [
+            "uuid",
+            "date",
+            "time",
+            "type",
             "description",
             "valid",
         ]
@@ -356,6 +386,7 @@ class FileSerializer(serializers.Serializer):
 
 
 # %% TESTING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 class NewEventSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False, read_only=False)
@@ -410,6 +441,7 @@ class DocumentListSerializer(serializers.ModelSerializer):
             "author",
             "filename",
             "filehash",
+            "external_url",
         ]
 
 
@@ -426,7 +458,7 @@ class DocumentSerializer(serializers.ModelSerializer):
     # type = serializers.PrimaryKeyRelatedField(queryset=DocumentType.objects.all())
     items = NestedItemSerializer(read_only=True, many=True)
 
-    '''
+    """
     type = DocumentTypeSerializer(read_only=True)
 
     type_id = serializers.PrimaryKeyRelatedField(
@@ -434,7 +466,7 @@ class DocumentSerializer(serializers.ModelSerializer):
         queryset=DocumentType.objects.all(),
         write_only=True,
     )
-    '''
+    """
 
     type = DocumentTypeSerializer(read_only=True)  # TODO
 
@@ -467,19 +499,25 @@ class DocumentSerializer(serializers.ModelSerializer):
             "author_id",
             "file",
             "filehash",
+            "external_url",
         ]
         read_only_fields = ["created", "modified"]
 
     def create(self, validated_data):
         version = "1"
         file = validated_data.get("file", None)
-        filename = file.name
-        file_extension = filename.rsplit(".", 1)[1]
-        filename = filename.rsplit(".", 1)[0] + f"_v{version}." + file_extension
-        file.name = filename
-        validated_data["file"] = file
-        validated_data["filename"] = filename
-        document = Document.objects.create(**validated_data)
+        external_url = validated_data.get("external_url", None)
+        if not file and not external_url:
+            raise serializers.ValidationError("Un document doit avoir soit un fichier, soit une URL externe.")
+
+        if file is not None:
+            filename = file.name
+            file_extension = filename.rsplit(".", 1)[1]
+            filename = filename.rsplit(".", 1)[0] + f"_v{version}." + file_extension
+            file.name = filename
+            validated_data["file"] = file
+            validated_data["filename"] = filename
+            document = Document.objects.create(**validated_data)
         return document
 
 
@@ -528,8 +566,18 @@ class NewDocumentSerializer(serializers.ModelSerializer):
             "author_id",
             "file",
             "filehash",
+            "external_url",
         ]
         read_only_fields = ["created", "modified"]
+
+    def validate(self, data):
+        file = data.get("file")
+        external_url = data.get("external_url")
+
+        if not file and not external_url:
+            raise serializers.ValidationError("Un document doit avoir soit un fichier, soit une URL externe.")
+
+        return data
 
 
 # %% New item serializer
@@ -586,6 +634,7 @@ class NewItemSerializer(serializers.ModelSerializer):
             "documents",
             "users",
             "valid",
+            "strategic",
         ]
 
     def create(self, validated_data):
@@ -624,6 +673,7 @@ class NewItemSerializer(serializers.ModelSerializer):
         instance.support.set(support)
         instance.autonotify = validated_data.get("autonotify", instance.autonotify)
         instance.valid = validated_data.get("valid", instance.valid)
+        instance.strategic = validated_data.get("strategic", instance.strategic)
 
         # for key, value in validated_data.items():
         #    setattr(instance, key, value)

@@ -48,6 +48,7 @@ export default {
                 "valid": false,
                 "author": null,
                 "created": null,
+                "external_url": null,
             }
         }
     },
@@ -79,6 +80,7 @@ export default {
                 "valid": false,
                 "author": store.user,
                 "created": null,
+                "external_url": this.document.external_url,
             })
         }
     }

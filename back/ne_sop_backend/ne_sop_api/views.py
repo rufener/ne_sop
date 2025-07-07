@@ -676,6 +676,7 @@ class ItemViewSet(viewsets.ViewSet):
             "status",
             "urgent",
             "startdate",
+            "nextdate",
             "enddate",
         ]:
             sortby = "id"
@@ -804,18 +805,19 @@ class ItemViewSet(viewsets.ViewSet):
         ws.cell(row_id, 6).value = "Type"
         ws.cell(row_id, 7).value = "Statut"
         ws.cell(row_id, 8).value = "Remarques"
-        ws.cell(row_id, 9).value = "Urgent"
-        ws.cell(row_id, 10).value = "Réponse écrite"
-        ws.cell(row_id, 11).value = "Réponse orale"
-        ws.cell(row_id, 12).value = "Date de dépôt"
-        ws.cell(row_id, 13).value = "Date de retour au SG"
-        ws.cell(row_id, 14).value = "Notifications auto"
-        ws.cell(row_id, 15).value = "Valide"
-        ws.cell(row_id, 16).value = "Retard"
-        ws.cell(row_id, 17).value = "Service principal"
-        ws.cell(row_id, 18).value = "Service(s) en appui"
-        ws.cell(row_id, 19).value = "Événements"
-        ws.cell(row_id, 20).value = "Documents"
+        ws.cell(row_id, 9).value = "Stratégique"
+        ws.cell(row_id, 10).value = "Urgent"
+        ws.cell(row_id, 11).value = "Réponse écrite"
+        ws.cell(row_id, 12).value = "Réponse orale"
+        ws.cell(row_id, 13).value = "Date de dépôt"
+        ws.cell(row_id, 14).value = "Date de retour au SG"
+        ws.cell(row_id, 15).value = "Notifications auto"
+        ws.cell(row_id, 16).value = "Valide"
+        ws.cell(row_id, 17).value = "Retard"
+        ws.cell(row_id, 18).value = "Service principal"
+        ws.cell(row_id, 19).value = "Service(s) en appui"
+        ws.cell(row_id, 20).value = "Événements"
+        ws.cell(row_id, 21).value = "Documents"
 
         sep = "\n"
         for op in queryset:
@@ -831,32 +833,30 @@ class ItemViewSet(viewsets.ViewSet):
             ws.cell(row_id, 7).value = op.status.name or None
             parser = MyHTMLParser()
             parser.feed(op.description)
-            ws.cell(row_id, 8).value = parser.get_text() or None
-            # ws.cell(row_id, 8).value = op.description or None
-            ws.cell(row_id, 9).value = op.urgent or None
-            ws.cell(row_id, 10).value = op.writtenresponse or None
-            ws.cell(row_id, 11).value = op.oralresponse or None
-            ws.cell(row_id, 12).value = datetime.datetime.strftime(op.startdate, "%d.%m.%Y") if op.startdate is not None else None
-            ws.cell(row_id, 13).value = datetime.datetime.strftime(op.enddate, "%d.%m.%Y") if op.enddate is not None else None
-            ws.cell(row_id, 14).value = op.autonotify or None
-            ws.cell(row_id, 15).value = op.valid or None
-            ws.cell(row_id, 16).value = op.late or None
-            ws.cell(row_id, 17).value = op.lead.name or None
-            ws.cell(row_id, 18).value = sep.join([sup.name for sup in op.support.all()])
-            ws.cell(row_id, 19).value = sep.join([tmp.type.name for tmp in op.events.all()])
-            ws.cell(row_id, 20).value = sep.join([tmp.filename for tmp in op.documents.all()])
-            ws.cell(row_id, 18).alignment = Alignment(wrap_text=True)
-            ws.cell(row_id, 19).alignment = Alignment(wrap_text=True)
-            ws.cell(row_id, 20).alignment = Alignment(wrap_text=True)
+            remarks = parser.get_text() or None
+            ws.cell(row_id, 8).value = remarks
+            ws.cell(row_id, 9).value = op.strategic or None
+            ws.cell(row_id, 10).value = op.urgent or None
+            ws.cell(row_id, 11).value = op.writtenresponse or None
+            ws.cell(row_id, 12).value = op.oralresponse or None
+            ws.cell(row_id, 13).value = datetime.datetime.strftime(op.startdate, "%d.%m.%Y") if op.startdate is not None else None
+            ws.cell(row_id, 14).value = datetime.datetime.strftime(op.enddate, "%d.%m.%Y") if op.enddate is not None else None
+            ws.cell(row_id, 15).value = op.autonotify or None
+            ws.cell(row_id, 16).value = op.valid or None
+            ws.cell(row_id, 17).value = op.late or None
+            ws.cell(row_id, 18).value = op.lead.name or None
+            ws.cell(row_id, 19).value = sep.join([sup.name for sup in op.support.all()])
+            ws.cell(row_id, 20).value = sep.join([(f"{' '.join(filter(None, [datetime.date.strftime(tmp.date, '%d.%m.%Y'), datetime.time.strftime(tmp.time, '%H:%M') if tmp.time else None]))} - {tmp.type.name}") for tmp in op.events.all()])
+            ws.cell(row_id, 21).value = sep.join([tmp.filename for tmp in op.documents.all()])
 
-            # adjust row height
-            ws.row_dimensions[row_id].height = (max([len(op.support.all()), len(op.events.all()), len(op.events.all())]) - 1) * 15 + 15
+            for i in range(1, 22):
+                ws.cell(row_id, i).alignment = Alignment(wrap_text=True)
 
         # adjust column width
         ws = Utils.auto_adjust_excel_column_width(ws)
 
         # create table in worksheet
-        table = Table(displayName="Table1", ref="A4:" + get_column_letter(20) + str(row_id))
+        table = Table(displayName="Table1", ref="A4:" + get_column_letter(21) + str(row_id))
         style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False, showLastColumn=False, showRowStripes=True, showColumnStripes=False)
         table.tableStyleInfo = style
         ws.add_table(table)
@@ -1067,18 +1067,24 @@ class DocumentViewSet(viewsets.ViewSet):
         user = self.request.user
         if user.groups.filter(name="Manager").exists():
             return Document.objects.all()
-        return Document.objects.filter(Q(item__lead__in=user.entities.all()) | Q(item__support__in=user.entities.all()))
+
+        authored_and_unlinked = Q(author=user, items__isnull=True)
+        linked_to_user_items = Q(items__lead__in=user.entities.all()) | Q(items__support__in=user.entities.all())
+
+        # The current user can access documents he created and documents related to items associated with his service(s)
+        return Document.objects.filter(authored_and_unlinked | linked_to_user_items).distinct()
 
     @extend_schema(
         responses=DocumentListSerializer,
         tags=["Document"],
     )
     def list(self, request):
-        filter = filters.SearchFilter()
-        queryset = filter.filter_queryset(request, self.get_queryset(), self)
+        search_filter = filters.SearchFilter()
+        queryset = search_filter.filter_queryset(request, self.get_queryset(), self)
 
         # queryset = Event.objects.all()
         item = request.query_params.get("document", None)
+        document_type = request.query_params.get("type")
         page = int(request.query_params.get("page", "1"))
         size = int(request.query_params.get("size", "10"))
         sortby = request.query_params.get("sortby", "id")
@@ -1089,6 +1095,9 @@ class DocumentViewSet(viewsets.ViewSet):
 
         if descending not in ["true", "false"]:
             descending = "true"
+
+        if document_type:
+            queryset = queryset.filter(type__id__in=list(filter(None, document_type.split(",")))).distinct()
 
         if item and len(item) > 0:
             queryset = queryset.filter(items__id__in=item.split(","))
@@ -1193,8 +1202,6 @@ class DocumentViewSet(viewsets.ViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            print("response data")
-            print(serializer.data)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1383,7 +1390,8 @@ class ServiceStatisticsViewSet(viewsets.ViewSet):
 
         # get unique set of years
         years = list(set(int(x.year.year) if x.year is not None else None for x in queryset))
-        years.remove(None)
+        if None in years:
+            years.remove(None)
         years.sort(reverse=True)
 
         # get unique set of services
@@ -1424,7 +1432,8 @@ class StatutStatisticsViewSet(viewsets.ViewSet):
 
         # get unique set of years
         years = list(set(int(x["year"].year) if x["year"] is not None else None for x in queryset))
-        years.remove(None)
+        if None in years:
+            years.remove(None)
         years.sort(reverse=True)
 
         # get unique set of statuts
@@ -1471,7 +1480,8 @@ class UrgentWrittenStatisticsViewSet(viewsets.ViewSet):
         # get unique set of years
         years = list(set(int(x.year.year) if x.year is not None else None for x in queryset))
         if None in years:
-            years.remove(None)
+            if None in years:
+                years.remove(None)
         years.sort(reverse=True)
 
         # get unique set of statuts

@@ -4,7 +4,7 @@ from pathlib import Path, PurePath
 
 from django.contrib.auth.models import User, Group
 from django.db import models
-
+from django.core.exceptions import ValidationError
 # from django.utils import timezone
 import datetime
 from ne_sop_api.utils import Utils
@@ -97,10 +97,12 @@ class Item(models.Model):
     writtenresponse = models.BooleanField(default=False)
     oralresponse = models.BooleanField(default=False)
     startdate = models.DateField(null=True)
+    nextdate = models.DateField(null=True)
     enddate = models.DateField(null=True)
     autonotify = models.BooleanField(default=False)
     valid = models.BooleanField(default=True)
     late = models.BooleanField(default=False)
+    strategic = models.BooleanField(default=False)
 
     lead = models.ForeignKey(
         "Entity",
@@ -176,13 +178,15 @@ class Event(models.Model):
     valid = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ["created"]
+        ordering = ["date", "time"]
 
     def __str__(self):
         return str(self.date) + " - " + str(self.type)
 
     def save(self, *args, **kwargs):
         super(Event, self).save(*args, **kwargs)
+
+        today = datetime.date.today()
 
         start_event = Event.objects.filter(item=self.item.pk, type=1).order_by("date").first()
 
@@ -194,8 +198,19 @@ class Event(models.Model):
 
         end_event = Event.objects.filter(item=self.item.pk, type=3).order_by("date").last()
 
+        next_event = Event.objects.filter(item=self.item.pk, date__gt=today).order_by("date").first()
+
         # get item instance
         item_instance = Item.objects.get(id=self.item.pk)
+
+        # update item next date
+        if next_event:
+
+            item_instance.nextdate = next_event.date
+            item_instance.save()
+
+        else:
+            item_instance.nextdate = None
 
         # update item end date and late status
         if end_event:
@@ -203,7 +218,7 @@ class Event(models.Model):
             # Item.objects.filter(id=self.item.pk).update(enddate=end_event.date)
             item_instance.enddate = end_event.date
 
-            if (item_instance.enddate < datetime.date.today()) and (item_instance.status.deadline):
+            if (item_instance.enddate < today) and (item_instance.status.deadline):
                 item_instance.late = True
                 # Item.objects.filter(id=self.item.pk, status__in=[1, 2]).update(late=True)
             else:
@@ -257,15 +272,16 @@ class Document(models.Model):
     modified = models.DateTimeField(auto_now=True)
     # template = models.ForeignKey(Template, null=True, on_delete=models.SET_NULL)
     note = models.CharField(max_length=500, blank=True, default="")
-    filename = models.CharField(default=None, max_length=200)
+    filename = models.CharField(default=None, max_length=200, blank=True, null=True)
     version = models.PositiveIntegerField(default=None)
-    size = models.PositiveIntegerField(default=0, null=False)
+    size = models.PositiveIntegerField(default=0, null=True)
     # item = models.ForeignKey(Item, related_name="documents", on_delete=models.CASCADE)
 
     items = models.ManyToManyField(Item, blank=True, related_name="documents")
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
-    file = models.FileField(upload_to=Utils.get_upload_path)
-    filehash = models.CharField(max_length=64, blank=True)
+    file = models.FileField(upload_to=Utils.get_upload_path, blank=True, null=True, default=None)
+    filehash = models.CharField(max_length=64, blank=True, null=True)
+    external_url = models.URLField(blank=True, null=True)
 
     class Meta:
         ordering = ["created"]
@@ -277,7 +293,17 @@ class Document(models.Model):
     def __str__(self):
         return self.file.name
 
+    def clean(self):
+        # Make sure that at least one of them is not empty
+        if not self.file and not self.external_url:
+            raise ValidationError("Un document doit avoir soit un fichier soit une URL externe.")
+        # Make sure that only one is not empty
+        if self.file and self.external_url:
+            raise ValidationError("Un document ne peut être enregistré que sous la forme d'un fichier OU d'une URL externe.")
+
     def save(self, *args, **kwargs):
+        self.full_clean()
+
         # Only calculate the hash if it hasn't been set
         if self.file:
             hasher = hashlib.sha256()

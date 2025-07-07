@@ -71,7 +71,6 @@ export const store = reactive({
   // HANDLE HTTP FETCH RESPONSE
   async handleResponse(response) {
     let payload = await response.json();
-
     // handle server errors
     if (response.ok) {
       return payload;
@@ -300,7 +299,7 @@ export const store = reactive({
     try {
       let query;
       if (summary) {
-        query = new URL(`${host}/api/item-summary/${uuid}`); // ?????????? ID ou UUID ?
+        query = new URL(`${host}/api/item-summary/${uuid}`);
       } else {
         query = new URL(`${host}/api/item/${uuid}`);
       }
@@ -487,7 +486,6 @@ export const store = reactive({
         body: JSON.stringify(data),
         redirect: "follow",
       });
-
       return await this.handleResponse(response);
     } catch (error) {
       // handle network and CORS errors (fetch promise rejected)
@@ -667,10 +665,15 @@ export const store = reactive({
     });
 
     formData.append("author", formInput.author.id);
-    formData.append("filename", formInput.filename);
-    formData.append("version", formInput.version); // TODO remove
-    formData.append("size", formInput.size);
-    formData.append("file", formInput.file);
+    if (formInput.file) {
+      formData.append("filename", formInput.filename);
+      formData.append("size", formInput.size);
+      formData.append("file", formInput.file);
+    }
+    if (formInput.external_url) {
+      formData.append("external_url", formInput.external_url);
+    }
+    formData.append("version", formInput.version);
     formData.append("valid", formInput.valid);
 
     // console.log("formData");
