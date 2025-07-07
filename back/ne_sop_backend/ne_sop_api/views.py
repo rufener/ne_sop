@@ -184,12 +184,11 @@ class ServiceViewSet(viewsets.ViewSet):
         tags=["Entities"],
     )
     def list(self, request):
-        filter = filters.SearchFilter()
+        # filter = filters.SearchFilter()
+        # print("ServiceViewSet - LIST")
 
-        print("ServiceViewSet - LIST")
-
-        print(f"len(self.get_queryset()): {len(self.get_queryset())}")
-        print(f"len(Entity.objects.all()): {len(Entity.objects.all())}")
+        # print(f"len(self.get_queryset()): {len(self.get_queryset())}")
+        # print(f"len(Entity.objects.all()): {len(Entity.objects.all())}")
 
         # queryset = filter.filter_queryset(request, Entity.objects.all(), self)
         # queryset = filter.filter_queryset(request, self.get_queryset(), self)
@@ -214,7 +213,7 @@ class ServiceViewSet(viewsets.ViewSet):
         if descending not in ["true", "false"]:
             descending = "false"
 
-        print(f"Queryset length: {len(queryset)}")
+        # print(f"Queryset length: {len(queryset)}")
 
         '''
         if descending == "true":
@@ -231,7 +230,7 @@ class ServiceViewSet(viewsets.ViewSet):
         nrows = paginator.count
         npages = paginator.num_pages
 
-        print(f"Queryset (modified) length: {len(queryset)}")
+        # print(f"Queryset (modified) length: {len(queryset)}")
 
         serializer = EntityListSerializer(queryset, many=True, context={'request': request})
 
