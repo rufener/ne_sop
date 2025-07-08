@@ -630,11 +630,11 @@ export const store = reactive({
 
     formData.append("reference", formInput.reference);
     formData.append("title", formInput.title);
-    formData.append("type", formInput.type.id);
+    formData.append("type_id", formInput.type.id);
     formData.append("note", formInput.note);
 
     formInput.items.forEach((item) => {
-      formData.append("items", item.id);
+      formData.append("items_id", item.id);
     });
 
     formData.append("author", formInput.author.id);
@@ -643,7 +643,6 @@ export const store = reactive({
     formData.append("file", formInput.file);
     formData.append("external_url", formInput.external_url);
     formData.append("version", formInput.version);
-    formData.append("valid", formInput.valid);
 
     // console.log("formData");
     // console.log(formData);
@@ -679,11 +678,11 @@ export const store = reactive({
     formData.append("uuid", formInput.uuid);
     formData.append("reference", formInput.reference);
     formData.append("title", formInput.title);
-    formData.append("type", formInput.type.id);
+    formData.append("type_id", formInput.type.id);
     formData.append("note", formInput.note);
 
     formInput.items.forEach((item) => {
-      formData.append("items", item.id);
+      formData.append("items_id", item.id);
     });
 
     formData.append("author", formInput.author.id);
@@ -691,7 +690,6 @@ export const store = reactive({
     formData.append("filename", formInput.filename);
     formData.append("size", formInput.size);
     formData.append("file", formInput.file);
-    formData.append("valid", formInput.valid);
     formData.append("version", formInput.version); // TODO remove
     // formData.append("created", formInput.created);
 
@@ -711,8 +709,7 @@ export const store = reactive({
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
-      // console.log("Document updated successfully:", data);
+      return await this.handleResponse(response);
     } catch (error) {
       console.error("Error updating document:", error);
     }

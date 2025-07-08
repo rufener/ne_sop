@@ -180,7 +180,7 @@ export default {
             loading: false,
             pagination: {
                 rowsNumber: 0,
-                sortBy: "id",
+                sortBy: "modified",
                 descending: true,
                 page: 1,
                 rowsPerPage: 25,

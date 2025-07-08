@@ -118,7 +118,7 @@
 
                         <div class="col">
 
-                            <q-select bg-color="white" popup-content-class="custom-dropdown" outlined v-model="myitem" use-input hide-selected :options="itemOptions" option-label="title" @update:model-value="selectOption" @filter="filterFn" :rules="[() => checkItemList()]" label="Lier des objets politiques à ce document" :disable="!edit">
+                            <q-select bg-color="white" popup-content-class="custom-dropdown" outlined v-model="myitem" use-input hide-selected :options="itemOptions" option-label="title" @update:model-value="selectOption" @filter="filterFn" :rules="[() => checkItemList()]" label="Chercher (n° ou titre) des objets politiques à lier au document" :disable="!edit">
                                 <template v-slot:prepend>
                                     <q-icon name="sym_o_search" />
                                 </template>
@@ -141,6 +141,14 @@
                                             </q-chip>
                                         </q-item-section>
                                         -->
+                                    </q-item>
+                                </template>
+
+                                <template v-slot:no-option>
+                                    <q-item>
+                                        <q-item-section class="text-grey">
+                                        Aucun résultat
+                                        </q-item-section>
                                     </q-item>
                                 </template>
 
@@ -240,6 +248,18 @@ export default {
             documentModel: "Document",
         }
     },
+    watch: {
+        modelValue: {
+            handler(newValue, oldValue) {
+                store.document.new = JSON.stringify(this.modelValue)
+
+                if (this.changewatch) {
+                    store.updateWarning(store.document)
+                }
+            },
+            deep: true
+        },
+    },
     computed: {
         document: {
             get() {
@@ -270,6 +290,10 @@ export default {
         },
         async getItemOptions(searchstring = "") {
 
+            if (searchstring.length < 3) {
+                this.itemOptions = [];
+                return;
+            }
             const options = (await store.getItems({ search: searchstring.toLowerCase() }, 1, 5, "number", "false")).results
             options.map(x => x.disable = this.document.items.some(item => item.uuid === x.uuid))
             this.itemOptions = options
@@ -330,6 +354,9 @@ export default {
                 window.open(this.document.external_url, '_blank')
             }
         }
+    },
+    async mounted() {
+        store.document.old = JSON.stringify(this.modelValue)
     }
 }
 </script>
