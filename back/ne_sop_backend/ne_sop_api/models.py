@@ -283,9 +283,9 @@ class Document(models.Model):
     class Meta:
         ordering = ["created"]
 
-    @property
-    def relpath(self):
-        return PurePath(str(self.item.created.year), str(self.item.id), self.file.name)
+    # @property
+    # def relpath(self):
+    #     return PurePath(str(self.item.created.year), str(self.item.id), self.file.name)
 
     def __str__(self):
         return self.file.name

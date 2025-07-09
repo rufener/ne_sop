@@ -8,6 +8,8 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template import loader
 
+import os
+
 
 class MyHTMLParser(HTMLParser):
     def __init__(self):
@@ -62,6 +64,22 @@ class Utils(object):
     def get_upload_path(cls, instance, filename):
         return PurePath(str(instance.uuid), filename)
         # return PurePath(str(instance.item.created.year), str(instance.item.id), filename)
+
+    @classmethod
+    def removeFile(cls, instance, removeParentDir=False):
+        if instance.file:
+            instance.file.close()
+            print("Deleting existing file:", instance.file.path)
+            instance.file.delete(save=False)
+        if removeParentDir is True:
+            try:
+                print("Removing file parent folder:", str(instance.uuid))
+                os.rmdir(PurePath(settings.MEDIA_ROOT, str(instance.uuid)))
+            except OSError as e:
+                print(f"Erreur lors de la suppression du répertoire : {e}")
+
+        return
+
 
     @classmethod
     def get_next_documentVersion(cls, DocumentModel, data):

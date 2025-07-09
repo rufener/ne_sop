@@ -1056,19 +1056,17 @@ class DocumentViewSet(viewsets.ViewSet):
 
             # Check if a new file was uploaded.
             if "file" in request.FILES:
-                # If a new file is provided and there's an existing file, delete the old file.
-                if document.file:
-                    document.file.close()
-                    print("Deleting existing file:", document.file.path)
-                    document.file.delete(save=False)
+                # If a new file is provided and there's an existing file, delete the old file
+                Utils.removeFile(document, removeParentDir=False)
             else:
-                # No new file uploaded via request.FILES.
+                # No new file uploaded via request.FILES
                 # Remove the 'file' key if it exists (it might be a string or empty value)
                 data.pop("file", None)
                 data.pop("filename", None)
                 data.pop("size", None)
 
         if isinstance(filename, str) and filename.lower() == "null":
+            Utils.removeFile(document, removeParentDir=True)
             data["file"] = None
             data["size"] = None
             data["filename"] = None

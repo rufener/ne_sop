@@ -508,24 +508,22 @@ class DocumentSerializer(serializers.ModelSerializer):
     #     return document
 
     def validate(self, data):
+        def _move_fieldID_to_field(fieldname):
+            """saves value contained in field_id into field and remove field_id"""
+            field = data_dict.get(fieldname, None)
+            field_id = data_dict.get(fieldname + "_id", None)
+            if field is None and not field_id is None:
+                field = field_id
+                data_dict[fieldname] = field_id
+                data_dict.pop(fieldname + "_id")
+
         data_dict = dict(data)  # mutable copy of data
+
+        _move_fieldID_to_field("items")
+        _move_fieldID_to_field("type")
 
         # Check that at least one item is linked to document
         items = data_dict.get("items", None)
-        items_id = data_dict.get("items_id", None)
-        if items is None and not items_id is None:
-            items = items_id
-            data_dict["items"] = items_id
-            data_dict.pop("items_id")
-
-        # Check that at least one item is linked to document
-        type = data_dict.get("type", None)
-        type_id = data_dict.get("type_id", None)
-        if type is None and not type_id is None:
-            type = type_id
-            data_dict["type"] = type_id
-            data_dict.pop("type_id", None)
-
         if not items or len(items) == 0:
             raise serializers.ValidationError("Un document doit être lié à au moins un item.")
 
