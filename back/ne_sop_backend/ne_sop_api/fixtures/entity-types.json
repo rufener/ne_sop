@@ -1,34 +1,34 @@
 [
-    {
-        "model": "ne_sop_api.EntityType",
-        "pk": 1,
-        "fields": {
-            "name": "Service de l'état",
-            "service": true
-        }
-    },
-    {
-        "model": "ne_sop_api.EntityType",
-        "pk": 2,
-        "fields": {
-            "name": "Parlementaire",
-            "service": false
-        }
-    },
-    {
-        "model": "ne_sop_api.EntityType",
-        "pk": 3,
-        "fields": {
-            "name": "Groupe parlementaire",
-            "service": false
-        }
-    },
-    {
-        "model": "ne_sop_api.EntityType",
-        "pk": 4,
-        "fields": {
-            "name": "Autre",
-            "service": false
-        }
+  {
+    "model": "ne_sop_api.EntityType",
+    "pk": 1,
+    "fields": {
+      "name": "Service de l'état",
+      "service": true
     }
+  },
+  {
+    "model": "ne_sop_api.EntityType",
+    "pk": 2,
+    "fields": {
+      "name": "Parlementaire",
+      "service": false
+    }
+  },
+  {
+    "model": "ne_sop_api.EntityType",
+    "pk": 3,
+    "fields": {
+      "name": "Groupe parlementaire",
+      "service": false
+    }
+  },
+  {
+    "model": "ne_sop_api.EntityType",
+    "pk": 4,
+    "fields": {
+      "name": "Autre",
+      "service": false
+    }
+  }
 ]

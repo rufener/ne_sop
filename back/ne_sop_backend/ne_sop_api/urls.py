@@ -11,6 +11,7 @@ router.register(r"item-summary", views.ItemSummaryViewSet, basename="item-summar
 router.register(r"item-type", views.ItemTypeViewSet, basename="item-type")
 router.register(r"item-status", views.ItemStatusViewSet, basename="item-status")
 router.register(r"entity", views.EntityViewSet, basename="entity")
+router.register(r"service", views.ServiceViewSet, basename="service")
 # router.register(r"service", views.ServiceViewSet, basename="service")
 router.register(r"entity-type", views.EntityTypeViewSet, basename="entity-type")
 # router.register(r"parliamentary-type", views.ParliamentaryTypeViewSet, basename="parliamentary-type")
