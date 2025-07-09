@@ -171,7 +171,7 @@ class ServiceViewSet(viewsets.ViewSet):
         return (
             Entity.objects
             .filter(type__service=True)
-            .annotate( 
+            .annotate(
                 has_access=Exists(
                     user.entities.filter(pk=OuterRef('pk'))
                 )
@@ -250,7 +250,7 @@ class EntityViewSet(viewsets.ViewSet):
     def list(self, request):
         search_filter = filters.SearchFilter()
         queryset = search_filter.filter_queryset(request, self.get_queryset(), self)
-    
+
     '''
 
     @extend_schema(
@@ -1108,6 +1108,7 @@ class DocumentViewSet(viewsets.ViewSet):
             instance = serializer.save()  # Save and get the created instance
             # Use a different serializer to format the output data
             output_serializer = DocumentSerializer(instance, context={"request": request})
+
             return Response(output_serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

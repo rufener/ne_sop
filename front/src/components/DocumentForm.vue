@@ -123,6 +123,10 @@
                                     <q-icon name="sym_o_search" />
                                 </template>
 
+                                <template v-slot:append>
+                                    <q-spinner color="blue-grey" :thickness="3" v-if="loading" />
+                                </template>
+
                                 <template v-slot:option="scope">
 
                                     <q-item v-bind="scope.itemProps">
@@ -237,6 +241,7 @@ export default {
     data() {
         return {
             store,
+            loading: false,
             myitem: [],
             filter: { search: "" },
             dialog: { deletion: false },
@@ -290,13 +295,17 @@ export default {
         },
         async getItemOptions(searchstring = "") {
 
+            this.loading = true;
             if (searchstring.length < 3) {
+                this.loading = false;
                 this.itemOptions = [];
                 return;
             }
+
             const options = (await store.getItems({ search: searchstring.toLowerCase() }, 1, 5, "number", "false")).results
             options.map(x => x.disable = this.document.items.some(item => item.uuid === x.uuid))
             this.itemOptions = options
+            this.loading = false;
 
         },
         filterFn(val, update, abort) {

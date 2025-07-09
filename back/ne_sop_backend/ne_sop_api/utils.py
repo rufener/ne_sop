@@ -9,6 +9,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template import loader
 
 import os
+import shutil
 
 
 class MyHTMLParser(HTMLParser):
@@ -24,7 +25,7 @@ class MyHTMLParser(HTMLParser):
             self.text_parts.append("\n")
 
     def get_text(self):
-        return ''.join(self.text_parts)
+        return "".join(self.text_parts)
 
 
 class Utils(object):
@@ -67,19 +68,30 @@ class Utils(object):
 
     @classmethod
     def removeFile(cls, instance, removeParentDir=False):
-        if instance.file:
-            instance.file.close()
-            print("Deleting existing file:", instance.file.path)
-            instance.file.delete(save=False)
-        if removeParentDir is True:
+        folder_path = os.path.join(settings.MEDIA_ROOT, str(instance.uuid))
+
+        if os.path.isdir(folder_path):
             try:
-                print("Removing file parent folder:", str(instance.uuid))
-                os.rmdir(PurePath(settings.MEDIA_ROOT, str(instance.uuid)))
-            except OSError as e:
+                shutil.rmtree(folder_path)
+            except Exception as e:
                 print(f"Erreur lors de la suppression du répertoire : {e}")
+                # return Response({"msg": f"Error deleting folder: {e}"}, status=500)
+
+        ###############################
+        ###      TODO REMOVE        ###
+        ###############################
+        #  if instance.file:
+        #     instance.file.close()
+        #     print("Deleting existing file:", instance.file.path)
+        #     instance.file.delete(save=False)
+        # if removeParentDir is True:
+        #     try:
+        #         print("Removing file parent folder:", str(instance.uuid))
+        #         os.rmdir(PurePath(settings.MEDIA_ROOT, str(instance.uuid)))
+        #     except OSError as e:
+        #         print(f"Erreur lors de la suppression du répertoire : {e}")
 
         return
-
 
     @classmethod
     def get_next_documentVersion(cls, DocumentModel, data):
@@ -212,8 +224,8 @@ class Utils(object):
         :return: HttpResponse containing the ICS file
         """
         cal = Calendar()
-        cal.add('prodid', '-//Neuchâtel//NESOP//EN')
-        cal.add('version', '2.0')
+        cal.add("prodid", "-//Neuchâtel//NESOP//EN")
+        cal.add("version", "2.0")
 
         ics_event = IcsEvent()
 
@@ -222,15 +234,15 @@ class Utils(object):
             dtstart = datetime.combine(event.date, event.time)
         else:
             dtstart = datetime.combine(event.date, datetime.min.time())
-        ics_event.add('dtstart', dtstart)
+        ics_event.add("dtstart", dtstart)
 
         # Default event duration: 1 hour
         dtend = dtstart + timedelta(hours=1)
-        ics_event.add('dtend', dtend)
+        ics_event.add("dtend", dtend)
 
         # Compose a summary (title) from event type and item name if available
         summary = f"OP {event.item.number} - {event.type.name}"
-        ics_event.add('summary', summary)
+        ics_event.add("summary", summary)
 
         # Add description and unique identifier
         description = (
@@ -241,15 +253,15 @@ class Utils(object):
             f"Description: {event.description}"
         )
 
-        ics_event.add('description', description)
-        ics_event.add('uid', str(event.uuid))
+        ics_event.add("description", description)
+        ics_event.add("uid", str(event.uuid))
 
         if event.created:
-            ics_event.add('created', event.created)
+            ics_event.add("created", event.created)
 
         cal.add_component(ics_event)
 
-        response = HttpResponse(cal.to_ical(), content_type='text/calendar; charset=utf-8')
+        response = HttpResponse(cal.to_ical(), content_type="text/calendar; charset=utf-8")
         filename = f"nesop_{event.item.number.replace('.', '')}_{event.date.strftime('%Y%m%d')}.ics"
-        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
         return response
