@@ -53,6 +53,9 @@ class Entity(models.Model):
     class Meta:
         ordering = ["name"]
 
+    def has_access(self, user):
+        return user in self.users.all()
+
 
 # %% ITEM TYPE
 class ItemType(models.Model):

@@ -36,7 +36,7 @@ from ne_sop_api.serializers import (
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.db.models.functions import Lower, TruncYear
-from django.db.models import Q, Count
+from django.db.models import Q, Count, BooleanField, Case, When, Value, Exists, OuterRef
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -158,6 +158,63 @@ class ParliamentaryTypeViewSet(viewsets.ViewSet):
 """
 
 
+# %% SERVICE
+class ServiceViewSet(viewsets.ViewSet):
+    """
+    Services viewset
+    """
+    serializer_class = EntityListSerializer
+    permission_classes = [IsManagerOrReadOnlyPermission]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        return (
+            Entity.objects
+            .filter(type__service=True)
+            .annotate( 
+                has_access=Exists(
+                    user.entities.filter(pk=OuterRef('pk'))
+                )
+            )
+            .order_by('-has_access', 'abbreviation')
+        )
+
+    @extend_schema(
+        tags=["Entities"],
+    )
+    def list(self, request):
+
+        queryset = self.get_queryset()
+
+        page = int(request.query_params.get("page", "1"))
+        size = int(request.query_params.get("size", "10"))
+        sortby = request.query_params.get("sortby", "id")
+        descending = request.query_params.get("descending", "false")
+
+        sortby = "has_access"
+
+        if descending not in ["true", "false"]:
+            descending = "false"
+
+        paginator = Paginator(queryset, size)
+        queryset = paginator.page(page)
+        nrows = paginator.count
+        npages = paginator.num_pages
+        serializer = EntityListSerializer(queryset, many=True, context={'request': request})
+
+        return Response(
+            {
+                "page": page,
+                "npages": npages,
+                "nrows": nrows,
+                "sortby": sortby,
+                "descending": descending,
+                "results": serializer.data,
+            }
+        )
+
+
 # %% ENTITY
 class EntityViewSet(viewsets.ViewSet):
     """
@@ -168,13 +225,44 @@ class EntityViewSet(viewsets.ViewSet):
     search_fields = ["name", "email", "telephone"]
     permission_classes = [IsManagerOrReadOnlyPermission]
 
+    def get_queryset(self):
+        # user = self.request.user
+        return Entity.objects.all()
+        # return user.entities.all().distinct()
+
+        # if user.groups.filter(name="Manager").exists():
+        #    return Entity.objects.all()
+
+        # return Entity.objects.filter(users__in=user.entities.all()).distinct()
+        # return Item.objects.all()
+
+    '''
+    def get_queryset(self):
+        user = self.request.user
+        # if user.groups.filter(name="Manager").exists():
+        #    return Item.objects.all()
+        return Item.objects.filter(Q(lead__in=user.entities.all()) | Q(support__in=user.entities.all())).distinct()
+        # return Item.objects.all()
+
+    @extend_schema(
+        responses=NewItemSerializer,
+        tags=["Items"],
+    )
+    def list(self, request):
+        search_filter = filters.SearchFilter()
+        queryset = search_filter.filter_queryset(request, self.get_queryset(), self)
+    
+    '''
+
     @extend_schema(
         tags=["Entities"],
     )
     def list(self, request):
         filter = filters.SearchFilter()
 
-        queryset = filter.filter_queryset(request, Entity.objects.all(), self)
+        # queryset = filter.filter_queryset(request, Entity.objects.all(), self)
+        queryset = filter.filter_queryset(request, self.get_queryset(), self)
+
         # queryset = filter.filter_queryset(request, Entity.objects.filter(type__in=[3]), self)
 
         # if self.request.user.is_superuser:
@@ -512,8 +600,8 @@ class ItemViewSet(viewsets.ViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.groups.filter(name="Manager").exists():
-            return Item.objects.all()
+        # if user.groups.filter(name="Manager").exists():
+        #    return Item.objects.all()
         return Item.objects.filter(Q(lead__in=user.entities.all()) | Q(support__in=user.entities.all())).distinct()
         # return Item.objects.all()
 

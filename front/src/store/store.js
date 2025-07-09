@@ -114,6 +114,33 @@ export const store = reactive({
     },
     */
 
+  // GET LIST OF SERVICES
+  async getServices(filter = {}, page = 1, size = 25, sortBy = "", descending = "false") {
+    try {
+      const query = new URL(`${host}/api/service?`);
+      query.searchParams.append("page", page);
+      query.searchParams.append("size", size);
+      query.searchParams.append("sortby", sortBy);
+      query.searchParams.append("descending", descending);
+
+      for (const [key, value] of Object.entries(filter)) {
+        if (value) {
+          // console.log(`${key}: ${value}`)
+          query.searchParams.append(key, value);
+        }
+      }
+
+      const response = await fetch(query, {
+        method: "GET",
+        redirect: "follow",
+      });
+
+      return await this.handleResponse(response);
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
   // GET LIST OF ENTITIES
   async getEntities(filter = {}, page = 1, size = 10, sortBy = "", descending = "false") {
     try {
