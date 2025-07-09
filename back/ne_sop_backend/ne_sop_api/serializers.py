@@ -3,6 +3,7 @@ from ne_sop_api.utils import Utils
 from django.conf import settings
 from django.contrib.auth.models import User
 from datetime import date
+from collections import OrderedDict
 
 from ne_sop_api.models import (
     Document,
@@ -453,97 +454,24 @@ class DocumentTypeSerializer(serializers.ModelSerializer):
 # %% DOCUMENT
 class DocumentSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False, read_only=False)
-    # type = serializers.PrimaryKeyRelatedField(queryset=DocumentType.objects.all())
+
     items = NestedItemSerializer(read_only=True, many=True)
+    items_id = serializers.PrimaryKeyRelatedField(many=True, queryset=Item.objects.all(), write_only=True)
 
-    """
     type = DocumentTypeSerializer(read_only=True)
-
-    type_id = serializers.PrimaryKeyRelatedField(
-        source="type",
-        queryset=DocumentType.objects.all(),
-        write_only=True,
-    )
-    """
-
-    type = DocumentTypeSerializer(read_only=True)  # TODO
+    type_id = serializers.PrimaryKeyRelatedField(required=True, queryset=DocumentType.objects.all(), write_only=True)
 
     # template = serializers.SlugRelatedField(slug_field="name", read_only=True)
     # template_id = serializers.PrimaryKeyRelatedField(source="template", queryset=Template.objects.all(), write_only=True)
 
-    # author = UserFullNameSerializer(read_only=True)
     author = UserSerializer(read_only=True)
-
     author_id = serializers.PrimaryKeyRelatedField(source="author", queryset=User.objects.all(), default=serializers.CurrentUserDefault(), write_only=True)
 
     version = serializers.IntegerField(required=False)
 
-    class Meta:
-        model = Document
-        fields = [
-            "id",
-            "uuid",
-            "reference",
-            "title",
-            "type",
-            "created",
-            "modified",
-            "filename",
-            "note",
-            "version",
-            "size",
-            "items",
-            "author",
-            "author_id",
-            "file",
-            "filehash",
-            "external_url",
-        ]
-        read_only_fields = ["created", "modified"]
+    external_url = serializers.URLField(required=False, allow_null=True)
 
-    def create(self, validated_data):
-        version = "1"
-        file = validated_data.get("file", None)
-        external_url = validated_data.get("external_url", None)
-        if not file and not external_url:
-            raise serializers.ValidationError("Un document doit avoir soit un fichier, soit une URL externe.")
-
-        if file is not None:
-            filename = file.name
-            file_extension = filename.rsplit(".", 1)[1]
-            filename = filename.rsplit(".", 1)[0] + f"_v{version}." + file_extension
-            file.name = filename
-            validated_data["file"] = file
-            validated_data["filename"] = filename
-            document = Document.objects.create(**validated_data)
-        return document
-
-
-# %% New document serializer
-class NewDocumentSerializer(serializers.ModelSerializer):
-
-    id = serializers.IntegerField(required=False, read_only=False)
-
-    type = serializers.PrimaryKeyRelatedField(
-        required=True,
-        queryset=DocumentType.objects.all(),
-    )
-
-    author = serializers.PrimaryKeyRelatedField(
-        required=True,
-        queryset=User.objects.all(),
-    )
-
-    version = serializers.IntegerField(required=False)
-
-    # type = serializers.PrimaryKeyRelatedField(queryset=DocumentType.objects.all())
-    # items = NestedItemSerializer(read_only=True, many=True)
-
-    items = serializers.PrimaryKeyRelatedField(
-        required=False,
-        many=True,
-        queryset=Item.objects.all(),
-    )
+    valid = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Document
@@ -553,6 +481,7 @@ class NewDocumentSerializer(serializers.ModelSerializer):
             "reference",
             "title",
             "type",
+            "type_id",
             "created",
             "modified",
             "filename",
@@ -560,22 +489,147 @@ class NewDocumentSerializer(serializers.ModelSerializer):
             "version",
             "size",
             "items",
+            "items_id",
             "author",
             "author_id",
             "file",
             "filehash",
             "external_url",
+            "valid",
         ]
         read_only_fields = ["created", "modified"]
+
+    def get_valid(self, obj):
+        return True
+
+    # def create(self, validated_data):
+    #     version = "1"
+    #     file = validated_data.get("file", None)
+    #     external_url = validated_data.get("external_url", None)
+    #     if not file and not external_url:
+    #         raise serializers.ValidationError("Un document doit avoir soit un fichier, soit une URL externe.")
+
+    #     if file is not None:
+    #         filename = file.name
+    #         file_extension = filename.rsplit(".", 1)[1]
+    #         filename = filename.rsplit(".", 1)[0] + f"_v{version}." + file_extension
+    #         file.name = filename
+    #         validated_data["file"] = file
+    #         validated_data["filename"] = filename
+    #         document = Document.objects.create(**validated_data)
+    #     return document
 
     def validate(self, data):
-        file = data.get("file")
-        external_url = data.get("external_url")
+        def _move_fieldID_to_field(fieldname):
+            """saves value contained in field_id into field and remove field_id"""
+            field = data_dict.get(fieldname, None)
+            field_id = data_dict.get(fieldname + "_id", None)
+            if field is None and not field_id is None:
+                field = field_id
+                data_dict[fieldname] = field_id
+                data_dict.pop(fieldname + "_id")
 
-        if not file and not external_url:
-            raise serializers.ValidationError("Un document doit avoir soit un fichier, soit une URL externe.")
+        data_dict = dict(data)  # mutable copy of data
 
-        return data
+        _move_fieldID_to_field("items")
+        _move_fieldID_to_field("type")
+
+        # Check that at least one item is linked to document
+        items = data_dict.get("items", None)
+        if not items or len(items) == 0:
+            raise serializers.ValidationError("Un document doit être lié à au moins un item.")
+
+        data_orderedDict = OrderedDict(data_dict)
+
+        return data_orderedDict
+
+
+# # %% New document serializer
+# class NewDocumentSerializer(serializers.ModelSerializer):
+
+#     id = serializers.IntegerField(required=False, read_only=False)
+
+#     # type = serializers.PrimaryKeyRelatedField(
+#     #     required=True,
+#     #     queryset=DocumentType.objects.all(),
+#     # )
+#     type = DocumentTypeSerializer(read_only=True)
+
+#     # author = serializers.PrimaryKeyRelatedField(
+#     #     required=True,
+#     #     queryset=User.objects.all(),
+#     # )
+#     author = UserSerializer(read_only=True)
+#     author_id = serializers.PrimaryKeyRelatedField(source="author", queryset=User.objects.all(), default=serializers.CurrentUserDefault(), write_only=True)
+
+#     version = serializers.IntegerField(required=False)
+
+#     # type = serializers.PrimaryKeyRelatedField(queryset=DocumentType.objects.all())
+#     # items = NestedItemSerializer(read_only=True, many=True)
+
+#     items = serializers.PrimaryKeyRelatedField(
+#         required=False,
+#         many=True,
+#         queryset=Item.objects.all(),
+#     )
+
+#     valid = serializers.SerializerMethodField(read_only=True)
+
+#     class Meta:
+#         model = Document
+#         fields = [
+#             "id",
+#             "uuid",
+#             "reference",
+#             "title",
+#             "type",
+#             "created",
+#             "modified",
+#             "filename",
+#             "note",
+#             "version",
+#             "size",
+#             "items",
+#             "author",
+#             "author_id",
+#             "file",
+#             "filehash",
+#             "external_url",
+#             "valid",
+#         ]
+#         read_only_fields = ["created", "modified"]
+
+#     def get_valid(self, obj):
+#         return True
+
+#     def validate(self, data):
+#         file = data.get("file", None)
+#         external_url = data.get("external_url", None)
+
+#         # Convert "null" string to None
+#         if isinstance(file, str) and file.lower() == "null":
+#             file = None
+#             data["file"] = None
+
+#         # Set filename and size to "null" if file is None
+#         if file is None:
+#             data["filename"] = None
+#             data["size"] = None
+
+#         # Convert "null" string to None
+#         if isinstance(external_url, str) and external_url.lower() == "null":
+#             external_url = None
+#             data["external_url"] = None
+
+#         if not file and not external_url:
+#             raise serializers.ValidationError("Un document doit avoir soit un fichier, soit une URL externe.")
+
+#         # Check that at least one item is linked to document
+#         items = data.get("items", None)
+#         if not items or len(items) == 0:
+#             raise serializers.ValidationError("Un document doit être lié à au moins un item.")
+
+#         return data
 
 
 # %% New item serializer

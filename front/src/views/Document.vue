@@ -109,6 +109,7 @@ export default {
                 "items": [],
                 "valid": false,
                 "author": store.user,
+                "external_url": null,
             }
             // console.log("initialize_document()")
             // console.log(this.document)

@@ -12,7 +12,6 @@ from ne_sop_api.models import (
 )
 from ne_sop_api.serializers import (
     DocumentSerializer,
-    NewDocumentSerializer,
     DocumentListSerializer,
     DocumentTypeSerializer,
     EntitySerializer,
@@ -172,7 +171,7 @@ class ServiceViewSet(viewsets.ViewSet):
         return (
             Entity.objects
             .filter(type__service=True)
-            .annotate( 
+            .annotate(
                 has_access=Exists(
                     user.entities.filter(pk=OuterRef('pk'))
                 )
@@ -251,7 +250,7 @@ class EntityViewSet(viewsets.ViewSet):
     def list(self, request):
         search_filter = filters.SearchFilter()
         queryset = search_filter.filter_queryset(request, self.get_queryset(), self)
-    
+
     '''
 
     @extend_schema(
@@ -1014,7 +1013,7 @@ class DocumentViewSet(viewsets.ViewSet):
     """
 
     parser_classes = (MultiPartParser, FormParser)
-    serializer_class = NewDocumentSerializer
+    serializer_class = DocumentSerializer
     search_fields = ["title", "reference", "filename", "items__title", "items__number"]
     # lookup_field = "uuid"
     # lookup_url_kwarg = "uuid"
@@ -1084,15 +1083,32 @@ class DocumentViewSet(viewsets.ViewSet):
         )
 
     @extend_schema(
-        responses=NewDocumentSerializer,
+        responses=DocumentSerializer,
         tags=["Document"],
     )
     def create(self, request):
-        serializer = NewDocumentSerializer(data=request.data, context={"request": request})  # self.request
+        # Make a mutable copy of request.data
+        data = request.data.copy()
+
+        # If filename is null, remove `file` field
+        filename = data.get("filename", "null")
+        if isinstance(filename, str) and filename.lower() == "null":
+            data["file"] = None
+            data["size"] = None
+            data["filename"] = None
+
+        # If external_url is null, remove `external_url` field
+        external_url = data.get("external_url", "null")
+        if isinstance(external_url, str) and external_url.lower() == "null":
+            data["external_url"] = None
+
+        serializer = DocumentSerializer(data=data, context={"request": request})  # self.request
+
         if serializer.is_valid():
             instance = serializer.save()  # Save and get the created instance
             # Use a different serializer to format the output data
             output_serializer = DocumentSerializer(instance, context={"request": request})
+
             return Response(output_serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -1108,57 +1124,49 @@ class DocumentViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     @extend_schema(
-        responses=NewDocumentSerializer,
+        responses=DocumentSerializer,
         tags=["Document"],
     )
     def update(self, request, pk=None):
-        #  document = get_object_or_404(self.get_queryset(), pk=pk) # TODO: decide if we use uuid or integer PK
         document = get_object_or_404(self.get_queryset(), uuid=pk)
-
-        # os.remove(PurePath(settings.MEDIA_ROOT, document.file.name))
 
         # Make a mutable copy of request.data.
         data = request.data.copy()
-
-        # print("update document")
-        # print("request data")
-        # print(data)
 
         # Clear linked items if the items attribute is not present in the update request
         if "items" not in request.data:
             document.items.clear()
 
-        # Check if a new file was uploaded.
-        if "file" in request.FILES:
-            # If a new file is provided and there's an existing file, delete the old file.
-            if document.file:
-                document.file.close()
-                print("Deleting existing file:", document.file.path)
-                document.file.delete(save=False)
-        else:
-            # No new file uploaded via request.FILES.
-            # Remove the 'file' key if it exists (it might be a string or empty value)
-            data.pop("file", None)
+        # If external_url is null, remove `external_url` field
+        external_url = data.get("external_url", "null")
+        filename = data.get("filename", "null")
+        if isinstance(external_url, str) and external_url.lower() == "null":
+            data["external_url"] = None
+
+            # Check if a new file was uploaded.
+            if "file" in request.FILES:
+                # If a new file is provided and there's an existing file, delete the old file
+                Utils.removeFile(document, removeParentDir=False)
+            else:
+                # No new file uploaded via request.FILES
+                # Remove the 'file' key if it exists (it might be a string or empty value)
+                data.pop("file", None)
+                data.pop("filename", None)
+                data.pop("size", None)
+
+        if isinstance(filename, str) and filename.lower() == "null":
+            Utils.removeFile(document, removeParentDir=True)
+            data["file"] = None
+            data["size"] = None
+            data["filename"] = None
 
         # Use partial=True so that only provided fields are updated.
-        serializer = NewDocumentSerializer(document, data=data, partial=True)
-
-        """
-        print("Update document")
-        print("Request:")
-        print(request)
-
-        print("Request FILES:")
-        print(request.FILES)
-
-        print("Request data:")
-        print(request.data)
-        print("Document:")
-        """
+        serializer = DocumentSerializer(document, data=data, partial=True)
 
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(

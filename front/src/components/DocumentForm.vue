@@ -60,9 +60,14 @@
                     <div v-if="documentModel === 'Lien hypertexte'">
                         <!-- EXTERNAL URL FIELD -->
                         <div class="col q-my-md">
-                            <q-input bg-color="white" outlined v-model="document.external_url" label="Lien hypertexte vers le fichier" placeholder="Insérer un lien hypertexte vers le fichier" :rules="[v => checkHref(v)]">
+                            <q-input bg-color="white" outlined v-model="document.external_url" label="Lien hypertexte vers le fichier" placeholder="Insérer un lien hypertexte vers le fichier" :rules="[v => checkHref(v)]" :disable="!edit">
                                 <template v-slot:prepend>
                                     <q-icon name="sym_o_globe" />
+                                </template>
+                                <template v-slot:after>
+                                    <q-btn dense round flat color="grey" @click="openExternalUrl" icon="sym_o_open_in_new">
+                                        <q-tooltip class="bg-black">Ouvrir dans un nouvel onglet: {{ document.title }}</q-tooltip>
+                                    </q-btn>
                                 </template>
                             </q-input>
                         </div>
@@ -113,9 +118,13 @@
 
                         <div class="col">
 
-                            <q-select bg-color="white" popup-content-class="custom-dropdown" outlined v-model="myitem" use-input hide-selected :options="itemOptions" option-label="title" @update:model-value="selectOption" @filter="filterFn" label="Lier des objets politiques à ce document" :disable="!edit">
+                            <q-select bg-color="white" popup-content-class="custom-dropdown" outlined v-model="myitem" use-input hide-selected :options="itemOptions" option-label="title" @update:model-value="selectOption" @filter="filterFn" :rules="[() => checkItemList()]" label="Chercher (n° ou titre) des objets politiques à lier au document" :disable="!edit">
                                 <template v-slot:prepend>
                                     <q-icon name="sym_o_search" />
+                                </template>
+
+                                <template v-slot:append>
+                                    <q-spinner color="blue-grey" :thickness="3" v-if="loading" />
                                 </template>
 
                                 <template v-slot:option="scope">
@@ -136,6 +145,14 @@
                                             </q-chip>
                                         </q-item-section>
                                         -->
+                                    </q-item>
+                                </template>
+
+                                <template v-slot:no-option>
+                                    <q-item>
+                                        <q-item-section class="text-grey">
+                                        Aucun résultat
+                                        </q-item-section>
                                     </q-item>
                                 </template>
 
@@ -224,6 +241,7 @@ export default {
     data() {
         return {
             store,
+            loading: false,
             myitem: [],
             filter: { search: "" },
             dialog: { deletion: false },
@@ -234,6 +252,18 @@ export default {
             valid: null,
             documentModel: "Document",
         }
+    },
+    watch: {
+        modelValue: {
+            handler(newValue, oldValue) {
+                store.document.new = JSON.stringify(this.modelValue)
+
+                if (this.changewatch) {
+                    store.updateWarning(store.document)
+                }
+            },
+            deep: true
+        },
     },
     computed: {
         document: {
@@ -265,9 +295,17 @@ export default {
         },
         async getItemOptions(searchstring = "") {
 
+            this.loading = true;
+            if (searchstring.length < 3) {
+                this.loading = false;
+                this.itemOptions = [];
+                return;
+            }
+
             const options = (await store.getItems({ search: searchstring.toLowerCase() }, 1, 5, "number", "false")).results
             options.map(x => x.disable = this.document.items.some(item => item.uuid === x.uuid))
             this.itemOptions = options
+            this.loading = false;
 
         },
         filterFn(val, update, abort) {
@@ -313,7 +351,21 @@ export default {
         updateDocumentType() {
             this.showFilepicker()
             this.document.external_url = null
+        },
+        checkItemList() {
+            if (this.document.items && this.document.items.length < 1) {
+                return "Champ obligatoire"
+            }
+        },
+        openExternalUrl(e) {
+            e.preventDefault()
+            if (this.document.external_url) {
+                window.open(this.document.external_url, '_blank')
+            }
         }
+    },
+    async mounted() {
+        store.document.old = JSON.stringify(this.modelValue)
     }
 }
 </script>
