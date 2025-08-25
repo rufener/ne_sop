@@ -802,7 +802,7 @@ class ItemViewSet(viewsets.ViewSet):
             ws.cell(row_id, 18).value = op.lead.name or None
             ws.cell(row_id, 19).value = sep.join([sup.name for sup in op.support.all()])
             ws.cell(row_id, 20).value = sep.join([(f"{' '.join(filter(None, [datetime.date.strftime(tmp.date, '%d.%m.%Y'), datetime.time.strftime(tmp.time, '%H:%M') if tmp.time else None]))} - {tmp.type.name}") for tmp in op.events.all()])
-            ws.cell(row_id, 21).value = sep.join([tmp.filename for tmp in op.documents.all()])
+            ws.cell(row_id, 21).value = sep.join([f"{tmp.title} ({tmp.filename or tmp.external_url})" for tmp in op.documents.all()])
 
             for i in range(1, 22):
                 ws.cell(row_id, i).alignment = Alignment(wrap_text=True)
