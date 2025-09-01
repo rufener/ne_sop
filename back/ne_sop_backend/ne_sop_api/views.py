@@ -162,22 +162,14 @@ class ServiceViewSet(viewsets.ViewSet):
     """
     Services viewset
     """
+
     serializer_class = EntityListSerializer
     permission_classes = [IsManagerOrReadOnlyPermission]
 
     def get_queryset(self):
         user = self.request.user
 
-        return (
-            Entity.objects
-            .filter(type__service=True)
-            .annotate(
-                has_access=Exists(
-                    user.entities.filter(pk=OuterRef('pk'))
-                )
-            )
-            .order_by('-has_access', 'abbreviation')
-        )
+        return Entity.objects.filter(type__service=True).annotate(has_access=Exists(user.entities.filter(pk=OuterRef("pk")))).order_by("-has_access", "abbreviation")
 
     @extend_schema(
         tags=["Entities"],
@@ -200,7 +192,7 @@ class ServiceViewSet(viewsets.ViewSet):
         queryset = paginator.page(page)
         nrows = paginator.count
         npages = paginator.num_pages
-        serializer = EntityListSerializer(queryset, many=True, context={'request': request})
+        serializer = EntityListSerializer(queryset, many=True, context={"request": request})
 
         return Response(
             {
@@ -235,7 +227,7 @@ class EntityViewSet(viewsets.ViewSet):
         # return Entity.objects.filter(users__in=user.entities.all()).distinct()
         # return Item.objects.all()
 
-    '''
+    """
     def get_queryset(self):
         user = self.request.user
         # if user.groups.filter(name="Manager").exists():
@@ -251,7 +243,7 @@ class EntityViewSet(viewsets.ViewSet):
         search_filter = filters.SearchFilter()
         queryset = search_filter.filter_queryset(request, self.get_queryset(), self)
 
-    '''
+    """
 
     @extend_schema(
         tags=["Entities"],
@@ -856,8 +848,8 @@ class EventViewSet(viewsets.ViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.groups.filter(name="Manager").exists():
-            return Event.objects.all()
+        # if user.groups.filter(name="Manager").exists():
+        #     return Event.objects.all()
 
         return Event.objects.filter(Q(item__lead__in=user.entities.all()) | Q(item__support__in=user.entities.all()))
 
@@ -1020,8 +1012,8 @@ class DocumentViewSet(viewsets.ViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.groups.filter(name="Manager").exists():
-            return Document.objects.all()
+        # if user.groups.filter(name="Manager").exists():
+        #     return Document.objects.all()
 
         authored_and_unlinked = Q(author=user, items__isnull=True)
         linked_to_user_items = Q(items__lead__in=user.entities.all()) | Q(items__support__in=user.entities.all())
