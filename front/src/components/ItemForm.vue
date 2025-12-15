@@ -234,9 +234,9 @@
 
                         <!-- AUTOMATIC NOTIFICATIONS CHECKBOX FIELD -->
                         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-                            <q-item tag="label" v-ripple :disable="!edit || !store.user.is_manager">
+                            <q-item tag="label" v-ripple :disable="!edit">
                                 <q-item-section avatar>
-                                    <q-checkbox v-model="item.autonotify" val="true" color="blue" :disable="!edit || !store.user.is_manager" />
+                                    <q-checkbox v-model="item.autonotify" val="true" color="blue" :disable="!edit" />
                                 </q-item-section>
                                 <q-item-section>
                                     <q-item-label>Notification automatique</q-item-label>
@@ -359,7 +359,7 @@ export default {
         // this.serviceOptions = (await store.getEntities({ search: "", type: [], service: "true" }, 1, 100, "name", "false")).results
         this.serviceOptions = (await store.getServices({ search: "" }, 1, 100, "has_access", "false")).results
         this.authorOptions = (await store.getEntities({ search: "", type: [], service: "false" }, 1, 200, "name", "false")).results
-        
+
         this.itemStatus = await store.getItemStatus()
         this.itemTypes = await store.getItemTypes()
 
